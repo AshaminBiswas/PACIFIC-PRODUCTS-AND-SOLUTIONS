@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "./Button";
@@ -10,6 +10,7 @@ export function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [activeMobileDropdown, setActiveMobileDropdown] = useState<string | null>(null);
   const location = useLocation();
+  const navigate = useNavigate(); // Added useNavigate hook
 
   useEffect(() => {
     const handleScroll = () => {
@@ -157,7 +158,8 @@ export function Navbar() {
 
           {/* CTA Button – desktop */}
           <div className="hidden lg:block flex-shrink-0">
-            <Button onClick={() => (window.location.href = "/contact")}>
+            {/* Updated to use navigate */}
+            <Button onClick={() => navigate("/contact")}>
               Get Quote
             </Button>
           </div>
@@ -288,7 +290,7 @@ export function Navbar() {
                   <Button
                     className="w-full"
                     onClick={() => {
-                      window.location.href = "/contact";
+                      navigate("/contact"); // Updated to use navigate
                       setIsMobileMenuOpen(false);
                     }}
                   >
