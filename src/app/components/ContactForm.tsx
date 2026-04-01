@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
+import emailjs from "@emailjs/browser";
 import { Button } from "./Button";
+
+// ─── EmailJS Configuration ────────────────────────────────────────────────────
+// Replace these with your actual EmailJS credentials from https://emailjs.com
+const EMAILJS_SERVICE_ID = "service_jv7krzo";   // e.g. "service_abc123"
+const EMAILJS_TEMPLATE_ID = "template_fg2sxhb"; // e.g. "template_xyz789"
+const EMAILJS_PUBLIC_KEY = "tBXdx5KB_3Nr2C-v-";   // e.g. "abcDEF123..."
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface ContactFormProps {
   onClose?: () => void;
@@ -20,31 +28,53 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // EmailJS template parameters — these must match the variable names
+    // used in your EmailJS template (e.g. {{from_name}}, {{from_email}}, etc.)
+    const templateParams = {
+      from_name: formData.name,
+      from_email: formData.email,
+      phone: formData.phone,
+      company: formData.company || "N/A",
+      requirement: formData.requirement || "Not specified",
+      message: formData.message || "No additional details provided.",
+    };
 
-    console.log("Form submitted:", formData);
-    setSubmitted(true);
-    setIsSubmitting(false);
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
 
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        requirement: "",
-        message: "",
-      });
-      if (onClose) onClose();
-    }, 3000);
+      setSubmitted(true);
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          company: "",
+          requirement: "",
+          message: "",
+        });
+        if (onClose) onClose();
+      }, 3000);
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      setError("Something went wrong. Please try again or contact us directly.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -169,6 +199,17 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
           placeholder="Tell us about your project requirements..."
         />
       </div>
+
+      {/* Error message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 border border-red-300 rounded-xl p-4 text-red-700 text-sm"
+        >
+          {error}
+        </motion.div>
+      )}
 
       {submitted ? (
         <motion.div
