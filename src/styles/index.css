@@ -1,0 +1,34 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+/* Additional global styles */
+* {
+  scroll-behavior: smooth;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7FB706;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6fa005;
+}
