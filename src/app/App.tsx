@@ -4,4 +4,3 @@ import { Analytics } from "@vercel/analytics/react"
 export default function App() {
   return <RouterProvider router={router} />;
 }
-npm 
