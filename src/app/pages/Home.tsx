@@ -13,6 +13,7 @@ import {
   Plane,
   Home,
 } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/Button";
 import { ServiceCard } from "../components/ServiceCard";
 import { ProductCard } from "../components/ProductCard";
@@ -54,6 +55,7 @@ const stats = [
 // ── Hero Section (extracted as its own component) ─────────────
 
 function HeroSection() {
+  const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
   const [quoteHovered, setQuoteHovered] = useState(false);
   const [productHovered, setProductHovered] = useState(false);
@@ -172,7 +174,7 @@ function HeroSection() {
             <Button
               size="lg"
               className="w-full sm:w-auto relative overflow-hidden px-8 py-4 text-base font-semibold shadow-lg shadow-[#7FB706]/25 transition-shadow hover:shadow-xl hover:shadow-[#7FB706]/35"
-              onClick={() => (window.location.href = "/contact")}
+              onClick={() => navigate("/contact")}
             >
               <span className="relative z-10 flex items-center gap-2">
                 Get Quote
@@ -195,7 +197,7 @@ function HeroSection() {
               size="lg"
               variant="outline"
               className="w-full sm:w-auto px-8 py-4 text-base font-semibold backdrop-blur-sm border-[#7FB706]/40 hover:bg-[#7FB706]/5 hover:border-[#7FB706]/30 hover:text-gray-900 transition-all"
-              onClick={() => (window.location.href = "/products")}
+              onClick={() => navigate("/products")}
             >
               <span className="flex items-center gap-2">
                 View Products
@@ -265,6 +267,8 @@ function HeroSection() {
 // ── Page ──────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen">
 
@@ -306,7 +310,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mt-8 sm:mt-12"
           >
-            <Button size="lg" variant="outline" onClick={() => (window.location.href = "/products")}>
+            <Button size="lg" variant="outline" onClick={() => navigate("/products")}>
               View All Products
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
@@ -378,7 +382,7 @@ export default function HomePage() {
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -8 }}
                 className="group cursor-pointer"
-                onClick={() => (window.location.href = industry.path)}
+                onClick={() => navigate(industry.path)}
               >
                 <div className="relative h-48 sm:h-56 lg:h-64 rounded-2xl overflow-hidden mb-3 sm:mb-4">
                   <ImageWithFallback
@@ -492,7 +496,7 @@ export default function HomePage() {
                 ))}
               </div>
               <div className="mt-6 sm:mt-8">
-                <Button size="lg" onClick={() => (window.location.href = "/about")}>
+                <Button size="lg" onClick={() => navigate("/about")}>
                   Learn More About Us
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
@@ -549,7 +553,7 @@ export default function HomePage() {
                 size="lg"
                 variant="secondary"
                 className="w-full sm:w-auto"
-                onClick={() => (window.location.href = "/contact")}
+                onClick={() => navigate("/contact")}
               >
                 Get Free Quote
                 <ArrowRight className="w-5 h-5 ml-2" />
