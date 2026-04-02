@@ -1,10 +1,27 @@
 import { motion } from "motion/react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { CheckCircle2, Shield, Zap, Award } from "lucide-react";
 import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
-const productData: Record<string, any> = {
+// 1. Added TypeScript Interfaces for better type safety
+interface ProductSpecification {
+  label: string;
+  value: string;
+}
+
+interface Product {
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  features: string[];
+  specifications: ProductSpecification[];
+  applications: string[];
+}
+
+// 2. Applied the Product type to the data object
+const productData: Record<string, Product> = {
   "restroom-cubicles": {
     title: "Restroom Cubicles",
     subtitle: "Premium Commercial Restroom Solutions",
@@ -156,6 +173,10 @@ const productData: Record<string, any> = {
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  
+  // 3. Initialize the navigate hook
+  const navigate = useNavigate(); 
+  
   const product = slug ? productData[slug] : null;
 
   if (!product) {
@@ -163,7 +184,8 @@ export default function ProductDetailPage() {
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-[#030213] mb-4">Product Not Found</h1>
-          <Button onClick={() => window.location.href = "/products"}>View All Products</Button>
+          {/* 4. Swapped window.location for navigate() */}
+          <Button onClick={() => navigate("/products")}>View All Products</Button>
         </div>
       </div>
     );
@@ -187,7 +209,8 @@ export default function ProductDetailPage() {
                 {product.description}
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button size="lg" onClick={() => window.location.href = "/contact"}>
+                {/* 5. Swapped window.location for navigate() */}
+                <Button size="lg" onClick={() => navigate("/contact")}>
                   Request Quote
                 </Button>
                 <Button size="lg" variant="outline">
@@ -254,7 +277,8 @@ export default function ProductDetailPage() {
             >
               <h2 className="text-4xl font-bold text-[#030213] mb-8">Technical Specifications</h2>
               <div className="bg-white rounded-2xl p-8 shadow-lg">
-                {product.specifications.map((spec: any, index: number) => (
+                {/* 6. Applied ProductSpecification type */}
+                {product.specifications.map((spec: ProductSpecification, index: number) => (
                   <div
                     key={index}
                     className="flex justify-between items-center py-4 border-b border-gray-200 last:border-0"
@@ -350,7 +374,8 @@ export default function ProductDetailPage() {
             <p className="text-xl mb-8 text-gray-300 max-w-2xl mx-auto">
               Contact our team for detailed specifications, pricing, and project consultation
             </p>
-            <Button size="lg" variant="secondary" onClick={() => window.location.href = "/contact"}>
+            {/* 7. Swapped window.location for navigate() */}
+            <Button size="lg" variant="secondary" onClick={() => navigate("/contact")}>
               Request Detailed Quote
             </Button>
           </motion.div>
