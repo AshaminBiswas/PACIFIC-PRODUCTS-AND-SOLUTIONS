@@ -5,6 +5,8 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "./Button";
 import { ThemeToggle } from "./ThemeToggle";
 import { useProducts, useSolutions } from "../../lib/hooks";
+// @ts-ignore
+import logo from "../../image/logo/pacific-product-and-solution-logo.png";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -102,16 +104,13 @@ export function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="text-xl sm:text-2xl font-bold text-[#030213] dark:text-white"
-            >
-              <span className="text-[#7FB706]">PACIFIC</span>
-              <br />
-              <span className="text-[10px] sm:text-xs font-normal tracking-wider">
-                PRODUCTS & SOLUTIONS
-              </span>
+          <Link to="/" className="flex items-center flex-shrink-0">
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <img 
+                src={logo} 
+                alt="Pacific Products & Solutions" 
+                className="h-12 sm:h-16 w-auto object-contain rounded-2xl"
+              />
             </motion.div>
           </Link>
 

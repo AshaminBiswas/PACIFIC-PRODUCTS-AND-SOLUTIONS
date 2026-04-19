@@ -1,6 +1,8 @@
 import { Link } from "react-router";
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
 import { useProducts, useSolutions } from "../../lib/hooks";
+// @ts-ignore
+import logo from "../../image/logo/pacific-product-and-solution-logo.png";
 
 export function Footer() {
   const { data: products } = useProducts();
@@ -48,10 +50,13 @@ export function Footer() {
           {/* Company Info */}
           <div className="lg:col-span-1">
             <div className="mb-6">
-              <h3 className="text-2xl font-bold mb-2">
-                <span className="text-[#7FB706]">PACIFIC</span>
-              </h3>
-              <p className="text-xs tracking-wider text-gray-400">PRODUCTS & SOLUTIONS</p>
+              <Link to="/">
+                <img 
+                  src={logo} 
+                  alt="Pacific Products & Solutions" 
+                  className="h-16 w-auto object-contain rounded-2xl bg-white/5 p-1"
+                />
+              </Link>
             </div>
             <p className="text-gray-400 mb-6">
               Leading provider of premium interior contracting solutions, specializing in restroom cubicles, cladding, and paneling.

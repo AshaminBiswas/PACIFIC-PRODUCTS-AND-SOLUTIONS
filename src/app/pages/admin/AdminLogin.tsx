@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
 import { useNavigate } from "react-router";
+// @ts-ignore
+import logo from "../../../image/logo/pacific-product-and-solution-logo.png";
 
 /**
  * Admin login gate — uses Supabase email/password auth.
@@ -60,12 +62,13 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-[#030213] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-white">
-            <span className="text-[#7FB706]">PACIFIC</span>
-          </h1>
-          <p className="text-xs tracking-wider text-gray-400 mt-1">
+        <div className="text-center mb-10 flex flex-col items-center">
+          <img 
+            src={logo} 
+            alt="Pacific Products & Solutions" 
+            className="h-20 w-auto object-contain mb-2 rounded-2xl bg-white/5 p-2"
+          />
+          <p className="text-xs tracking-wider text-gray-400">
             ADMIN PANEL
           </p>
         </div>

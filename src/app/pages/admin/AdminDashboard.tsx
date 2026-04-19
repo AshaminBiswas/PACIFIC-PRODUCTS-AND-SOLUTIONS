@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
+// @ts-ignore
+import logo from "../../../image/logo/pacific-product-and-solution-logo.png";
 import {
   LayoutDashboard,
   Package,
@@ -74,9 +76,11 @@ export default function AdminDashboard() {
         {/* Logo */}
         <div className="p-6 border-b border-white/5">
           <Link to="/" className="block">
-            <h1 className="text-xl font-bold text-white">
-              <span className="text-[#7FB706]">PACIFIC</span>
-            </h1>
+            <img 
+              src={logo} 
+              alt="Pacific Products & Solutions" 
+              className="h-16 w-auto object-contain mb-1 rounded-2xl bg-white/5 p-2"
+            />
             <p className="text-[10px] tracking-wider text-gray-500">
               ADMIN PANEL
             </p>
