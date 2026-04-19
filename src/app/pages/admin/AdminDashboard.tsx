@@ -79,7 +79,7 @@ export default function AdminDashboard() {
             <img 
               src={logo} 
               alt="Pacific Products & Solutions" 
-              className="h-16 w-auto object-contain mb-1 rounded-2xl bg-white/5 p-2"
+              className="h-16 w-auto object-contain mb-1 rounded-full bg-white/5 p-2"
             />
             <p className="text-[10px] tracking-wider text-gray-500">
               ADMIN PANEL

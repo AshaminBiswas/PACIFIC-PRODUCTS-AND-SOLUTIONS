@@ -109,7 +109,7 @@ export function Navbar() {
               <img 
                 src={logo} 
                 alt="Pacific Products & Solutions" 
-                className="h-12 sm:h-16 w-auto object-contain rounded-2xl"
+                className="h-12 sm:h-16 w-auto object-contain rounded-full"
               />
             </motion.div>
           </Link>

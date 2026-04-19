@@ -54,7 +54,7 @@ export function Footer() {
                 <img 
                   src={logo} 
                   alt="Pacific Products & Solutions" 
-                  className="h-16 w-auto object-contain rounded-2xl bg-white/5 p-1"
+                  className="h-16 w-auto object-contain rounded-full bg-white/5 p-1"
                 />
               </Link>
             </div>
