@@ -1,26 +1,33 @@
 import { Link } from "react-router";
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { useProducts, useSolutions } from "../../lib/hooks";
 
 export function Footer() {
-  const productLinks = [
-    { name: "Restroom Cubicles", path: "/products/restroom-cubicles" },
-    { name: "Toilet Cubicles", path: "/products/toilet-cubicles" },
-    { name: "Toilet Partitions", path: "/products/toilet-partitions" },
-    { name: "Cubicle Hardware", path: "/products/cubicle-hardware" },
-    { name: "Exterior Cladding", path: "/products/exterior-cladding" },
-    { name: "Interior Paneling", path: "/products/interior-paneling" },
-  ];
+  const { data: products } = useProducts();
+  const { data: solutions } = useSolutions();
 
-  const solutionLinks = [
-    { name: "Airports", path: "/solutions/airports" },
-    { name: "Malls", path: "/solutions/malls" },
-    { name: "Offices", path: "/solutions/offices" },
-    { name: "Residential", path: "/solutions/residential" },
-  ];
+  const productCategories = products && products.length > 0
+    ? Array.from(new Set(products.map(p => p.category).filter(Boolean))).slice(0, 6)
+    : ["Restroom Cubicles", "Shower Cubicles", "Exterior Cladding", "Locker System", "Custom Hardware", "Others"];
+
+  const productLinks = productCategories.map(c => ({
+    name: c,
+    path: `/products?category=${encodeURIComponent(c)}`
+  }));
+
+  const solutionTitles = solutions && solutions.length > 0
+    ? Array.from(new Set(solutions.map(s => s.title).filter(Boolean))).slice(0, 7)
+    : ["Corporates", "Malls", "Airports", "Metro and railways", "Hospitals", "Schools & Colleges", "Others"];
+
+  const solutionLinks = solutionTitles.map(t => ({
+    name: t,
+    path: `/solutions?industry=${encodeURIComponent(t)}`
+  }));
 
   const companyLinks = [
     { name: "About Us", path: "/about" },
     { name: "Our Process", path: "/process" },
+    { name: "Brochure", path: "/brochure" },
     { name: "Testimonials", path: "/testimonials" },
     { name: "Careers", path: "/careers" },
     { name: "Blog", path: "/blog" },
@@ -65,9 +72,9 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Products */}
+          {/* Services */}
           <div>
-            <h4 className="font-bold mb-4 text-[#B5F823]">Products</h4>
+            <h4 className="font-bold mb-4 text-[#B5F823]">Services</h4>
             <ul className="space-y-2">
               {productLinks.map((link) => (
                 <li key={link.name}>

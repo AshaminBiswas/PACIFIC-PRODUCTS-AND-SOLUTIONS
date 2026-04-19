@@ -21,8 +21,6 @@ import { TestimonialCarousel } from "../components/TestimonialCarousel";
 import { AnimatedCounter } from "../components/AnimatedCounter";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useRef, useState } from "react";
-import background from "../../image/hero-background.png"
-import background1 from "../../image/second_slider.jpg"
 // ─────────────────────────────────────────────────────────────
 // BACKGROUND IMAGE SLOT
 // When you're ready to add a background image, uncomment the
@@ -33,13 +31,13 @@ function BackgroundImage() {
   return (
     <div className="absolute inset-0 z-0">
       <ImageWithFallback
-        src={background1}
+        src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"
         alt=""
         aria-hidden="true"
         className="w-full h-full object-cover object-center"
       />
       {/* Overlay — adjust opacity to control image visibility */}
-     <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
     </div>
   );
 }
@@ -48,8 +46,8 @@ function BackgroundImage() {
 const stats = [
   { value: 500, suffix: "+", label: "Projects Completed" },
   { value: 250, suffix: "+", label: "Happy Clients" },
-  { value: 15,  suffix: "+", label: "Years Experience" },
-  { value: 5,   suffix: "",  label: "Countries Served" },
+  { value: 15, suffix: "+", label: "Years Experience" },
+  { value: 5, suffix: "", label: "Countries Served" },
 ];
 
 // ── Hero Section (extracted as its own component) ─────────────
@@ -65,7 +63,7 @@ function HeroSection() {
     offset: ["start start", "end start"],
   });
 
-  const y       = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
@@ -200,7 +198,7 @@ function HeroSection() {
               onClick={() => navigate("/products")}
             >
               <span className="flex items-center gap-2">
-                View Products
+                View Services
                 <motion.span
                   animate={{ x: productHovered ? 4 : 0 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -247,7 +245,7 @@ function HeroSection() {
         transition={{ delay: 1.4, duration: 0.6 }}
         className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 z-10"
       >
-       
+
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
@@ -266,8 +264,15 @@ function HeroSection() {
 
 // ── Page ──────────────────────────────────────────────────────
 
+import { useProducts, useSolutions } from "../../lib/hooks";
+import * as Icons from "lucide-react";
+
 export default function HomePage() {
   const navigate = useNavigate();
+  const { data: allProducts, loading } = useProducts();
+  const featuredProducts = allProducts?.filter(p => p.is_featured).slice(0, 3) || [];
+
+  const { data: solutions, loading: loadingSolutions } = useSolutions();
 
   return (
     <div className="min-h-screen">
@@ -277,8 +282,8 @@ export default function HomePage() {
 
       {/* Featured Products */}
 
-      
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-gray-50 to-white">
+
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-[#030213] text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -286,23 +291,31 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-10 sm:mb-14 lg:mb-16"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] mb-3 sm:mb-4">
-              Featured Products
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[#7FB706]">
+              Featured Services
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto px-2">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto px-2">
               Explore our range of premium interior solutions
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {[
-              { title: "Compact Laminate Cubicles",    category: "Restroom Cubicles",  image: "https://images.unsplash.com/photo-1564540586988-aa4e53c3d799?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800", path: "/products/restroom-cubicles" },
-              { title: "Aluminum Composite Cladding",  category: "Exterior Cladding",  image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800", path: "/products/exterior-cladding" },
-              { title: "Decorative Wall Panels",        category: "Interior Paneling",  image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800", path: "/products/interior-paneling" },
-            ].map((product, index) => (
-              <ProductCard key={index} {...product} index={index} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center text-gray-500 py-10">Loading featured services...</div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              {featuredProducts.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  title={product.title}
+                  description={product.description || product.subtitle}
+                  image={product.image_url}
+                  path={`/products/${product.slug}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-10">No featured services yet. Add some in the Admin panel!</div>
+          )}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -311,7 +324,7 @@ export default function HomePage() {
             className="text-center mt-8 sm:mt-12"
           >
             <Button size="lg" variant="outline" onClick={() => navigate("/products")}>
-              View All Products
+              View All Services
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </motion.div>
@@ -337,14 +350,14 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {[
-              { icon: Factory,   title: "Restroom Cubicles",  description: "Premium quality toilet cubicles and partitions designed for durability and aesthetic appeal in commercial spaces." },
-              { icon: Shield,    title: "Exterior Cladding",  description: "Weather-resistant cladding solutions that protect and enhance building facades with modern architectural finishes." },
-              { icon: Lightbulb, title: "Interior Paneling",  description: "Sophisticated interior wall paneling systems that transform spaces with style, functionality, and acoustic benefits." },
-              { icon: Target,    title: "Custom Hardware",    description: "High-quality cubicle hardware and fittings engineered for smooth operation and long-lasting performance." },
-              { icon: Award,     title: "Quality Assurance",  description: "Rigorous quality control processes ensuring every installation meets international standards and specifications." },
-              { icon: Users,     title: "Project Consulting", description: "Expert consultation services to help plan and execute complex interior projects from concept to completion." },
+              { icon: Factory, title: "Restroom Cubicles", description: "Premium quality toilet cubicles and partitions designed for durability and aesthetic appeal in commercial spaces." },
+              { icon: Shield, title: "Exterior Cladding", description: "Weather-resistant cladding solutions that protect and enhance building facades with modern architectural finishes." },
+              { icon: Lightbulb, title: "Interior Paneling", description: "Sophisticated interior wall paneling systems that transform spaces with style, functionality, and acoustic benefits." },
+              { icon: Target, title: "Custom Hardware", description: "High-quality cubicle hardware and fittings engineered for smooth operation and long-lasting performance." },
+              { icon: Award, title: "Quality Assurance", description: "Rigorous quality control processes ensuring every installation meets international standards and specifications." },
+              { icon: Users, title: "Project Consulting", description: "Expert consultation services to help plan and execute complex interior projects from concept to completion." },
             ].map((service, index) => (
-              <ServiceCard key={index} {...service} index={index} />
+              <ServiceCard key={index} {...service} />
             ))}
           </div>
         </div>
@@ -359,7 +372,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-10 sm:mb-14 lg:mb-16"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[#7FB706]">
               Industries We Serve
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto px-2">
@@ -367,41 +380,45 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-            {[
-              { icon: Plane,       title: "Airports",    description: "High-traffic washroom solutions for international airports",  image: "https://images.unsplash.com/photo-1759497904878-82c9bb21b2f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", path: "/solutions/airports" },
-              { icon: ShoppingBag, title: "Malls",       description: "Stylish and durable installations for retail spaces",         image: "https://images.unsplash.com/photo-1542883339-f2680a3e3996?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", path: "/solutions/malls" },
-              { icon: Building2,   title: "Offices",     description: "Professional solutions for corporate environments",           image: "https://images.unsplash.com/photo-1686100510109-d520e59bf0ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", path: "/solutions/offices" },
-              { icon: Home,        title: "Residential", description: "Premium bathroom solutions for luxury homes",                 image: "https://images.unsplash.com/photo-1774578342098-66adff9c1fe1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", path: "/solutions/residential" },
-            ].map((industry, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -8 }}
-                className="group cursor-pointer"
-                onClick={() => navigate(industry.path)}
-              >
-                <div className="relative h-48 sm:h-56 lg:h-64 rounded-2xl overflow-hidden mb-3 sm:mb-4">
-                  <ImageWithFallback
-                    src={industry.image}
-                    alt={industry.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                  <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6">
-                    <industry.icon className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-[#B5F823] mb-1 sm:mb-2" />
-                  </div>
-                </div>
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-1 sm:mb-2">
-                  {industry.title}
-                </h3>
-                <p className="text-sm sm:text-base text-gray-400">{industry.description}</p>
-              </motion.div>
-            ))}
-          </div>
+          {loadingSolutions ? (
+            <div className="text-center text-gray-400 py-10">Loading industries...</div>
+          ) : solutions && solutions.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              {solutions.map((industry, index) => {
+                const Icon = (Icons as any)[industry.icon_name || "Building2"] || Icons.Building2;
+                return (
+                  <motion.div
+                    key={industry.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ y: -8 }}
+                    className="group cursor-pointer"
+                    onClick={() => navigate(`/solutions/${industry.slug}`)}
+                  >
+                    <div className="relative h-48 sm:h-56 lg:h-64 rounded-2xl overflow-hidden mb-3 sm:mb-4">
+                      <ImageWithFallback
+                        src={industry.image_url}
+                        alt={industry.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                      <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6">
+                        <Icon className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-[#B5F823] mb-1 sm:mb-2" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-1 sm:mb-2">
+                      {industry.title}
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-400">{industry.subtitle}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400 py-10">No industries added yet.</div>
+          )}
         </div>
       </section>
 
@@ -424,10 +441,10 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {[
-              { step: "01", title: "Consultation",   description: "We discuss your requirements, space constraints, and design preferences." },
+              { step: "01", title: "Consultation", description: "We discuss your requirements, space constraints, and design preferences." },
               { step: "02", title: "Design & Quote", description: "Our team creates custom designs and provides a detailed, transparent quote." },
-              { step: "03", title: "Manufacturing",  description: "Products are precision-manufactured in our ISO-certified facility." },
-              { step: "04", title: "Installation",   description: "Professional installation by our trained team with minimal disruption." },
+              { step: "03", title: "Manufacturing", description: "Products are precision-manufactured in our ISO-certified facility." },
+              { step: "04", title: "Installation", description: "Professional installation by our trained team with minimal disruption." },
             ].map((process, index) => (
               <motion.div
                 key={index}

@@ -8,11 +8,24 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
+import Solutions from "./pages/Solutions";
 import SolutionDetail from "./pages/SolutionDetail";
 import LocationDetail from "./pages/LocationDetail";
 import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
+import Blog from "./pages/Blog";
+import BlogDetail from "./pages/BlogDetail";
+import Brochure from "./pages/Brochure";
 import NotFound from "./pages/NotFound";
+
+// Admin Pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminBlogs from "./pages/admin/AdminBlogs";
+import AdminSolutions from "./pages/admin/AdminSolutions";
+import AdminGallery from "./pages/admin/AdminGallery";
 
 function Layout() {
   return (
@@ -35,17 +48,20 @@ export const router = createBrowserRouter([
       { path: "about", Component: About },
       { path: "products", Component: Products },
       { path: "products/:slug", Component: ProductDetail },
+      { path: "solutions", Component: Solutions },
       { path: "solutions/:industry", Component: SolutionDetail },
       { path: "locations/:location", Component: LocationDetail },
       { path: "gallery", Component: Gallery },
       { path: "contact", Component: Contact },
+      { path: "blog", Component: Blog },
+      { path: "blog/:slug", Component: BlogDetail },
+      { path: "brochure", Component: Brochure },
       
-      // Additional pages that would be created
-      { path: "process", Component: About }, // Using About as placeholder
-      { path: "testimonials", Component: Home }, // Using Home as placeholder
-      { path: "clients", Component: Home }, // Using Home as placeholder
-      { path: "careers", Component: Contact }, // Using Contact as placeholder
-      { path: "blog", Component: Gallery }, // Using Gallery as placeholder
+      // Additional pages
+      { path: "process", Component: About },
+      { path: "testimonials", Component: Home },
+      { path: "clients", Component: Home },
+      { path: "careers", Component: Contact },
       { path: "privacy", Component: () => (
         <div className="min-h-screen pt-20 py-24 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
@@ -99,4 +115,20 @@ export const router = createBrowserRouter([
       { path: "*", Component: NotFound },
     ],
   },
+  {
+    path: "/admin",
+    Component: AdminLogin,
+  },
+  {
+    path: "/admin/dashboard",
+    Component: AdminDashboard,
+    children: [
+      { index: true, Component: AdminOverview },
+      { path: "products", Component: AdminProducts },
+      { path: "blogs", Component: AdminBlogs },
+      { path: "solutions", Component: AdminSolutions },
+      { path: "gallery", Component: AdminGallery },
+    ],
+  },
 ]);
+

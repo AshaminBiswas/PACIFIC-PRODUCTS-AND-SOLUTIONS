@@ -4,172 +4,12 @@ import { CheckCircle2, Shield, Zap, Award } from "lucide-react";
 import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
-// 1. Added TypeScript Interfaces for better type safety
+import { useProduct } from "../../lib/hooks";
+
 interface ProductSpecification {
   label: string;
   value: string;
 }
-
-interface Product {
-  title: string;
-  subtitle: string;
-  description: string;
-  image: string;
-  features: string[];
-  specifications: ProductSpecification[];
-  applications: string[];
-}
-
-// 2. Applied the Product type to the data object
-const productData: Record<string, Product> = {
-  "restroom-cubicles": {
-    title: "Restroom Cubicles",
-    subtitle: "Premium Commercial Restroom Solutions",
-    description: "High-quality, durable restroom cubicle systems designed for heavy-traffic commercial environments. Our cubicles combine functionality with modern aesthetics.",
-    image: "https://images.unsplash.com/photo-1635493637999-ed6a733d2334?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjByZXN0cm9vbSUyMGN1YmljbGVzJTIwY29tbWVyY2lhbHxlbnwxfHx8fDE3NzQ3NzI3OTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Moisture-resistant materials",
-      "Easy to clean and maintain",
-      "Customizable colors and finishes",
-      "Heavy-duty hardware",
-      "Fire-resistant options available",
-      "Quick installation",
-    ],
-    specifications: [
-      { label: "Material", value: "HPL, Compact Laminate, PVC" },
-      { label: "Panel Thickness", value: "12mm - 18mm" },
-      { label: "Height", value: "1800mm - 2100mm" },
-      { label: "Warranty", value: "5 Years" },
-    ],
-    applications: ["Airports", "Malls", "Corporate Offices", "Hotels", "Educational Institutions"],
-  },
-  "toilet-cubicles": {
-    title: "Toilet Cubicles",
-    subtitle: "Modern Toilet Partition Systems",
-    description: "Contemporary toilet cubicle solutions that offer privacy, durability, and style. Perfect for both commercial and residential applications.",
-    image: "https://images.unsplash.com/photo-1635493637999-ed6a733d2334?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjByZXN0cm9vbSUyMGN1YmljbGVzJTIwY29tbWVyY2lhbHxlbnwxfHx8fDE3NzQ3NzI3OTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Sleek modern designs",
-      "Water-resistant construction",
-      "Anti-bacterial surface treatment",
-      "Multiple finish options",
-      "Durable hardware fittings",
-      "Easy maintenance",
-    ],
-    specifications: [
-      { label: "Material", value: "Compact Laminate, Aluminum" },
-      { label: "Panel Thickness", value: "13mm - 20mm" },
-      { label: "Standard Height", value: "1900mm" },
-      { label: "Warranty", value: "7 Years" },
-    ],
-    applications: ["Shopping Centers", "Restaurants", "Gyms", "Public Facilities", "Transportation Hubs"],
-  },
-  "toilet-partitions": {
-    title: "Toilet Partitions",
-    subtitle: "Versatile Washroom Partition Solutions",
-    description: "Flexible partition systems that maximize space efficiency while providing privacy and comfort in washroom facilities.",
-    image: "https://images.unsplash.com/photo-1635493637999-ed6a733d2334?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjByZXN0cm9vbSUyMGN1YmljbGVzJTIwY29tbWVyY2lhbHxlbnwxfHx8fDE3NzQ3NzI3OTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Space-efficient designs",
-      "Corrosion-resistant hardware",
-      "Impact-resistant panels",
-      "Easy installation",
-      "Multiple mounting options",
-      "Customizable dimensions",
-    ],
-    specifications: [
-      { label: "Material", value: "HPL, Phenolic, Stainless Steel" },
-      { label: "Panel Thickness", value: "12mm - 25mm" },
-      { label: "Door Width", value: "600mm - 900mm" },
-      { label: "Warranty", value: "5 Years" },
-    ],
-    applications: ["Sports Stadiums", "Convention Centers", "Schools", "Hospitals", "Government Buildings"],
-  },
-  "cubicle-hardware": {
-    title: "Cubicle Hardware",
-    subtitle: "Premium Fittings & Accessories",
-    description: "High-quality hardware components designed for smooth operation and long-lasting performance in commercial washroom environments.",
-    image: "https://images.unsplash.com/photo-1696454822226-3c57759522ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbmR1c3RyaWFsJTIwaW50ZXJpb3IlMjBjbGFkZGluZyUyMHBhbmVsc3xlbnwxfHx8fDE3NzQ3NzI3OTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Stainless steel construction",
-      "Corrosion-resistant finish",
-      "Smooth operation",
-      "Heavy-duty hinges",
-      "Indicator locks",
-      "Self-closing mechanisms",
-    ],
-    specifications: [
-      { label: "Material", value: "304/316 Stainless Steel" },
-      { label: "Finish", value: "Satin, Mirror, Black" },
-      { label: "Load Capacity", value: "Up to 50kg" },
-      { label: "Warranty", value: "3 Years" },
-    ],
-    applications: ["All Commercial Washrooms", "Public Restrooms", "Educational Facilities", "Healthcare Centers"],
-  },
-  "exterior-cladding": {
-    title: "Exterior Cladding",
-    subtitle: "Weather-Resistant Building Facades",
-    description: "Premium exterior cladding solutions that protect and enhance building facades with modern architectural finishes and superior weather resistance.",
-    image: "https://images.unsplash.com/photo-1696454822226-3c57759522ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbmR1c3RyaWFsJTIwaW50ZXJpb3IlMjBjbGFkZGluZyUyMHBhbmVsc3xlbnwxfHx8fDE3NzQ3NzI3OTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Weather-resistant materials",
-      "UV protection",
-      "Low maintenance",
-      "Energy efficient",
-      "Fire-rated options",
-      "Variety of textures and colors",
-    ],
-    specifications: [
-      { label: "Material", value: "Aluminum Composite, Fiber Cement" },
-      { label: "Panel Size", value: "1220mm x 2440mm" },
-      { label: "Thickness", value: "3mm - 6mm" },
-      { label: "Warranty", value: "10 Years" },
-    ],
-    applications: ["Commercial Buildings", "Residential Towers", "Industrial Facilities", "Institutional Buildings"],
-  },
-  "interior-paneling": {
-    title: "Interior Paneling",
-    subtitle: "Sophisticated Wall Paneling Systems",
-    description: "Premium interior wall paneling that transforms spaces with style, acoustic benefits, and functional design for modern interiors.",
-    image: "https://images.unsplash.com/photo-1686100510109-d520e59bf0ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3Jwb3JhdGUlMjBvZmZpY2UlMjBidWlsZGluZyUyMGludGVyaW9yfGVufDF8fHx8MTc3NDc3Mjc5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Acoustic properties",
-      "Easy installation",
-      "Wide range of finishes",
-      "Durable and scratch-resistant",
-      "Eco-friendly options",
-      "Fire-resistant variants",
-    ],
-    specifications: [
-      { label: "Material", value: "MDF, WPC, PVC, Wood Veneer" },
-      { label: "Panel Size", value: "Customizable" },
-      { label: "Thickness", value: "6mm - 18mm" },
-      { label: "Warranty", value: "5 Years" },
-    ],
-    applications: ["Corporate Offices", "Hotels", "Retail Spaces", "Restaurants", "Residential Interiors"],
-  },
-  "acrylic-solid-surface": {
-    title: "Acrylic Solid Surface",
-    subtitle: "Premium Surface Solutions",
-    description: "Seamless acrylic solid surface materials perfect for countertops, vanities, and decorative applications with endless design possibilities.",
-    image: "https://images.unsplash.com/photo-1774578342098-66adff9c1fe1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjByZXNpZGVudGlhbCUyMGJhdGhyb29tJTIwZGVzaWdufGVufDF8fHx8MTc3NDc3Mjc5OHww&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Seamless joints",
-      "Non-porous surface",
-      "Stain resistant",
-      "Easy to clean",
-      "Thermoformable",
-      "Repairable and renewable",
-    ],
-    specifications: [
-      { label: "Material", value: "Acrylic Polymer + Minerals" },
-      { label: "Sheet Size", value: "3050mm x 760mm" },
-      { label: "Thickness", value: "6mm, 12mm" },
-      { label: "Warranty", value: "10 Years" },
-    ],
-    applications: ["Kitchen Countertops", "Bathroom Vanities", "Reception Desks", "Wall Cladding", "Healthcare Facilities"],
-  },
-};
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -177,15 +17,23 @@ export default function ProductDetailPage() {
   // 3. Initialize the navigate hook
   const navigate = useNavigate(); 
   
-  const product = slug ? productData[slug] : null;
+  const { data: product, loading } = useProduct(slug);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <div className="text-center text-gray-500">Loading service...</div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-[#030213] mb-4">Product Not Found</h1>
+          <h1 className="text-4xl font-bold text-[#030213] mb-4">Service Not Found</h1>
           {/* 4. Swapped window.location for navigate() */}
-          <Button onClick={() => navigate("/products")}>View All Products</Button>
+          <Button onClick={() => navigate("/products")}>View All Services</Button>
         </div>
       </div>
     );
@@ -224,7 +72,7 @@ export default function ProductDetailPage() {
               className="relative"
             >
               <ImageWithFallback
-                src={product.image}
+                src={product.image_url}
                 alt={product.title}
                 className="rounded-2xl shadow-2xl"
               />
@@ -232,6 +80,31 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* Product Gallery */}
+      {product.additional_images && product.additional_images.length > 0 && (
+        <section className="py-12 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {product.additional_images.map((img: string, idx: number) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                >
+                  <ImageWithFallback
+                    src={img}
+                    alt={`${product.title} gallery ${idx + 1}`}
+                    className="w-full h-48 object-cover rounded-xl shadow-lg"
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Features */}
       <section className="py-24 bg-white">

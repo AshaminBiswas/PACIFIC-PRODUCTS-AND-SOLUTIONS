@@ -4,76 +4,20 @@ import { Plane, ShoppingBag, Building2, Home } from "lucide-react";
 import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
-const solutionsData: Record<string, any> = {
-  airports: {
-    title: "Airport Solutions",
-    icon: Plane,
-    subtitle: "High-Traffic Washroom Solutions for Aviation Facilities",
-    description: "Our specialized restroom solutions for airports are designed to handle high traffic volumes while maintaining premium aesthetics and durability. We understand the unique demands of aviation facilities.",
-    image: "https://images.unsplash.com/photo-1759497904878-82c9bb21b2f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhaXJwb3J0JTIwbW9kZXJuJTIwcmVzdHJvb20lMjBmYWNpbGl0aWVzfGVufDF8fHx8MTc3NDc3Mjc5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Heavy-duty construction for high traffic",
-      "Easy maintenance and cleaning",
-      "Vandal-resistant hardware",
-      "Antimicrobial surface treatment",
-      "Quick installation with minimal disruption",
-      "Compliance with aviation standards",
-    ],
-    clients: ["Mumbai International Airport", "Delhi Airport", "Dubai International Airport"],
-  },
-  malls: {
-    title: "Shopping Mall Solutions",
-    icon: ShoppingBag,
-    subtitle: "Stylish and Durable Installations for Retail Spaces",
-    description: "Transform your mall washrooms into premium experiences with our stylish and durable cubicle systems that complement your retail environment while handling constant use.",
-    image: "https://images.unsplash.com/photo-1542883339-f2680a3e3996?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaG9wcGluZyUyMG1hbGwlMjBpbnRlcmlvciUyMGRlc2lnbnxlbnwxfHx8fDE3NzQ3NzI3OTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Contemporary designs matching mall aesthetics",
-      "Wide range of colors and finishes",
-      "Durable materials for heavy footfall",
-      "Low maintenance requirements",
-      "Customizable to brand requirements",
-      "Quick installation during off-hours",
-    ],
-    clients: ["Phoenix Market City", "Select City Walk", "Dubai Mall"],
-  },
-  offices: {
-    title: "Corporate Office Solutions",
-    icon: Building2,
-    subtitle: "Professional Washroom Solutions for Corporate Environments",
-    description: "Elevate your corporate washrooms with our premium solutions that reflect professionalism and provide comfort to your employees and visitors.",
-    image: "https://images.unsplash.com/photo-1686100510109-d520e59bf0ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3Jwb3JhdGUlMjBvZmZpY2UlMjBidWlsZGluZyUyMGludGVyaW9yfGVufDF8fHx8MTc3NDc3Mjc5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Professional and elegant designs",
-      "Sound-dampening properties",
-      "Premium hardware and finishes",
-      "Easy to clean surfaces",
-      "Space-efficient layouts",
-      "Accessible design options",
-    ],
-    clients: ["Infosys Bangalore", "TCS Mumbai", "Wipro Hyderabad"],
-  },
-  residential: {
-    title: "Residential Solutions",
-    icon: Home,
-    subtitle: "Premium Bathroom Solutions for Luxury Homes",
-    description: "Bring hotel-like luxury to your home with our premium residential bathroom solutions featuring sophisticated designs and superior quality.",
-    image: "https://images.unsplash.com/photo-1774578342098-66adff9c1fe1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjByZXNpZGVudGlhbCUyMGJhdGhyb29tJTIwZGVzaWdufGVufDF8fHx8MTc3NDc3Mjc5OHww&ixlib=rb-4.1.0&q=80&w=1080",
-    features: [
-      "Customizable to personal preferences",
-      "Premium materials and finishes",
-      "Modern and elegant designs",
-      "Long-lasting durability",
-      "Easy maintenance",
-      "Expert installation services",
-    ],
-    clients: ["Luxury Villas Dubai", "Premium Apartments Mumbai", "High-Rise Towers Bangalore"],
-  },
-};
+import { useSolution } from "../../lib/hooks";
+import * as Icons from "lucide-react";
 
 export default function SolutionDetailPage() {
   const { industry } = useParams<{ industry: string }>();
-  const solution = industry ? solutionsData[industry] : null;
+  const { data: solution, loading } = useSolution(industry);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <div className="text-center text-gray-500">Loading solution...</div>
+      </div>
+    );
+  }
 
   if (!solution) {
     return (
@@ -86,7 +30,8 @@ export default function SolutionDetailPage() {
     );
   }
 
-  const Icon = solution.icon;
+  // Fallback to Building2 if the icon doesn't exist
+  const Icon = (Icons as any)[solution.icon_name || "Building2"] || Icons.Building2;
 
   return (
     <div className="min-h-screen pt-20">
@@ -109,7 +54,7 @@ export default function SolutionDetailPage() {
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}>
               <ImageWithFallback
-                src={solution.image}
+                src={solution.image_url}
                 alt={solution.title}
                 className="rounded-2xl shadow-2xl"
               />
@@ -117,6 +62,31 @@ export default function SolutionDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* Solution Gallery */}
+      {solution.additional_images && solution.additional_images.length > 0 && (
+        <section className="py-12 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {solution.additional_images.map((img: string, idx: number) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                >
+                  <ImageWithFallback
+                    src={img}
+                    alt={`${solution.title} gallery ${idx + 1}`}
+                    className="w-full h-48 object-cover rounded-xl shadow-lg"
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Features */}
       <section className="py-24 bg-white">
