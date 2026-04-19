@@ -192,6 +192,20 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      {/* Map Section */}
+      <section className="h-[400px] sm:h-[500px] w-full relative">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112130.34005085694!2d76.99403816684724!3d28.514782017772656!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d19d582e38859%3A0x2cf5fe8e5c64b1e!2sGurugram%2C%20Haryana!5e0!3m2!1sen!2sin!4v1713550212891!5m2!1sen!2sin"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen={true}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="filter dark:invert dark:hue-rotate-180 dark:contrast-85 opacity-90 transition-all duration-300"
+          title="Delhi NCR Office Location"
+        ></iframe>
+      </section>
     </div>
   );
 }
