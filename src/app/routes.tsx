@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { Outlet } from "react-router";
 
 // Pages
@@ -30,6 +31,7 @@ import AdminGallery from "./pages/admin/AdminGallery";
 function Layout() {
   return (
     <div className="min-h-screen flex flex-col relative">
+      <ScrollToTop />
       <Navbar />
       <main className="flex-1">
         <Outlet />
