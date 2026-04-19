@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Youtube, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
 import { useProducts, useSolutions } from "../../lib/hooks";
 // @ts-ignore
 import logo from "../../image/logo/pacific-product-and-solution-logo.png";
@@ -62,16 +62,16 @@ export function Footer() {
               Leading provider of premium interior contracting solutions, specializing in restroom cubicles, cladding, and paneling.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-[#7FB706] transition-colors">
+              <a href="https://www.facebook.com/profile.php?id=100063648025932" target="_blank" rel="noopener noreferrer" className="hover:text-[#7FB706] transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="hover:text-[#7FB706] transition-colors">
-                <Twitter className="w-5 h-5" />
+              <a href="https://youtube.com/@pacificcubicles" target="_blank" rel="noopener noreferrer" className="hover:text-[#7FB706] transition-colors">
+                <Youtube className="w-5 h-5" />
               </a>
-              <a href="#" className="hover:text-[#7FB706] transition-colors">
+              <a href="https://www.linkedin.com/company/pacific-products-and-solutions" target="_blank" rel="noopener noreferrer" className="hover:text-[#7FB706] transition-colors">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href="#" className="hover:text-[#7FB706] transition-colors">
+              <a href="https://www.instagram.com/pacificcubicles" target="_blank" rel="noopener noreferrer" className="hover:text-[#7FB706] transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>
@@ -133,12 +133,16 @@ export function Footer() {
             <h4 className="font-bold mb-4 text-[#B5F823]">Contact</h4>
             <ul className="space-y-3 mb-6">
               <li className="flex items-start space-x-2">
-                <Phone className="w-4 h-4 mt-1 text-[#7FB706]" />
-                <span className="text-gray-400 text-sm">+91 98765 43210</span>
+                <Phone className="w-4 h-4 mt-1 text-[#7FB706] shrink-0" />
+                <a href="https://wa.me/919818592113" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#7FB706] text-sm transition-colors">
+                  +91 98185 92113
+                </a>
               </li>
               <li className="flex items-start space-x-2">
-                <Mail className="w-4 h-4 mt-1 text-[#7FB706]" />
-                <span className="text-gray-400 text-sm">info@pacificproducts.com</span>
+                <Mail className="w-4 h-4 mt-1 text-[#7FB706] shrink-0" />
+                <a href="mailto:info@pacificproducts.com" className="text-gray-400 hover:text-[#7FB706] text-sm transition-colors">
+                  info@pacificproducts.com
+                </a>
               </li>
               <li className="flex items-start space-x-2">
                 <MapPin className="w-4 h-4 mt-1 text-[#7FB706]" />
