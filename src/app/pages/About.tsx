@@ -5,19 +5,19 @@ import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
       {/* Hero */}
-      <section className="py-24 bg-gradient-to-br from-[#E9FDBF] to-white">
+      <section className="py-24 bg-gradient-to-br from-[#E9FDBF] to-white dark:from-[#0a0a1a] dark:to-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto text-center"
           >
-            <h1 className="text-5xl sm:text-6xl font-bold text-[#030213] mb-6">
+            <h1 className="text-5xl sm:text-6xl font-bold text-[#030213] dark:text-white mb-6">
               About <span className="text-[#7FB706]">Pacific Products</span>
             </h1>
-            <p className="text-xl text-gray-700 leading-relaxed">
+            <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
               Leading the interior contracting industry with engineering precision, premium quality, and unmatched reliability for over 15 years
             </p>
           </motion.div>
@@ -25,7 +25,7 @@ export default function AboutPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
@@ -45,7 +45,7 @@ export default function AboutPage() {
                 <div className="text-5xl font-bold text-[#7FB706] mb-2">
                   <AnimatedCounter end={stat.value} suffix={stat.suffix} />
                 </div>
-                <p className="text-gray-600">{stat.label}</p>
+                <p className="text-gray-600 dark:text-gray-400">{stat.label}</p>
               </motion.div>
             ))}
           </div>
@@ -53,7 +53,7 @@ export default function AboutPage() {
       </section>
 
       {/* Story */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-gray-50 dark:bg-[#0a0a1a] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -61,8 +61,8 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-bold text-[#030213] mb-6">Our Story</h2>
-              <div className="space-y-4 text-gray-700 leading-relaxed">
+              <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-6">Our Story</h2>
+              <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
                 <p>
                   Founded in 2011, Pacific Products & Solutions emerged from a vision to revolutionize the interior contracting industry in India. What started as a small workshop has grown into a leading manufacturer and supplier of premium restroom cubicles, cladding, and paneling solutions.
                 </p>
@@ -91,7 +91,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-white dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -99,8 +99,8 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-[#030213] mb-4">Our Core Values</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">Our Core Values</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               The principles that guide everything we do
             </p>
           </motion.div>
@@ -144,13 +144,13 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-gradient-to-br from-[#E9FDBF]/30 to-white rounded-2xl p-8 border border-[#7FB706]/20"
+                className="bg-gradient-to-br from-[#E9FDBF]/30 to-white dark:from-[#030213] dark:to-[#0a0a1a] rounded-2xl p-8 border border-[#7FB706]/20 dark:border-white/10"
               >
                 <div className="w-16 h-16 bg-gradient-to-br from-[#7FB706] to-[#B5F823] rounded-xl flex items-center justify-center mb-6">
                   <value.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-[#030213] mb-3">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
+                <h3 className="text-xl font-semibold text-[#030213] dark:text-white mb-3">{value.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400">{value.description}</p>
               </motion.div>
             ))}
           </div>
@@ -158,7 +158,7 @@ export default function AboutPage() {
       </section>
 
       {/* Team */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-[#0a0a1a] dark:to-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -166,8 +166,8 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-[#030213] mb-4">Our Team</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">Our Team</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Meet the professionals who make it all possible
             </p>
           </motion.div>
@@ -184,7 +184,7 @@ export default function AboutPage() {
               className="rounded-2xl shadow-2xl w-full"
             />
             <div className="mt-8 text-center">
-              <p className="text-gray-700 text-lg max-w-3xl mx-auto">
+              <p className="text-gray-700 dark:text-gray-300 text-lg max-w-3xl mx-auto">
                 Our team comprises experienced engineers, skilled craftsmen, project managers, and design consultants who bring decades of combined expertise to every project. Together, we're committed to delivering excellence.
               </p>
             </div>

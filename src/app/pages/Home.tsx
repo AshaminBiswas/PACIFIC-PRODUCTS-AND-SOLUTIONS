@@ -74,7 +74,7 @@ function HeroSection() {
     >
       {/* Animated blur background */}
       <motion.div style={{ y }} className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f0ffc8]/80 via-white/60 to-[#e6fdb0]/80" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f0ffc8]/80 via-white/60 to-[#e6fdb0]/80 dark:from-[#030213] dark:via-[#030213] dark:to-[#0a0a1a]" />
         <motion.div
           className="absolute -top-24 -left-24 w-[480px] h-[480px] rounded-full"
           style={{ background: "radial-gradient(circle, rgba(127,183,6,0.35) 0%, rgba(127,183,6,0) 70%)", filter: "blur(48px)" }}
@@ -129,7 +129,7 @@ function HeroSection() {
 
         {/* Headline */}
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5rem] font-bold text-[#030213] mb-5 sm:mb-6 leading-[1.08] tracking-tight"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5rem] font-bold text-[#030213] dark:text-white mb-5 sm:mb-6 leading-[1.08] tracking-tight"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.7 }}
@@ -148,7 +148,7 @@ function HeroSection() {
 
         {/* Sub-headline */}
         <motion.p
-          className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-900 mb-8 sm:mb-10 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed"
+          className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-900 dark:text-gray-300 mb-8 sm:mb-10 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.6 }}
@@ -194,7 +194,7 @@ function HeroSection() {
             <Button
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto px-8 py-4 text-base font-semibold backdrop-blur-sm border-[#7FB706]/40 hover:bg-[#7FB706]/5 hover:border-[#7FB706]/30 hover:text-gray-900 transition-all"
+              className="w-full sm:w-auto px-8 py-4 text-base font-semibold backdrop-blur-sm border-[#7FB706]/40 hover:bg-[#7FB706]/5 hover:border-[#7FB706]/30 hover:text-gray-900 dark:hover:text-white dark:text-gray-300 transition-all"
               onClick={() => navigate("/products")}
             >
               <span className="flex items-center gap-2">
@@ -283,7 +283,7 @@ export default function HomePage() {
       {/* Featured Products */}
 
 
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-[#030213] text-white">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -294,7 +294,7 @@ export default function HomePage() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[#7FB706]">
               Featured Services
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto px-2">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
               Explore our range of premium interior solutions
             </p>
           </motion.div>
@@ -332,7 +332,7 @@ export default function HomePage() {
       </section>
 
       {/* Services Overview */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gray-50 dark:bg-[#0a0a1a] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -340,10 +340,10 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-10 sm:mb-14 lg:mb-16"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] mb-3 sm:mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-3 sm:mb-4">
               Our Core Services
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto px-2">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
               Comprehensive interior contracting solutions engineered for excellence
             </p>
           </motion.div>
@@ -364,7 +364,7 @@ export default function HomePage() {
       </section>
 
       {/* Industries Served */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-[#030213] text-white">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -375,7 +375,7 @@ export default function HomePage() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[#7FB706]">
               Industries We Serve
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto px-2">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
               Trusted by leading organizations across multiple sectors
             </p>
           </motion.div>
@@ -423,7 +423,7 @@ export default function HomePage() {
       </section>
 
       {/* Process Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-[#E9FDBF]/30 to-white">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-[#E9FDBF]/30 to-white dark:from-[#0a0a1a] dark:to-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -431,10 +431,10 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-10 sm:mb-14 lg:mb-16"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] mb-3 sm:mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-3 sm:mb-4">
               Our Process
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto px-2">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
               A streamlined approach from consultation to installation
             </p>
           </motion.div>
@@ -454,14 +454,14 @@ export default function HomePage() {
                 transition={{ delay: index * 0.1 }}
                 className="relative pb-8 lg:pb-0"
               >
-                <div className="bg-gradient-to-br from-[#E9FDBF] to-white rounded-2xl p-6 sm:p-8 border border-[#7FB706]/20 h-full">
+                <div className="bg-gradient-to-br from-[#E9FDBF] to-white dark:from-[#030213] dark:to-[#0a0a1a] rounded-2xl p-6 sm:p-8 border border-[#7FB706]/20 dark:border-white/10 h-full">
                   <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#7FB706]/20 mb-3 sm:mb-4">
                     {process.step}
                   </div>
-                  <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-[#030213] mb-2 sm:mb-3">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-[#030213] dark:text-white mb-2 sm:mb-3">
                     {process.title}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-600">{process.description}</p>
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{process.description}</p>
                   <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-[#7FB706] rounded-full flex items-center justify-center">
                     <CheckCircle2 className="w-5 h-5 text-white" />
                   </div>
@@ -476,7 +476,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <motion.div
@@ -484,10 +484,10 @@ export default function HomePage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] mb-4 sm:mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-4 sm:mb-6">
                 Why Choose Pacific Products?
               </h2>
-              <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8">
+              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8">
                 With over 15 years of experience, we deliver unmatched quality and
                 innovation in every project we undertake.
               </p>
@@ -508,7 +508,7 @@ export default function HomePage() {
                     className="flex items-start gap-3"
                   >
                     <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#7FB706] flex-shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base text-gray-700">{point}</span>
+                    <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300">{point}</span>
                   </motion.div>
                 ))}
               </div>

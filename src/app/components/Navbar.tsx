@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "./Button";
+import { ThemeToggle } from "./ThemeToggle";
 import { useProducts, useSolutions } from "../../lib/hooks";
 
 export function Navbar() {
@@ -94,8 +95,8 @@ export function Navbar() {
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled || isMobileMenuOpen
-          ? "bg-white/95 backdrop-blur-lg shadow-lg"
-          : "bg-transparent"
+          ? "bg-white/95 dark:bg-[#030213]/95 backdrop-blur-lg shadow-lg border-b border-transparent dark:border-white/10"
+          : "bg-transparent border-b border-transparent"
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -104,7 +105,7 @@ export function Navbar() {
           <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="text-xl sm:text-2xl font-bold text-[#030213]"
+              className="text-xl sm:text-2xl font-bold text-[#030213] dark:text-white"
             >
               <span className="text-[#7FB706]">PACIFIC</span>
               <br />
@@ -129,7 +130,7 @@ export function Navbar() {
                     location.pathname === item.path ||
                     location.pathname.startsWith(item.path + "/")
                       ? "text-[#7FB706]"
-                      : "text-[#030213] hover:text-[#7FB706]"
+                      : "text-[#030213] dark:text-gray-300 hover:text-[#7FB706] dark:hover:text-[#7FB706]"
                   }`}
                 >
                   <span>{item.name}</span>
@@ -150,16 +151,16 @@ export function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                      className="absolute top-full left-0 mt-2 w-60 bg-white dark:bg-[#0a0a1a] rounded-xl shadow-xl border border-gray-100 dark:border-white/10 py-2 z-50"
                     >
                       {item.dropdown.map((subItem) => (
                         <Link
                           key={subItem.name}
                           to={subItem.path}
-                          className={`block px-4 py-2.5 text-sm transition-colors hover:bg-[#E9FDBF] ${
+                          className={`block px-4 py-2.5 text-sm transition-colors hover:bg-[#E9FDBF] dark:hover:bg-[#7FB706]/20 ${
                             location.pathname === subItem.path
-                              ? "text-[#7FB706] bg-[#E9FDBF]"
-                              : "text-[#030213]"
+                              ? "text-[#7FB706] bg-[#E9FDBF] dark:bg-[#7FB706]/20"
+                              : "text-[#030213] dark:text-gray-300"
                           }`}
                         >
                           {subItem.name}
@@ -172,9 +173,9 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* CTA Button – desktop */}
-          <div className="hidden lg:block flex-shrink-0">
-            {/* Updated to use navigate */}
+          {/* CTA Button & Theme Toggle – desktop */}
+          <div className="hidden lg:flex items-center space-x-4 flex-shrink-0">
+            <ThemeToggle />
             <Button onClick={() => navigate("/contact")}>
               Get Quote
             </Button>
@@ -195,7 +196,7 @@ export function Navbar() {
                   exit={{ rotate: 90, opacity: 0 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <X className="w-6 h-6 text-[#030213]" />
+                  <X className="w-6 h-6 text-[#030213] dark:text-white" />
                 </motion.div>
               ) : (
                 <motion.div
@@ -205,7 +206,7 @@ export function Navbar() {
                   exit={{ rotate: -90, opacity: 0 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <Menu className="w-6 h-6 text-[#030213]" />
+                  <Menu className="w-6 h-6 text-[#030213] dark:text-white" />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -221,7 +222,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="lg:hidden bg-white border-t border-gray-200 overflow-hidden"
+            className="lg:hidden bg-white dark:bg-[#030213] border-t border-gray-200 dark:border-white/10 overflow-hidden"
           >
             <div
               className="overflow-y-auto"
@@ -237,8 +238,8 @@ export function Navbar() {
                           onClick={() => toggleMobileDropdown(item.name)}
                           className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-colors ${
                             activeMobileDropdown === item.name
-                              ? "bg-[#E9FDBF] text-[#7FB706]"
-                              : "hover:bg-gray-50 text-[#030213]"
+                              ? "bg-[#E9FDBF] text-[#7FB706] dark:bg-[#7FB706]/20"
+                              : "hover:bg-gray-50 text-[#030213] dark:text-gray-300 dark:hover:bg-white/5"
                           }`}
                         >
                           <span>{item.name}</span>
@@ -273,8 +274,8 @@ export function Navbar() {
                                     }}
                                     className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${
                                       location.pathname === subItem.path
-                                        ? "text-[#7FB706] bg-[#E9FDBF] font-medium"
-                                        : "text-gray-600 hover:bg-[#E9FDBF] hover:text-[#7FB706]"
+                                        ? "text-[#7FB706] bg-[#E9FDBF] dark:bg-[#7FB706]/20 font-medium"
+                                        : "text-gray-600 dark:text-gray-400 hover:bg-[#E9FDBF] dark:hover:bg-[#7FB706]/10 hover:text-[#7FB706]"
                                     }`}
                                   >
                                     {subItem.name}
@@ -291,8 +292,8 @@ export function Navbar() {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${
                           location.pathname === item.path
-                            ? "bg-[#E9FDBF] text-[#7FB706]"
-                            : "hover:bg-gray-50 text-[#030213]"
+                            ? "bg-[#E9FDBF] text-[#7FB706] dark:bg-[#7FB706]/20"
+                            : "hover:bg-gray-50 text-[#030213] dark:text-gray-300 dark:hover:bg-white/5"
                         }`}
                       >
                         {item.name}
@@ -301,6 +302,11 @@ export function Navbar() {
                   </div>
                 ))}
 
+                {/* Theme Toggle inside mobile menu */}
+                <div className="pt-2 px-2 pb-2 flex justify-end">
+                  <ThemeToggle />
+                </div>
+                
                 {/* CTA inside mobile menu */}
                 <div className="pt-3 pb-2">
                   <Button

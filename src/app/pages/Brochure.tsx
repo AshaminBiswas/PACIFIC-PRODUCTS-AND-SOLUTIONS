@@ -16,8 +16,8 @@ import {
 
 export default function Brochure() {
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-[#E9FDBF] selection:text-[#7FB706] pt-20">
-      <div className="w-full max-w-5xl mx-auto shadow-2xl overflow-hidden bg-white">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a1a] text-gray-900 dark:text-white font-sans selection:bg-[#E9FDBF] selection:text-[#7FB706] pt-20 transition-colors">
+      <div className="w-full max-w-5xl mx-auto shadow-2xl overflow-hidden bg-white dark:bg-[#030213] transition-colors">
         
         {/* ═══ COVER ═══ */}
         <div className="grid grid-cols-1 md:grid-cols-2 min-h-[520px] bg-[#030213] relative overflow-hidden">
@@ -86,11 +86,11 @@ export default function Brochure() {
         {/* ═══ ABOUT ═══ */}
         <div className="p-8 md:p-14">
           <div className="text-[10px] tracking-[0.3em] uppercase text-[#7FB706] font-semibold mb-2">Who We Are</div>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#030213] leading-[1.15] mb-4">Built on Trust.<br />Delivered with Excellence.</h2>
+          <h2 className="font-serif text-3xl md:text-4xl text-[#030213] dark:text-white leading-[1.15] mb-4">Built on Trust.<br />Delivered with Excellence.</h2>
           <div className="w-12 h-0.5 bg-[#7FB706] mb-8"></div>
           
           <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-10 items-start">
-            <div className="space-y-4 text-[15px] text-gray-700 leading-relaxed">
+            <div className="space-y-4 text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed">
               <p>Pacific's Products & Solutions is a Delhi-based turnkey interiors contracting company that has grown into one of India's most trusted names in interior and exterior solutions. With a dedicated team under expert guidance, we have mastered the art of combining skill, speed, workmanship, and punctuality.</p>
               <p>Our product range — built on high-pressure compact grade laminates compliant with IS 2026 and fire retardant BS-476/97 standards — serves corporate offices, shopping malls, airports, hospitals, schools, and residential buildings across the length and breadth of India.</p>
               <p>From restroom cubicles for Delhi Metro to wall panelling for Parliament House and interior fit-outs for M3M, Infosys, and Zomato — Pacific's name stands behind every project we deliver.</p>
@@ -102,9 +102,9 @@ export default function Brochure() {
                 { num: "ISO", lbl: "HPL Provided per ISO-2046" },
                 { num: "5/Day", lbl: "Cubicles Installation Speed" }
               ].map((c, i) => (
-                <div key={i} className="bg-white border border-gray-200 border-l-[3px] border-l-[#7FB706] py-4 px-5 rounded-r-md">
-                  <div className="font-serif text-3xl font-bold text-[#030213] leading-none">{c.num}</div>
-                  <div className="text-[11px] tracking-[0.15em] uppercase text-gray-500 mt-1.5">{c.lbl}</div>
+                <div key={i} className="bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/5 border-l-[3px] border-l-[#7FB706] dark:border-l-[#7FB706] py-4 px-5 rounded-r-md">
+                  <div className="font-serif text-3xl font-bold text-[#030213] dark:text-white leading-none">{c.num}</div>
+                  <div className="text-[11px] tracking-[0.15em] uppercase text-gray-500 dark:text-gray-400 mt-1.5">{c.lbl}</div>
                 </div>
               ))}
             </div>
@@ -112,12 +112,12 @@ export default function Brochure() {
         </div>
 
         {/* ═══ PRODUCTS ═══ */}
-        <div className="bg-[#F9FAFB] p-8 md:p-14 pb-0">
+        <div className="bg-[#F9FAFB] dark:bg-[#0a0a1a] p-8 md:p-14 pb-0 transition-colors">
           <div className="text-[10px] tracking-[0.3em] uppercase text-[#7FB706] font-semibold mb-2">Our Products &amp; Services</div>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#030213] leading-[1.15] mb-4">Complete Interior &amp; Exterior Solutions</h2>
+          <h2 className="font-serif text-3xl md:text-4xl text-[#030213] dark:text-white leading-[1.15] mb-4">Complete Interior &amp; Exterior Solutions</h2>
           <div className="w-12 h-0.5 bg-[#7FB706] mb-8"></div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-0.5 bg-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-0.5 bg-gray-200 dark:bg-white/5">
           {[
             { n: "01", t: "Interior Wall Panelling", d: "Premium compact grade laminate panels for offices, hotels, hospitals & residences. Available in 30+ wood grain textures and solid colours.", tg: ["Fire-Rated", "Scratch Resistant"] },
             { n: "02", t: "Exterior Wall Cladding", d: "Ventilated facade systems with double-hardened acrylic PUR resins. Weather-resistant, UV-protected, compatible with Revit & 3M systems.", tg: ["UV Protected", "Weather Resistant"] },
@@ -126,14 +126,14 @@ export default function Brochure() {
             { n: "05", t: "Locker Systems", d: "High-pressure laminate lockers in 1–6 tier and Z-shape configurations. Ideal for gyms, schools, swimming pools & sports centres.", tg: ["1–6 Tier", "Anti-Bacterial"] },
             { n: "06", t: "Turnkey Contracting", d: "End-to-end interior project management — design, supply, and installation. Corporate, commercial and residential. Pan-India capability.", tg: ["Design to Delivery", "Pan-India"] }
           ].map((p, i) => (
-            <div key={i} className="bg-white p-6 md:p-8 relative overflow-hidden group">
+            <div key={i} className="bg-white dark:bg-[#030213] p-6 md:p-8 relative overflow-hidden group">
               <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#7FB706] scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
-              <div className="font-serif text-5xl font-bold text-gray-100 leading-none mb-[-10px] select-none">{p.n}</div>
-              <div className="w-9 h-9 bg-[#030213] rounded flex items-center justify-center mb-4 relative z-10">
+              <div className="font-serif text-5xl font-bold text-gray-100 dark:text-white/5 leading-none mb-[-10px] select-none">{p.n}</div>
+              <div className="w-9 h-9 bg-[#030213] dark:bg-white/10 rounded flex items-center justify-center mb-4 relative z-10">
                 <Layers className="w-4 h-4 text-[#B5F823]" />
               </div>
-              <div className="text-sm font-semibold text-[#030213] mb-2">{p.t}</div>
-              <div className="text-[12.5px] text-gray-600 line-clamp-3 mb-4 leading-relaxed">{p.d}</div>
+              <div className="text-sm font-semibold text-[#030213] dark:text-white mb-2">{p.t}</div>
+              <div className="text-[12.5px] text-gray-600 dark:text-gray-400 line-clamp-3 mb-4 leading-relaxed">{p.d}</div>
               <div className="flex flex-wrap gap-1.5 mt-auto">
                 {p.tg.map((tag, j) => (
                   <span key={j} className="text-[10px] tracking-wider uppercase bg-[#E9FDBF] text-[#7FB706] font-semibold px-2 py-1 rounded-sm">{tag}</span>
@@ -181,9 +181,9 @@ export default function Brochure() {
         </div>
 
         {/* ═══ FEATURES ═══ */}
-        <div className="bg-[#F9FAFB] p-8 md:p-14">
+        <div className="bg-[#F9FAFB] dark:bg-[#0a0a1a] p-8 md:p-14 transition-colors">
           <div className="text-[10px] tracking-[0.3em] uppercase text-[#7FB706] font-semibold mb-2">Product Advantages</div>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#030213] leading-[1.15] mb-4">Built for Performance.</h2>
+          <h2 className="font-serif text-3xl md:text-4xl text-[#030213] dark:text-white leading-[1.15] mb-4">Built for Performance.</h2>
           <div className="w-12 h-0.5 bg-[#7FB706] mb-8"></div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
@@ -191,30 +191,30 @@ export default function Brochure() {
               "Fire-Rated", "Anti-Bacterial", "Eco-Friendly", "Emergency Opening", 
               "Noise Absorption", "Rapid Installation", "Burn Resistant", "IS 2026 Compliant"
             ].map((f, i) => (
-              <div key={i} className="bg-white border border-gray-200 p-5 text-center">
+              <div key={i} className="bg-white dark:bg-[#030213] border border-gray-200 dark:border-white/5 p-5 text-center">
                 <div className="w-10 h-10 bg-[#030213] mx-auto mb-3 flex items-center justify-center [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]">
                   <ShieldCheck className="w-4 h-4 text-[#B5F823]" />
                 </div>
-                <div className="text-xs font-semibold text-[#030213] tracking-wide">{f}</div>
+                <div className="text-xs font-semibold text-[#030213] dark:text-gray-200 tracking-wide">{f}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* ═══ TECHNICAL DRAWINGS ═══ */}
-        <div className="p-8 md:p-14 bg-white">
+        <div className="p-8 md:p-14 bg-white dark:bg-[#030213] transition-colors">
           <div className="text-[10px] tracking-[0.3em] uppercase text-[#7FB706] font-semibold mb-2">Technical Drawings</div>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#030213] leading-[1.15] mb-4">Engineering Specifications</h2>
+          <h2 className="font-serif text-3xl md:text-4xl text-[#030213] dark:text-white leading-[1.15] mb-4">Engineering Specifications</h2>
           <div className="w-12 h-0.5 bg-[#7FB706] mb-8"></div>
-          <p className="text-[13.5px] text-gray-600 mb-10 max-w-2xl leading-relaxed">
+          <p className="text-[13.5px] text-gray-600 dark:text-gray-400 mb-10 max-w-2xl leading-relaxed">
             All Pacific restroom cubicle systems are precision-engineered to Indian Standard IS 2026 and fire retardant BS-476/97. Below are standard dimensions and configurations.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* DELIGHT DRAWING */}
-            <div className="border border-gray-200 p-6">
+            <div className="border border-gray-200 dark:border-white/10 p-6">
               <div className="text-[10px] tracking-[0.2em] uppercase text-[#7FB706] font-semibold mb-1">Model</div>
-              <div className="font-serif text-2xl text-[#030213] font-bold mb-6">DELIGHT</div>
+              <div className="font-serif text-2xl text-[#030213] dark:text-white font-bold mb-6">DELIGHT</div>
               <svg width="100%" viewBox="0 0 380 260" className="block mb-6">
                 <text x="70" y="14" fontSize="10" fill="#888" fontFamily="sans-serif" textAnchor="middle" letterSpacing="1">FRONT VIEW</text>
                 <line x1="10" y1="220" x2="140" y2="220" stroke="#333" strokeWidth="1.5"/>
@@ -250,16 +250,16 @@ export default function Brochure() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11.5px] border-collapse">
                   <thead>
-                    <tr className="bg-[#030213] text-white">
+                    <tr className="bg-[#030213] dark:bg-white/10 text-white">
                       <th className="py-1.5 px-2.5 font-medium">Dimension</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">General (mm)</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">PH (mm)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-gray-700 divide-y divide-gray-100">
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
+                  <tbody className="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-white/5">
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
                     <tr><td className="py-1.5 px-2.5">Depth</td><td className="text-center">1500</td><td className="text-center">1800</td></tr>
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Height</td><td className="text-center">2025</td><td className="text-center">2025</td></tr>
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Height</td><td className="text-center">2025</td><td className="text-center">2025</td></tr>
                     <tr><td className="py-1.5 px-2.5">Door Width</td><td className="text-center">600</td><td className="text-center">900</td></tr>
                   </tbody>
                 </table>
@@ -267,9 +267,9 @@ export default function Brochure() {
             </div>
 
             {/* SKYLIGHT DRAWING */}
-            <div className="border border-gray-200 p-6">
+            <div className="border border-gray-200 dark:border-white/10 p-6">
               <div className="text-[10px] tracking-[0.2em] uppercase text-[#7FB706] font-semibold mb-1">Model</div>
-              <div className="font-serif text-2xl text-[#030213] font-bold mb-6">SKYLIGHT</div>
+              <div className="font-serif text-2xl text-[#030213] dark:text-white font-bold mb-6">SKYLIGHT</div>
               <svg width="100%" viewBox="0 0 380 260" className="block mb-6">
                 <text x="70" y="14" fontSize="10" fill="#888" fontFamily="sans-serif" textAnchor="middle" letterSpacing="1">FRONT VIEW</text>
                 <line x1="10" y1="220" x2="140" y2="220" stroke="#333" strokeWidth="1.5"/>
@@ -305,19 +305,19 @@ export default function Brochure() {
                       <th className="py-1.5 px-2.5 font-medium text-center">PH (mm)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-gray-700 divide-y divide-gray-100">
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
+                  <tbody className="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-white/5">
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
                     <tr><td className="py-1.5 px-2.5">Depth</td><td className="text-center">1500</td><td className="text-center">1800</td></tr>
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1995</td><td className="text-center">1995</td></tr>
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1995</td><td className="text-center">1995</td></tr>
                     <tr><td className="py-1.5 px-2.5">Door Width</td><td className="text-center">600</td><td className="text-center">900</td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
             {/* PLATINA DRAWING */}
-            <div className="border border-gray-200 p-6">
+            <div className="border border-gray-200 dark:border-white/10 p-6">
               <div className="text-[10px] tracking-[0.2em] uppercase text-[#7FB706] font-semibold mb-1">Model</div>
-              <div className="font-serif text-2xl text-[#030213] font-bold mb-6">PLATINA</div>
+              <div className="font-serif text-2xl text-[#030213] dark:text-white font-bold mb-6">PLATINA</div>
               <svg width="100%" viewBox="0 0 380 260" className="block mb-6">
                 <text x="70" y="14" fontSize="10" fill="#888" fontFamily="sans-serif" textAnchor="middle" letterSpacing="1">FRONT VIEW</text>
                 <line x1="10" y1="220" x2="140" y2="220" stroke="#333" strokeWidth="1.5"/>
@@ -351,16 +351,16 @@ export default function Brochure() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11.5px] border-collapse">
                   <thead>
-                    <tr className="bg-[#030213] text-white">
+                    <tr className="bg-[#030213] dark:bg-white/10 text-white">
                       <th className="py-1.5 px-2.5 font-medium">Dimension</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">General (mm)</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">PH (mm)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-gray-700 divide-y divide-gray-100">
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
+                  <tbody className="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-white/5">
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
                     <tr><td className="py-1.5 px-2.5">Depth</td><td className="text-center">1500</td><td className="text-center">1800</td></tr>
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1875</td><td className="text-center">1875</td></tr>
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1875</td><td className="text-center">1875</td></tr>
                     <tr><td className="py-1.5 px-2.5">Door Width</td><td className="text-center">600</td><td className="text-center">900</td></tr>
                   </tbody>
                 </table>
@@ -368,9 +368,9 @@ export default function Brochure() {
             </div>
 
             {/* SAFFRON DRAWING */}
-            <div className="border border-gray-200 p-6">
+            <div className="border border-gray-200 dark:border-white/10 p-6">
               <div className="text-[10px] tracking-[0.2em] uppercase text-[#7FB706] font-semibold mb-1">Model</div>
-              <div className="font-serif text-2xl text-[#030213] font-bold mb-6">SAFFRON</div>
+              <div className="font-serif text-2xl text-[#030213] dark:text-white font-bold mb-6">SAFFRON</div>
               <svg width="100%" viewBox="0 0 380 260" className="block mb-6">
                 <text x="70" y="14" fontSize="10" fill="#888" fontFamily="sans-serif" textAnchor="middle" letterSpacing="1">FRONT VIEW</text>
                 <line x1="10" y1="220" x2="140" y2="220" stroke="#333" strokeWidth="1.5"/>
@@ -409,10 +409,10 @@ export default function Brochure() {
                       <th className="py-1.5 px-2.5 font-medium text-center">PH (mm)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-gray-700 divide-y divide-gray-100">
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
+                  <tbody className="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-white/5">
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
                     <tr><td className="py-1.5 px-2.5">Depth</td><td className="text-center">1500</td><td className="text-center">1800</td></tr>
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1995</td><td className="text-center">1995</td></tr>
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1995</td><td className="text-center">1995</td></tr>
                     <tr><td className="py-1.5 px-2.5">Door Width</td><td className="text-center">600</td><td className="text-center">900</td></tr>
                   </tbody>
                 </table>
@@ -420,9 +420,9 @@ export default function Brochure() {
             </div>
 
             {/* GUSTO DRAWING */}
-            <div className="border border-gray-200 p-6">
+            <div className="border border-gray-200 dark:border-white/10 p-6">
               <div className="text-[10px] tracking-[0.2em] uppercase text-[#7FB706] font-semibold mb-1">Model</div>
-              <div className="font-serif text-2xl text-[#030213] font-bold mb-6">GUSTO</div>
+              <div className="font-serif text-2xl text-[#030213] dark:text-white font-bold mb-6">GUSTO</div>
               <svg width="100%" viewBox="0 0 380 260" className="block mb-6">
                 <text x="70" y="14" fontSize="10" fill="#888" fontFamily="sans-serif" textAnchor="middle" letterSpacing="1">FRONT VIEW</text>
                 <line x1="10" y1="220" x2="140" y2="220" stroke="#333" strokeWidth="1.5"/>
@@ -458,16 +458,16 @@ export default function Brochure() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11.5px] border-collapse">
                   <thead>
-                    <tr className="bg-[#030213] text-white">
+                    <tr className="bg-[#030213] dark:bg-white/10 text-white">
                       <th className="py-1.5 px-2.5 font-medium">Dimension</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">General (mm)</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">PH (mm)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-gray-700 divide-y divide-gray-100">
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
+                  <tbody className="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-white/5">
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
                     <tr><td className="py-1.5 px-2.5">Depth</td><td className="text-center">1500</td><td className="text-center">1800</td></tr>
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1840</td><td className="text-center">1840</td></tr>
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1840</td><td className="text-center">1840</td></tr>
                     <tr><td className="py-1.5 px-2.5">Door Width</td><td className="text-center">600</td><td className="text-center">900</td></tr>
                   </tbody>
                 </table>
@@ -475,9 +475,9 @@ export default function Brochure() {
             </div>
 
             {/* SKY WINGS DRAWING */}
-            <div className="border border-gray-200 p-6">
+            <div className="border border-gray-200 dark:border-white/10 p-6">
               <div className="text-[10px] tracking-[0.2em] uppercase text-[#7FB706] font-semibold mb-1">Model</div>
-              <div className="font-serif text-2xl text-[#030213] font-bold mb-6">SKY WINGS</div>
+              <div className="font-serif text-2xl text-[#030213] dark:text-white font-bold mb-6">SKY WINGS</div>
               <svg width="100%" viewBox="0 0 380 260" className="block mb-6">
                 <text x="70" y="14" fontSize="10" fill="#888" fontFamily="sans-serif" textAnchor="middle" letterSpacing="1">FRONT VIEW</text>
                 <line x1="10" y1="20" x2="140" y2="20" stroke="#333" strokeWidth="2"/>
@@ -511,16 +511,16 @@ export default function Brochure() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11.5px] border-collapse">
                   <thead>
-                    <tr className="bg-[#030213] text-white">
+                    <tr className="bg-[#030213] dark:bg-white/10 text-white">
                       <th className="py-1.5 px-2.5 font-medium">Dimension</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">General (mm)</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">PH (mm)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-gray-700 divide-y divide-gray-100">
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
+                  <tbody className="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-white/5">
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
                     <tr><td className="py-1.5 px-2.5">Depth</td><td className="text-center">1500</td><td className="text-center">1800</td></tr>
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Height</td><td className="text-center">2400</td><td className="text-center">2400</td></tr>
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Height</td><td className="text-center">2400</td><td className="text-center">2400</td></tr>
                     <tr><td className="py-1.5 px-2.5">Door Width</td><td className="text-center">600</td><td className="text-center">900</td></tr>
                   </tbody>
                 </table>
@@ -528,9 +528,9 @@ export default function Brochure() {
             </div>
 
             {/* WALL HUNG DRAWING */}
-            <div className="border border-gray-200 p-6">
+            <div className="border border-gray-200 dark:border-white/10 p-6">
               <div className="text-[10px] tracking-[0.2em] uppercase text-[#7FB706] font-semibold mb-1">Model</div>
-              <div className="font-serif text-2xl text-[#030213] font-bold mb-6">WALL HUNG</div>
+              <div className="font-serif text-2xl text-[#030213] dark:text-white font-bold mb-6">WALL HUNG</div>
               <svg width="100%" viewBox="0 0 380 260" className="block mb-6">
                 <text x="70" y="14" fontSize="10" fill="#888" fontFamily="sans-serif" textAnchor="middle" letterSpacing="1">FRONT VIEW</text>
                 <line x1="10" y1="220" x2="140" y2="220" stroke="#333" strokeWidth="1.5"/>
@@ -560,16 +560,16 @@ export default function Brochure() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11.5px] border-collapse">
                   <thead>
-                    <tr className="bg-[#030213] text-white">
+                    <tr className="bg-[#030213] dark:bg-white/10 text-white">
                       <th className="py-1.5 px-2.5 font-medium">Dimension</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">General (mm)</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">PH (mm)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-gray-700 divide-y divide-gray-100">
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
+                  <tbody className="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-white/5">
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">900</td><td className="text-center">1500</td></tr>
                     <tr><td className="py-1.5 px-2.5">Depth</td><td className="text-center">1500</td><td className="text-center">1800</td></tr>
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Height</td><td className="text-center">2050</td><td className="text-center">2050</td></tr>
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Height</td><td className="text-center">2050</td><td className="text-center">2050</td></tr>
                     <tr><td className="py-1.5 px-2.5">Door Width</td><td className="text-center">600</td><td className="text-center">900</td></tr>
                   </tbody>
                 </table>
@@ -577,9 +577,9 @@ export default function Brochure() {
             </div>
 
             {/* SPLENDOR DRAWING */}
-            <div className="border border-gray-200 p-6">
+            <div className="border border-gray-200 dark:border-white/10 p-6">
               <div className="text-[10px] tracking-[0.2em] uppercase text-[#7FB706] font-semibold mb-1">Model</div>
-              <div className="font-serif text-2xl text-[#030213] font-bold mb-6">SPLENDOR</div>
+              <div className="font-serif text-2xl text-[#030213] dark:text-white font-bold mb-6">SPLENDOR</div>
               <svg width="100%" viewBox="0 0 380 260" className="block mb-6">
                 <text x="70" y="14" fontSize="10" fill="#888" fontFamily="sans-serif" textAnchor="middle" letterSpacing="1">FRONT VIEW</text>
                 <line x1="10" y1="220" x2="140" y2="220" stroke="#333" strokeWidth="1.5"/>
@@ -616,16 +616,16 @@ export default function Brochure() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11.5px] border-collapse">
                   <thead>
-                    <tr className="bg-[#030213] text-white">
+                    <tr className="bg-[#030213] dark:bg-white/10 text-white">
                       <th className="py-1.5 px-2.5 font-medium">Dimension</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">General (mm)</th>
                       <th className="py-1.5 px-2.5 font-medium text-center">PH (mm)</th>
                     </tr>
                   </thead>
-                  <tbody className="text-gray-700 divide-y divide-gray-100">
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">600-900</td><td className="text-center">1500</td></tr>
+                  <tbody className="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-white/5">
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Frontal Width</td><td className="text-center">600-900</td><td className="text-center">1500</td></tr>
                     <tr><td className="py-1.5 px-2.5">Depth</td><td className="text-center">1500</td><td className="text-center">1800</td></tr>
-                    <tr className="bg-gray-50"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1980</td><td className="text-center">1980</td></tr>
+                    <tr className="bg-gray-50 dark:bg-white/5"><td className="py-1.5 px-2.5">Height</td><td className="text-center">1980</td><td className="text-center">1980</td></tr>
                     <tr><td className="py-1.5 px-2.5">Door Width</td><td className="text-center">600</td><td className="text-center">900</td></tr>
                   </tbody>
                 </table>

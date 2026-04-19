@@ -32,19 +32,19 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
       {/* Hero */}
-      <section className="py-24 bg-gradient-to-br from-[#E9FDBF] to-white">
+      <section className="py-24 bg-gradient-to-br from-[#E9FDBF] to-white dark:from-[#0a0a1a] dark:to-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto text-center"
           >
-            <h1 className="text-5xl sm:text-6xl font-bold text-[#030213] mb-6">
+            <h1 className="text-5xl sm:text-6xl font-bold text-[#030213] dark:text-white mb-6">
               Get In <span className="text-[#7FB706]">Touch</span>
             </h1>
-            <p className="text-xl text-gray-700 leading-relaxed">
+            <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
               Ready to start your project? Contact our team for expert consultation and detailed quotations
             </p>
           </motion.div>
@@ -52,7 +52,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form & Info */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-white dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
@@ -72,42 +72,42 @@ export default function ContactPage() {
               className="space-y-8"
             >
               <div>
-                <h2 className="text-3xl font-bold text-[#030213] mb-6">Contact Information</h2>
-                <p className="text-gray-600 mb-8">
+                <h2 className="text-3xl font-bold text-[#030213] dark:text-white mb-6">Contact Information</h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-8">
                   Get in touch with us through any of the following channels. Our team is ready to assist you.
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-[#E9FDBF] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-[#E9FDBF] dark:bg-[#E9FDBF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Phone className="w-6 h-6 text-[#7FB706]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-[#030213] mb-1">Phone</h4>
-                    <p className="text-gray-600">+91 22 1234 5678</p>
-                    <p className="text-gray-600">+91 98765 43210 (Sales)</p>
+                    <h4 className="font-semibold text-[#030213] dark:text-white mb-1">Phone</h4>
+                    <p className="text-gray-600 dark:text-gray-400">+91 22 1234 5678</p>
+                    <p className="text-gray-600 dark:text-gray-400">+91 98765 43210 (Sales)</p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-[#E9FDBF] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-[#E9FDBF] dark:bg-[#E9FDBF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Mail className="w-6 h-6 text-[#7FB706]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-[#030213] mb-1">Email</h4>
-                    <p className="text-gray-600">info@pacificproducts.com</p>
-                    <p className="text-gray-600">sales@pacificproducts.com</p>
+                    <h4 className="font-semibold text-[#030213] dark:text-white mb-1">Email</h4>
+                    <p className="text-gray-600 dark:text-gray-400">info@pacificproducts.com</p>
+                    <p className="text-gray-600 dark:text-gray-400">sales@pacificproducts.com</p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-[#E9FDBF] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-[#E9FDBF] dark:bg-[#E9FDBF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-6 h-6 text-[#7FB706]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-[#030213] mb-1">Head Office</h4>
-                    <p className="text-gray-600">
+                    <h4 className="font-semibold text-[#030213] dark:text-white mb-1">Head Office</h4>
+                    <p className="text-gray-600 dark:text-gray-400">
                       Plot No. 123, MIDC Industrial Area<br />
                       Andheri East, Mumbai - 400093<br />
                       Maharashtra, India
@@ -116,14 +116,14 @@ export default function ContactPage() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-[#E9FDBF] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-[#E9FDBF] dark:bg-[#E9FDBF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Clock className="w-6 h-6 text-[#7FB706]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-[#030213] mb-1">Business Hours</h4>
-                    <p className="text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM</p>
-                    <p className="text-gray-600">Saturday: 9:00 AM - 2:00 PM</p>
-                    <p className="text-gray-600">Sunday: Closed</p>
+                    <h4 className="font-semibold text-[#030213] dark:text-white mb-1">Business Hours</h4>
+                    <p className="text-gray-600 dark:text-gray-400">Monday - Friday: 9:00 AM - 6:00 PM</p>
+                    <p className="text-gray-600 dark:text-gray-400">Saturday: 9:00 AM - 2:00 PM</p>
+                    <p className="text-gray-600 dark:text-gray-400">Sunday: Closed</p>
                   </div>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function ContactPage() {
       </section>
 
       {/* Locations */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-gray-50 dark:bg-[#0a0a1a] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -156,8 +156,8 @@ export default function ContactPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-[#030213] mb-4">Our Locations</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">Our Locations</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Find us across major cities in India and UAE
             </p>
           </motion.div>
@@ -170,10 +170,10 @@ export default function ContactPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-[#7FB706] hover:shadow-lg transition-all"
+                className="bg-white dark:bg-[#030213] rounded-2xl p-8 border border-gray-200 dark:border-white/10 hover:border-[#7FB706] hover:shadow-lg transition-all"
               >
-                <h3 className="text-2xl font-semibold text-[#030213] mb-4">{location.city}</h3>
-                <div className="space-y-3 text-gray-600">
+                <h3 className="text-2xl font-semibold text-[#030213] dark:text-white mb-4">{location.city}</h3>
+                <div className="space-y-3 text-gray-600 dark:text-gray-400">
                   <div className="flex items-start space-x-3">
                     <MapPin className="w-5 h-5 text-[#7FB706] flex-shrink-0 mt-1" />
                     <p>{location.address}</p>
