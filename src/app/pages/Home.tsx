@@ -423,26 +423,39 @@ export default function HomePage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -8 }}
-                    className="group cursor-pointer"
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                    className="group relative flex flex-col bg-white dark:bg-[#0a0a1a] rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer h-full"
                     onClick={() => navigate(`/solutions/${industry.slug}`)}
                   >
-                    <div className="relative h-48 sm:h-56 lg:h-64 rounded-2xl overflow-hidden mb-3 sm:mb-4">
+                    {/* Top Image */}
+                    <div className="relative h-48 sm:h-52 overflow-hidden bg-gray-100 dark:bg-gray-900 shrink-0">
                       <ImageWithFallback
                         src={industry.image_url}
                         alt={industry.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                      <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6">
-                        <Icon className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-[#B5F823] mb-1 sm:mb-2" />
+                      <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
+                    </div>
+
+                    {/* Overlapping Floating Icon */}
+                    <div className="absolute top-48 sm:top-52 right-6 -translate-y-1/2 z-10">
+                      <div className="w-14 h-14 rounded-full bg-[#7FB706] text-white flex items-center justify-center shadow-lg shadow-[#7FB706]/30 transform transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
+                        <Icon className="w-6 h-6" />
                       </div>
                     </div>
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-1 sm:mb-2">
-                      {industry.title}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-400">{industry.subtitle}</p>
+
+                    {/* Bottom Content Area */}
+                    <div className="flex flex-col flex-1 p-6 pt-10">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-[#7FB706] transition-colors duration-300 pr-8">
+                        {industry.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-6 leading-relaxed flex-1">
+                        {industry.subtitle}
+                      </p>
+                      <div className="mt-auto flex items-center text-sm font-semibold text-gray-400 group-hover:text-[#7FB706] transition-colors duration-300">
+                        Explore <ArrowRight className="w-4 h-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" />
+                      </div>
+                    </div>
                   </motion.div>
                 );
               })}
