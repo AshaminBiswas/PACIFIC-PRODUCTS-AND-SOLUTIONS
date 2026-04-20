@@ -435,6 +435,7 @@ export default function AdminProducts() {
                     className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]"
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-1 font-medium">Recommended: 800×600 px (4:3 ratio)</p>
                 {form.image_url && (
                   <img
                     src={form.image_url}
@@ -465,6 +466,7 @@ export default function AdminProducts() {
                     Upload Additional
                   </button>
                 </div>
+                <p className="text-xs text-gray-500 mt-1 font-medium">Recommended: 800×600 px (4:3 ratio)</p>
                 {form.additional_images.length > 0 && (
                   <div className="flex gap-2 mt-2 flex-wrap">
                     {form.additional_images.map((img, i) => (

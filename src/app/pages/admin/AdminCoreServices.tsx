@@ -193,6 +193,7 @@ export default function AdminCoreServices() {
             className="hidden"
             onChange={handleUpload}
           />
+          <p className="text-xs text-gray-500 font-medium ml-2 hidden sm:block">Recommended: 800×500 px (16:10)</p>
         </div>
       </div>
 
