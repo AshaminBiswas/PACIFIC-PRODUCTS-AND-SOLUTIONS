@@ -1,7 +1,7 @@
 /**
  * React hooks for fetching data from Supabase with demo-data fallback.
  */
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase, isSupabaseConfigured } from "./supabase";
 import type { Product, Blog, Solution, GalleryImage, HeroImage, CoreService } from "./database.types";
 import {
@@ -10,6 +10,27 @@ import {
   demoSolutions,
   demoGalleryImages,
 } from "./demo-data";
+
+// ── In-memory request cache ───────────────────────────────────
+// Stores already-fetched data so navigating back to a page is instant.
+// Cache is busted only when `refetch()` is explicitly called.
+const memCache = new Map<string, { data: unknown; timestamp: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+function getCached<T>(key: string): T[] | null {
+  const entry = memCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    memCache.delete(key);
+    return null;
+  }
+  return entry.data as T[];
+}
+
+function setCache<T>(key: string, data: T[]): void {
+  memCache.set(key, { data, timestamp: Date.now() });
+}
+
 
 // ── Generic helpers ──────────────────────────────────────────
 
@@ -29,11 +50,16 @@ interface UseSingleResult<T> {
 // ── Products ─────────────────────────────────────────────────
 
 export function useProducts(featuredOnly = false): UseDataResult<Product> {
-  const [data, setData] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = `products:${featuredOnly}`;
+  const [data, setData] = useState<Product[]>(() => getCached<Product>(cacheKey) ?? []);
+  const [loading, setLoading] = useState(() => !getCached<Product>(cacheKey));
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (bust = false) => {
+    if (!bust) {
+      const cached = getCached<Product>(cacheKey);
+      if (cached) { setData(cached); setLoading(false); return; }
+    }
     setLoading(true);
     setError(null);
 
@@ -41,6 +67,7 @@ export function useProducts(featuredOnly = false): UseDataResult<Product> {
       const filtered = featuredOnly
         ? demoProducts.filter((p) => p.is_featured)
         : demoProducts;
+      setCache(cacheKey, filtered);
       setData(filtered);
       setLoading(false);
       return;
@@ -59,11 +86,12 @@ export function useProducts(featuredOnly = false): UseDataResult<Product> {
 
       const { data: rows, error: err } = await query;
       if (err) throw err;
-      setData((rows as Product[]) || []);
+      const result = (rows as Product[]) || [];
+      setCache(cacheKey, result);
+      setData(result);
     } catch (e: any) {
       console.error("Failed to fetch products:", e);
       setError(e.message);
-      // Fallback to demo data on error
       const filtered = featuredOnly
         ? demoProducts.filter((p) => p.is_featured)
         : demoProducts;
@@ -71,13 +99,11 @@ export function useProducts(featuredOnly = false): UseDataResult<Product> {
     } finally {
       setLoading(false);
     }
-  }, [featuredOnly]);
+  }, [featuredOnly, cacheKey]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  return { data, loading, error, refetch: fetchData };
+  return { data, loading, error, refetch: () => fetchData(true) };
 }
 
 export function useProduct(slug: string | undefined): UseSingleResult<Product> {
@@ -105,7 +131,7 @@ export function useProduct(slug: string | undefined): UseSingleResult<Product> {
         const { data: row, error: err } = await supabase
           .from("products")
           .select("*")
-          .eq("slug", slug)
+          .eq("slug", slug!)
           .single();
         if (err) throw err;
         setData(row as Product);
@@ -127,15 +153,21 @@ export function useProduct(slug: string | undefined): UseSingleResult<Product> {
 // ── Solutions ────────────────────────────────────────────────
 
 export function useSolutions(): UseDataResult<Solution> {
-  const [data, setData] = useState<Solution[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = 'solutions';
+  const [data, setData] = useState<Solution[]>(() => getCached<Solution>(cacheKey) ?? []);
+  const [loading, setLoading] = useState(() => !getCached<Solution>(cacheKey));
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (bust = false) => {
+    if (!bust) {
+      const cached = getCached<Solution>(cacheKey);
+      if (cached) { setData(cached); setLoading(false); return; }
+    }
     setLoading(true);
     setError(null);
 
     if (!isSupabaseConfigured()) {
+      setCache(cacheKey, demoSolutions);
       setData(demoSolutions);
       setLoading(false);
       return;
@@ -148,7 +180,9 @@ export function useSolutions(): UseDataResult<Solution> {
         .eq("published", true)
         .order("sort_order", { ascending: true });
       if (err) throw err;
-      setData((rows as Solution[]) || []);
+      const result = (rows as Solution[]) || [];
+      setCache(cacheKey, result);
+      setData(result);
     } catch (e: any) {
       setError(e.message);
       setData(demoSolutions);
@@ -157,11 +191,9 @@ export function useSolutions(): UseDataResult<Solution> {
     }
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  return { data, loading, error, refetch: fetchData };
+  return { data, loading, error, refetch: () => fetchData(true) };
 }
 
 export function useSolution(slug: string | undefined): UseSingleResult<Solution> {
@@ -188,7 +220,7 @@ export function useSolution(slug: string | undefined): UseSingleResult<Solution>
         const { data: row, error: err } = await supabase
           .from("solutions")
           .select("*")
-          .eq("slug", slug)
+          .eq("slug", slug!)
           .single();
         if (err) throw err;
         setData(row as Solution);
@@ -209,15 +241,21 @@ export function useSolution(slug: string | undefined): UseSingleResult<Solution>
 // ── Blogs ────────────────────────────────────────────────────
 
 export function useBlogs(): UseDataResult<Blog> {
-  const [data, setData] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = 'blogs';
+  const [data, setData] = useState<Blog[]>(() => getCached<Blog>(cacheKey) ?? []);
+  const [loading, setLoading] = useState(() => !getCached<Blog>(cacheKey));
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (bust = false) => {
+    if (!bust) {
+      const cached = getCached<Blog>(cacheKey);
+      if (cached) { setData(cached); setLoading(false); return; }
+    }
     setLoading(true);
     setError(null);
 
     if (!isSupabaseConfigured()) {
+      setCache(cacheKey, demoBlogs);
       setData(demoBlogs);
       setLoading(false);
       return;
@@ -230,7 +268,9 @@ export function useBlogs(): UseDataResult<Blog> {
         .eq("published", true)
         .order("published_at", { ascending: false });
       if (err) throw err;
-      setData((rows as Blog[]) || []);
+      const result = (rows as Blog[]) || [];
+      setCache(cacheKey, result);
+      setData(result);
     } catch (e: any) {
       setError(e.message);
       setData(demoBlogs);
@@ -239,11 +279,9 @@ export function useBlogs(): UseDataResult<Blog> {
     }
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  return { data, loading, error, refetch: fetchData };
+  return { data, loading, error, refetch: () => fetchData(true) };
 }
 
 export function useBlog(slug: string | undefined): UseSingleResult<Blog> {
@@ -270,7 +308,7 @@ export function useBlog(slug: string | undefined): UseSingleResult<Blog> {
         const { data: row, error: err } = await supabase
           .from("blogs")
           .select("*")
-          .eq("slug", slug)
+          .eq("slug", slug!)
           .single();
         if (err) throw err;
         setData(row as Blog);
