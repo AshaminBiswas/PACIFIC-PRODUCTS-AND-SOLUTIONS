@@ -121,8 +121,7 @@ function HeroSection() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{ paddingTop: "var(--navbar-height, 64px)" }}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-0 sm:pt-16 lg:pt-20"
     >
       {/* Hero Background: slideshow if images exist, else animated gradient */}
       {heroImages.length > 0 ? (
@@ -214,19 +213,20 @@ function HeroSection() {
 
         {/* CTA buttons */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-14 sm:mb-16 lg:mb-20"
+          className="flex flex-row gap-2 sm:gap-4 justify-center items-center mb-14 sm:mb-16 lg:mb-20 w-full px-4 sm:px-0"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.5 }}
         >
           <motion.div
+            className="flex-1 sm:flex-none w-full sm:w-auto"
             onHoverStart={() => setQuoteHovered(true)}
             onHoverEnd={() => setQuoteHovered(false)}
             whileTap={{ scale: 0.97 }}
           >
             <Button
               size="lg"
-              className="w-full sm:w-auto relative overflow-hidden px-8 py-4 text-base font-semibold shadow-lg shadow-[#7FB706]/25 transition-shadow hover:shadow-xl hover:shadow-[#7FB706]/35"
+              className="w-full relative overflow-hidden px-2 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold shadow-lg shadow-[#7FB706]/25 transition-shadow hover:shadow-xl hover:shadow-[#7FB706]/35"
               onClick={() => navigate("/contact")}
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -242,6 +242,7 @@ function HeroSection() {
           </motion.div>
 
           <motion.div
+            className="flex-1 sm:flex-none w-full sm:w-auto"
             onHoverStart={() => setProductHovered(true)}
             onHoverEnd={() => setProductHovered(false)}
             whileTap={{ scale: 0.97 }}
@@ -249,7 +250,7 @@ function HeroSection() {
             <Button
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto px-8 py-4 text-base font-semibold backdrop-blur-sm border-[#7FB706]/40 hover:bg-[#7FB706]/5 hover:border-[#7FB706]/30 hover:text-gray-900 dark:hover:text-white dark:text-gray-300 transition-all"
+              className="w-full px-2 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold backdrop-blur-sm border-[#7FB706]/40 hover:bg-[#7FB706]/5 hover:border-[#7FB706]/30 hover:text-gray-900 dark:hover:text-white dark:text-gray-300 transition-all"
               onClick={() => navigate("/products")}
             >
               <span className="flex items-center gap-2">
@@ -291,8 +292,9 @@ function HeroSection() {
 
 // ── Page ──────────────────────────────────────────────────────
 
-import { useProducts, useSolutions, useHeroImages } from "../../lib/hooks";
+import { useProducts, useSolutions, useHeroImages, useCoreServices } from "../../lib/hooks";
 import * as Icons from "lucide-react";
+import { CoreServiceCard } from "../components/CoreServiceCard";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -300,6 +302,7 @@ export default function HomePage() {
   const featuredProducts = allProducts?.filter(p => p.is_featured).slice(0, 3) || [];
 
   const { data: solutions, loading: loadingSolutions } = useSolutions();
+  const { data: coreServices, loading: loadingCoreServices } = useCoreServices();
 
   return (
     <div className="min-h-screen">
@@ -375,18 +378,19 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {[
-              { icon: Factory, title: "Restroom Cubicles", description: "Premium quality toilet cubicles and partitions designed for durability and aesthetic appeal in commercial spaces." },
-              { icon: Shield, title: "Exterior Cladding", description: "Weather-resistant cladding solutions that protect and enhance building facades with modern architectural finishes." },
-              { icon: Lightbulb, title: "Interior Paneling", description: "Sophisticated interior wall paneling systems that transform spaces with style, functionality, and acoustic benefits." },
-              { icon: Target, title: "Custom Hardware", description: "High-quality cubicle hardware and fittings engineered for smooth operation and long-lasting performance." },
-              { icon: Award, title: "Quality Assurance", description: "Rigorous quality control processes ensuring every installation meets international standards and specifications." },
-              { icon: Users, title: "Project Consulting", description: "Expert consultation services to help plan and execute complex interior projects from concept to completion." },
-            ].map((service, index) => (
-              <ServiceCard key={index} {...service} />
-            ))}
-          </div>
+          {loadingCoreServices ? (
+            <div className="text-center text-gray-500 py-10">Loading core services...</div>
+          ) : coreServices.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              {coreServices.map((service) => (
+                <CoreServiceCard key={service.id} service={service} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-10">
+              No core services yet. Add some from the Admin Dashboard!
+            </div>
+          )}
         </div>
       </section>
 

@@ -31,6 +31,11 @@ export interface Database {
         Insert: Omit<HeroImage, "id" | "created_at">;
         Update: Partial<Omit<HeroImage, "id" | "created_at">>;
       };
+      core_services: {
+        Row: CoreService;
+        Insert: Omit<CoreService, "id" | "created_at">;
+        Update: Partial<Omit<CoreService, "id" | "created_at">>;
+      };
     };
     Views: {
       [_ in never]: never
@@ -115,6 +120,15 @@ export interface HeroImage {
   id: string;
   url: string;
   description: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface CoreService {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
   sort_order: number;
   created_at: string;
 }

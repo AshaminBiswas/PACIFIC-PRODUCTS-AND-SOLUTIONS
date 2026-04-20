@@ -129,7 +129,7 @@ function getCardVariants(mobile: boolean) {
       rotate: 0,
       opacity: 1,
       zIndex: 10,
-      transition: { type: "spring", stiffness: 260, damping: 26 },
+      transition: { type: "spring" as const, stiffness: 260, damping: 26 },
     },
     prev: {
       x: mobile ? "-50%" : "calc(-50% - 260px)",
@@ -138,7 +138,7 @@ function getCardVariants(mobile: boolean) {
       rotate: mobile ? 0 : -3,
       opacity: mobile ? 0.3 : 0.55,
       zIndex: 5,
-      transition: { type: "spring", stiffness: 260, damping: 26 },
+      transition: { type: "spring" as const, stiffness: 260, damping: 26 },
     },
     next: {
       x: mobile ? "-50%" : "calc(-50% + 260px)",
@@ -147,7 +147,7 @@ function getCardVariants(mobile: boolean) {
       rotate: mobile ? 0 : 3,
       opacity: mobile ? 0.3 : 0.55,
       zIndex: 5,
-      transition: { type: "spring", stiffness: 260, damping: 26 },
+      transition: { type: "spring" as const, stiffness: 260, damping: 26 },
     },
     "far-prev": {
       x: mobile ? "-50%" : "calc(-50% - 420px)",
@@ -156,7 +156,7 @@ function getCardVariants(mobile: boolean) {
       rotate: mobile ? 0 : -6,
       opacity: mobile ? 0.1 : 0.2,
       zIndex: 1,
-      transition: { type: "spring", stiffness: 260, damping: 26 },
+      transition: { type: "spring" as const, stiffness: 260, damping: 26 },
     },
     "far-next": {
       x: mobile ? "-50%" : "calc(-50% + 420px)",
@@ -165,14 +165,14 @@ function getCardVariants(mobile: boolean) {
       rotate: mobile ? 0 : 6,
       opacity: mobile ? 0.1 : 0.2,
       zIndex: 1,
-      transition: { type: "spring", stiffness: 260, damping: 26 },
+      transition: { type: "spring" as const, stiffness: 260, damping: 26 },
     },
     hidden: {
       x: "-50%",
       scale: 0.7,
       opacity: 0,
       zIndex: 0,
-      transition: { type: "spring", stiffness: 260, damping: 26 },
+      transition: { type: "spring" as const, stiffness: 260, damping: 26 },
     },
   };
 }
@@ -216,7 +216,7 @@ function TestimonialCard({
     >
       {/* Card surface */}
       <div
-        className="relative rounded-2xl p-7 bg-white border border-[#7FB706]/15 overflow-hidden"
+        className="relative rounded-2xl p-7 bg-white dark:bg-[#0a0a1a] border border-[#7FB706]/15 dark:border-white/10 overflow-hidden transition-colors"
         style={{
           boxShadow: isActive
             ? "0 24px 60px rgba(127,183,6,0.18), 0 8px 24px rgba(0,0,0,0.08)"
@@ -244,7 +244,7 @@ function TestimonialCard({
 
         <StarRating count={testimonial.stars} />
 
-        <p className="text-sm leading-relaxed text-gray-600 italic mb-6">
+        <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400 italic mb-6">
           {testimonial.text}
         </p>
 
@@ -261,10 +261,10 @@ function TestimonialCard({
           </motion.div>
 
           <div className="min-w-0">
-            <p className="font-semibold text-sm text-gray-900 truncate">
+            <p className="font-semibold text-sm text-gray-900 dark:text-white truncate transition-colors">
               {testimonial.name}
             </p>
-            <p className="text-xs text-gray-500 truncate">
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate transition-colors">
               {testimonial.role} · {testimonial.company}
             </p>
           </div>
@@ -292,7 +292,7 @@ function NavButton({
     <motion.button
       onClick={onClick}
       aria-label={direction === "prev" ? "Previous review" : "Next review"}
-      className="w-13 h-13 rounded-full bg-white border border-[#7FB706]/30 flex items-center justify-center text-[#5a8500] shadow-sm"
+      className="w-13 h-13 rounded-full bg-white dark:bg-[#0a0a1a] border border-[#7FB706]/30 dark:border-white/10 flex items-center justify-center text-[#5a8500] dark:text-[#7FB706] shadow-sm transition-colors"
       style={{ width: 52, height: 52 }}
       whileHover={{
         scale: 1.12,
@@ -398,9 +398,9 @@ export function TestimonialCarousel() {
   };
 
   return (
-    <section className="relative py-16 sm:py-20 md:py-24 lg:py-32 overflow-hidden">
+    <section className="relative py-16 sm:py-20 md:py-24 lg:py-32 overflow-hidden transition-colors">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#E9FDBF] via-white to-[#E9FDBF]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#E9FDBF] via-white to-[#E9FDBF] dark:from-[#0a0a1a] dark:via-[#030213] dark:to-[#0a0a1a] transition-colors" />
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute -top-20 -left-20 w-80 h-80 bg-[#7FB706] rounded-full blur-3xl" />
         <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#B5F823] rounded-full blur-3xl" />
@@ -418,10 +418,10 @@ export function TestimonialCarousel() {
             <span className="w-1.5 h-1.5 rounded-full bg-[#7FB706] inline-block" />
             Client Reviews
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] mb-3">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-3 transition-colors">
             What Our Clients Say
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto transition-colors">
             Trusted by architects, builders, and corporate clients across India
           </p>
         </motion.div>

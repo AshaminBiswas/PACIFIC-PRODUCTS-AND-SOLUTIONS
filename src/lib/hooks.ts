@@ -3,7 +3,7 @@
  */
 import { useState, useEffect, useCallback } from "react";
 import { supabase, isSupabaseConfigured } from "./supabase";
-import type { Product, Blog, Solution, GalleryImage, HeroImage } from "./database.types";
+import type { Product, Blog, Solution, GalleryImage, HeroImage, CoreService } from "./database.types";
 import {
   demoProducts,
   demoBlogs,
@@ -495,6 +495,73 @@ export function useAdminHeroImages(): UseDataResult<HeroImage> {
         .order("sort_order", { ascending: true });
       if (err) throw err;
       setData((rows as HeroImage[]) || []);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+// ── Core Services ────────────────────────────────────────────
+
+export function useCoreServices(): UseDataResult<CoreService> {
+  const [data, setData] = useState<CoreService[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    if (!isSupabaseConfigured()) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data: rows, error: err } = await supabase
+        .from("core_services")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (err) throw err;
+      setData((rows as CoreService[]) || []);
+    } catch (e: any) {
+      setError(e.message);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+export function useAdminCoreServices(): UseDataResult<CoreService> {
+  const [data, setData] = useState<CoreService[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: rows, error: err } = await supabase
+        .from("core_services")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (err) throw err;
+      setData((rows as CoreService[]) || []);
     } catch (e: any) {
       setError(e.message);
     } finally {

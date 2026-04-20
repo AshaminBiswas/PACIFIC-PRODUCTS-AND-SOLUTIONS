@@ -28,6 +28,7 @@ import AdminBlogs from "./pages/admin/AdminBlogs";
 import AdminSolutions from "./pages/admin/AdminSolutions";
 import AdminGallery from "./pages/admin/AdminGallery";
 import AdminHero from "./pages/admin/AdminHero";
+import AdminCoreServices from "./pages/admin/AdminCoreServices";
 
 function Layout() {
   return (
@@ -145,6 +146,7 @@ export const router = createBrowserRouter([
       { path: "solutions", Component: AdminSolutions },
       { path: "gallery", Component: AdminGallery },
       { path: "hero", Component: AdminHero },
+      { path: "core-services", Component: AdminCoreServices },
     ],
   },
 ]);
