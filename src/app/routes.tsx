@@ -40,6 +40,7 @@ const AdminSolutions  = lazy(() => import("./pages/admin/AdminSolutions"));
 const AdminGallery    = lazy(() => import("./pages/admin/AdminGallery"));
 const AdminHero       = lazy(() => import("./pages/admin/AdminHero"));
 const AdminCoreServices = lazy(() => import("./pages/admin/AdminCoreServices"));
+const AdminPageBanners  = lazy(() => import("./pages/admin/AdminPageBanners"));
 
 // ── Layout ────────────────────────────────────────────────────────────────
 function Layout() {
@@ -326,6 +327,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageSkeleton />}>
             <AdminCoreServices />
+          </Suspense>
+        ),
+      },
+      {
+        path: "page-banners",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminPageBanners />
           </Suspense>
         ),
       },

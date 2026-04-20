@@ -3,7 +3,7 @@
  */
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase, isSupabaseConfigured } from "./supabase";
-import type { Product, Blog, Solution, GalleryImage, HeroImage, CoreService } from "./database.types";
+import type { Product, Blog, Solution, GalleryImage, HeroImage, CoreService, PageBanner } from "./database.types";
 import {
   demoProducts,
   demoBlogs,
@@ -610,6 +610,75 @@ export function useAdminCoreServices(): UseDataResult<CoreService> {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+// ── Page Banners ──────────────────────────────────────────────
+
+export function usePageBanner(pageSlug: string): UseSingleResult<PageBanner> {
+  const [data, setData] = useState<PageBanner | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!pageSlug) { setLoading(false); return; }
+
+    const cacheKey = `page_banner:${pageSlug}`;
+    const cached = memCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      setData(cached.data as PageBanner);
+      setLoading(false);
+      return;
+    }
+
+    async function fetch() {
+      setLoading(true);
+      if (!isSupabaseConfigured()) { setLoading(false); return; }
+      try {
+        const { data: row, error: err } = await supabase
+          .from("page_banners")
+          .select("*")
+          .eq("page_slug", pageSlug)
+          .single();
+        if (err) throw err;
+        const banner = row as PageBanner;
+        memCache.set(cacheKey, { data: banner, timestamp: Date.now() });
+        setData(banner);
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetch();
+  }, [pageSlug]);
+
+  return { data, loading, error };
+}
+
+export function useAdminPageBanners(): UseDataResult<PageBanner> {
+  const [data, setData] = useState<PageBanner[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: rows, error: err } = await supabase
+        .from("page_banners")
+        .select("*")
+        .order("page_slug", { ascending: true });
+      if (err) throw err;
+      setData((rows as PageBanner[]) || []);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 }

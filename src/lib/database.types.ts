@@ -36,6 +36,11 @@ export interface Database {
         Insert: Omit<CoreService, "id" | "created_at">;
         Update: Partial<Omit<CoreService, "id" | "created_at">>;
       };
+      page_banners: {
+        Row: PageBanner;
+        Insert: Omit<PageBanner, "id" | "created_at">;
+        Update: Partial<Omit<PageBanner, "id" | "created_at">>;
+      };
     };
     Views: {
       [_ in never]: never
@@ -130,5 +135,14 @@ export interface CoreService {
   description: string;
   image_url: string;
   sort_order: number;
+  created_at: string;
+}
+
+export interface PageBanner {
+  id: string;
+  page_slug: string; // 'about' | 'services' | 'solutions' | 'gallery'
+  image_url: string;
+  title: string;
+  subtitle: string;
   created_at: string;
 }

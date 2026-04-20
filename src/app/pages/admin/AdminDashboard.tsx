@@ -15,6 +15,7 @@ import {
   ChevronRight,
   MonitorPlay,
   Layers,
+  LayoutTemplate,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -54,6 +55,7 @@ export default function AdminDashboard() {
     { name: "Gallery", path: "/admin/dashboard/gallery", icon: ImageIcon },
     { name: "Hero Images", path: "/admin/dashboard/hero", icon: MonitorPlay },
     { name: "Core Services", path: "/admin/dashboard/core-services", icon: Layers },
+    { name: "Page Banners", path: "/admin/dashboard/page-banners", icon: LayoutTemplate },
   ];
 
   if (checking) {
