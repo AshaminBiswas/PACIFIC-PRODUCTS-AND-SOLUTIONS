@@ -26,38 +26,50 @@ import { useRef, useState, useEffect } from "react";
 
 // ── Hero Background Slideshow ─────────────────────────────────
 
-function HeroSlideshow({ images }: { images: string[] }) {
+interface HeroSlideshowProps {
+  images: { url: string; description: string }[];
+  onSlideChange: (index: number) => void;
+}
+
+function HeroSlideshow({ images, onSlideChange }: HeroSlideshowProps) {
   const [current, setCurrent] = useState(0);
-  const [, setPrev] = useState<number | null>(null);
+
+  function goTo(i: number) {
+    setCurrent(i);
+    onSlideChange(i);
+  }
 
   useEffect(() => {
     if (images.length <= 1) return;
     const interval = setInterval(() => {
       setCurrent((c) => {
-        setPrev(c);
-        return (c + 1) % images.length;
+        const next = (c + 1) % images.length;
+        onSlideChange(next);
+        return next;
       });
     }, 5000);
     return () => clearInterval(interval);
-  }, [images.length]);
+  }, [images.length, onSlideChange]);
 
   return (
     <div className="absolute inset-0 z-0">
-      {images.map((src, i) => (
+      {images.map((img, i) => (
         <img
-          key={src}
-          src={src}
+          key={img.url}
+          src={img.url}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000"
           style={{ opacity: i === current ? 1 : 0 }}
         />
       ))}
-      {/* Uniform vignette — equal shadow from all sides */}
+      {/* Base dark overlay */}
+      <div className="absolute inset-0 z-10 bg-black/50 pointer-events-none" />
+      {/* Vignette — darker edges from all sides */}
       <div
         className="absolute inset-0 z-10 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.95) 100%)",
+          background: "radial-gradient(ellipse at center, transparent 10%, rgba(0,0,0,0.97) 100%)",
         }}
       />
 
@@ -67,7 +79,7 @@ function HeroSlideshow({ images }: { images: string[] }) {
           {images.map((_, i) => (
             <button
               key={i}
-              onClick={() => { setPrev(current); setCurrent(i); }}
+              onClick={() => goTo(i)}
               className={`h-2 rounded-full transition-all duration-300 ${
                 i === current ? "bg-white w-6" : "bg-white/40 hover:bg-white/70 w-2"
               }`}
@@ -90,6 +102,12 @@ function HeroSection() {
   const [quoteHovered, setQuoteHovered] = useState(false);
   const [productHovered, setProductHovered] = useState(false);
   const { data: heroImages } = useHeroImages();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const activeDescription =
+    heroImages.length > 0 && heroImages[currentSlide]?.description
+      ? heroImages[currentSlide].description
+      : "Premium restroom cubicles, cladding, and paneling solutions for architects, builders, and corporate clients worldwide";
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -107,7 +125,10 @@ function HeroSection() {
     >
       {/* Hero Background: slideshow if images exist, else animated gradient */}
       {heroImages.length > 0 ? (
-        <HeroSlideshow images={heroImages.map((img) => img.url)} />
+        <HeroSlideshow
+          images={heroImages.map((img) => ({ url: img.url, description: img.description }))}
+          onSlideChange={setCurrentSlide}
+        />
       ) : (
         <motion.div style={{ y }} className="absolute inset-0 z-0 pointer-events-none">
           <div className="absolute inset-0 bg-gradient-to-br from-[#f0ffc8]/80 via-white/60 to-[#e6fdb0]/80 dark:from-[#030213] dark:via-[#030213] dark:to-[#0a0a1a]" />
@@ -160,7 +181,8 @@ function HeroSection() {
 
         {/* Headline */}
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5rem] font-bold text-[#030213] dark:text-white mb-5 sm:mb-6 leading-[1.08] tracking-tight"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5rem] font-bold text-white mb-5 sm:mb-6 leading-[1.08] tracking-tight"
+          style={{ textShadow: "0 2px 16px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.9)" }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.7 }}
@@ -177,15 +199,16 @@ function HeroSection() {
           </motion.span>
         </motion.h1>
 
-        {/* Sub-headline */}
+        {/* Sub-headline — shows current slide description or static fallback */}
         <motion.p
+          key={currentSlide}
           className="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-8 sm:mb-10 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed"
-          initial={{ opacity: 0, y: 16 }}
+          style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9), 0 2px 20px rgba(0,0,0,0.7)" }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.6 }}
+          transition={{ duration: 0.5 }}
         >
-          Premium restroom cubicles, cladding, and paneling solutions for
-          architects, builders, and corporate clients worldwide
+          {activeDescription}
         </motion.p>
 
         {/* CTA buttons */}

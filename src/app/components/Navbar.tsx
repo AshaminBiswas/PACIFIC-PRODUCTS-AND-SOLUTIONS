@@ -129,7 +129,9 @@ export function Navbar() {
                     location.pathname === item.path ||
                     location.pathname.startsWith(item.path + "/")
                       ? "text-[#7FB706]"
-                      : "text-[#030213] dark:text-gray-300 hover:text-[#7FB706] dark:hover:text-[#7FB706]"
+                      : isScrolled || isMobileMenuOpen
+                        ? "text-[#030213] dark:text-gray-300 hover:text-[#7FB706] dark:hover:text-[#7FB706]"
+                        : "text-white hover:text-[#7FB706]"
                   }`}
                 >
                   <span>{item.name}</span>
@@ -205,7 +207,7 @@ export function Navbar() {
                   exit={{ rotate: -90, opacity: 0 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <Menu className="w-6 h-6 text-[#030213] dark:text-white" />
+                  <Menu className={`w-6 h-6 ${isScrolled || isMobileMenuOpen ? "text-[#030213] dark:text-white" : "text-white"}`} />
                 </motion.div>
               )}
             </AnimatePresence>

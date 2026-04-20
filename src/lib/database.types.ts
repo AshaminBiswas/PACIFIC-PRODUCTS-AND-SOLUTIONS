@@ -114,6 +114,7 @@ export interface GalleryImage {
 export interface HeroImage {
   id: string;
   url: string;
+  description: string;
   sort_order: number;
   created_at: string;
 }

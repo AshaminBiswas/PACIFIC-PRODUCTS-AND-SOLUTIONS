@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { supabase, uploadImage } from "../../../lib/supabase";
 import { useAdminHeroImages } from "../../../lib/hooks";
 import type { HeroImage } from "../../../lib/database.types";
@@ -6,12 +6,13 @@ import {
   Upload,
   Trash2,
   ImageIcon,
-  GripVertical,
   ChevronUp,
   ChevronDown,
   Loader2,
   AlertCircle,
   CheckCircle2,
+  Save,
+  Pencil,
 } from "lucide-react";
 
 const MAX_IMAGES = 10;
@@ -20,12 +21,20 @@ export default function AdminHero() {
   const { data: images, loading, refetch } = useAdminHeroImages();
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [descriptions, setDescriptions] = useState<Record<string, string>>({});
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function showToast(type: "success" | "error", msg: string) {
     setToast({ type, msg });
     setTimeout(() => setToast(null), 3500);
+  }
+
+  // Get working description for an image (local edit or saved value)
+  function getDesc(img: HeroImage) {
+    return descriptions[img.id] !== undefined ? descriptions[img.id] : img.description;
   }
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -49,13 +58,11 @@ export default function AdminHero() {
     for (let i = 0; i < toUpload.length; i++) {
       const file = toUpload[i];
 
-      // Validate type
       if (!file.type.startsWith("image/")) {
         showToast("error", `"${file.name}" is not an image file.`);
         continue;
       }
 
-      // Validate size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         showToast("error", `"${file.name}" exceeds 10 MB limit.`);
         continue;
@@ -70,7 +77,7 @@ export default function AdminHero() {
       const nextOrder = (images[images.length - 1]?.sort_order ?? -1) + 1 + i;
       const { error } = await supabase
         .from("hero_images")
-        .insert({ url, sort_order: nextOrder });
+        .insert({ url, description: "", sort_order: nextOrder });
 
       if (error) {
         showToast("error", `DB error: ${error.message}`);
@@ -85,8 +92,33 @@ export default function AdminHero() {
     }
 
     setUploading(false);
-    // Reset file input so same file can be re-selected
     if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleSaveDescription(img: HeroImage) {
+    const newDesc = getDesc(img);
+    setSavingId(img.id);
+
+    const { error } = await supabase
+      .from("hero_images")
+      .update({ description: newDesc })
+      .eq("id", img.id);
+
+    if (error) {
+      showToast("error", `Save failed: ${error.message}`);
+    } else {
+      showToast("success", "Description saved!");
+      setEditingId(null);
+      // Clear local override so refetch takes over
+      setDescriptions((prev) => {
+        const next = { ...prev };
+        delete next[img.id];
+        return next;
+      });
+      refetch();
+    }
+
+    setSavingId(null);
   }
 
   async function handleDelete(img: HeroImage) {
@@ -111,7 +143,6 @@ export default function AdminHero() {
 
     const other = images[swapIdx];
 
-    // Swap sort_order values
     await Promise.all([
       supabase.from("hero_images").update({ sort_order: other.sort_order }).eq("id", img.id),
       supabase.from("hero_images").update({ sort_order: img.sort_order }).eq("id", other.id),
@@ -145,7 +176,7 @@ export default function AdminHero() {
         <div>
           <h1 className="text-2xl font-bold text-white mb-1">Hero Background Images</h1>
           <p className="text-gray-400 text-sm">
-            Upload up to {MAX_IMAGES} images. They will appear as an auto-advancing slideshow on the home page hero section.
+            Upload up to {MAX_IMAGES} images. Add a description for each — it will appear as the hero subheadline when that slide is active.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -189,14 +220,13 @@ export default function AdminHero() {
         </div>
       )}
 
-      {/* Image Grid */}
+      {/* Image List */}
       {loading ? (
         <div className="flex items-center justify-center py-24 text-gray-500">
           <Loader2 className="w-6 h-6 animate-spin mr-3" />
           Loading images…
         </div>
       ) : images.length === 0 ? (
-        /* Empty state */
         <div
           onClick={() => fileInputRef.current?.click()}
           className="border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center py-20 cursor-pointer hover:border-[#7FB706]/40 hover:bg-[#7FB706]/5 transition-all group"
@@ -206,79 +236,145 @@ export default function AdminHero() {
           <p className="text-gray-600 text-sm">Click to upload your first image</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {images.map((img, idx) => (
-            <div
-              key={img.id}
-              className="group relative rounded-2xl overflow-hidden bg-[#0a0a1a] border border-white/8 hover:border-[#7FB706]/30 transition-all"
-            >
-              {/* Image */}
-              <div className="aspect-video w-full overflow-hidden">
-                <img
-                  src={img.url}
-                  alt={`Hero background ${idx + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
+        <div className="flex flex-col gap-4">
+          {images.map((img, idx) => {
+            const isEditing = editingId === img.id;
+            const isSaving = savingId === img.id;
+            const desc = getDesc(img);
 
-              {/* Overlay controls */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                {/* Order badge */}
-                <div className="absolute top-3 left-3 bg-black/60 text-white text-xs font-bold px-2 py-1 rounded-lg backdrop-blur-sm">
-                  #{idx + 1}
+            return (
+              <div
+                key={img.id}
+                className="flex gap-4 bg-[#0a0a1a] border border-white/8 rounded-2xl overflow-hidden hover:border-[#7FB706]/20 transition-all"
+              >
+                {/* Thumbnail */}
+                <div className="relative w-48 shrink-0 aspect-video">
+                  <img
+                    src={img.url}
+                    alt={`Hero background ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Order badge */}
+                  <div className="absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">
+                    #{idx + 1}
+                  </div>
                 </div>
 
-                {/* Action buttons */}
-                <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
-                  {/* Move up */}
-                  <button
-                    onClick={() => handleMove(img, "up")}
-                    disabled={idx === 0}
-                    className="w-8 h-8 bg-black/60 backdrop-blur-sm rounded-lg flex items-center justify-center text-white hover:bg-[#7FB706] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                    title="Move up"
-                  >
-                    <ChevronUp className="w-4 h-4" />
-                  </button>
-
-                  {/* Move down */}
-                  <button
-                    onClick={() => handleMove(img, "down")}
-                    disabled={idx === images.length - 1}
-                    className="w-8 h-8 bg-black/60 backdrop-blur-sm rounded-lg flex items-center justify-center text-white hover:bg-[#7FB706] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                    title="Move down"
-                  >
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-
-                  {/* Delete */}
-                  <button
-                    onClick={() => handleDelete(img)}
-                    disabled={deletingId === img.id}
-                    className="w-8 h-8 bg-black/60 backdrop-blur-sm rounded-lg flex items-center justify-center text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
-                    title="Delete image"
-                  >
-                    {deletingId === img.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                {/* Description + controls */}
+                <div className="flex-1 flex flex-col justify-between py-3 pr-4 gap-3">
+                  {/* Description field */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      Slide Description
+                    </label>
+                    {isEditing ? (
+                      <textarea
+                        autoFocus
+                        rows={3}
+                        value={desc}
+                        onChange={(e) =>
+                          setDescriptions((prev) => ({ ...prev, [img.id]: e.target.value }))
+                        }
+                        placeholder="Enter a short description for this slide…"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#7FB706]/50 resize-none transition-colors"
+                      />
                     ) : (
-                      <Trash2 className="w-4 h-4" />
+                      <p
+                        className="text-sm text-gray-300 leading-relaxed min-h-[3rem] cursor-pointer hover:text-white transition-colors"
+                        onClick={() => setEditingId(img.id)}
+                      >
+                        {desc || (
+                          <span className="text-gray-600 italic">No description yet — click to add one</span>
+                        )}
+                      </p>
                     )}
-                  </button>
-                </div>
+                  </div>
 
-                {/* Drag handle (visual only) */}
-                <div className="absolute top-3 right-3 text-white/40">
-                  <GripVertical className="w-4 h-4" />
+                  {/* Action row */}
+                  <div className="flex items-center justify-between">
+                    {/* Edit / Save buttons */}
+                    <div className="flex items-center gap-2">
+                      {isEditing ? (
+                        <>
+                          <button
+                            onClick={() => handleSaveDescription(img)}
+                            disabled={isSaving}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#7FB706] text-white rounded-lg text-xs font-semibold hover:bg-[#6fa005] transition-colors disabled:opacity-50"
+                          >
+                            {isSaving ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <Save className="w-3 h-3" />
+                            )}
+                            {isSaving ? "Saving…" : "Save"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingId(null);
+                              setDescriptions((prev) => {
+                                const next = { ...prev };
+                                delete next[img.id];
+                                return next;
+                              });
+                            }}
+                            className="px-3 py-1.5 text-gray-400 hover:text-white rounded-lg text-xs font-medium transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => setEditingId(img.id)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg text-xs font-medium transition-colors"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          Edit Description
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Reorder + Delete */}
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleMove(img, "up")}
+                        disabled={idx === 0}
+                        className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                        title="Move up"
+                      >
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleMove(img, "down")}
+                        disabled={idx === images.length - 1}
+                        className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                        title="Move down"
+                      >
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(img)}
+                        disabled={deletingId === img.id}
+                        className="w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-500/20 hover:text-red-300 disabled:opacity-50 transition-colors"
+                        title="Delete image"
+                      >
+                        {deletingId === img.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Tips */}
       {images.length > 0 && (
         <p className="mt-6 text-xs text-gray-600 text-center">
-          Hover over an image to see reorder and delete controls. Images display in order #1 → #{images.length} on the live site.
+          Each slide's description replaces the static subheadline on the home page hero section.
         </p>
       )}
     </div>
