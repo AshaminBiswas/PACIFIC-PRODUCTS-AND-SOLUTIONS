@@ -26,6 +26,11 @@ export interface Database {
         Insert: Omit<GalleryImage, "id" | "created_at">;
         Update: Partial<Omit<GalleryImage, "id" | "created_at">>;
       };
+      hero_images: {
+        Row: HeroImage;
+        Insert: Omit<HeroImage, "id" | "created_at">;
+        Update: Partial<Omit<HeroImage, "id" | "created_at">>;
+      };
     };
     Views: {
       [_ in never]: never
@@ -103,5 +108,12 @@ export interface GalleryImage {
   image_url: string;
   sort_order: number;
   published: boolean;
+  created_at: string;
+}
+
+export interface HeroImage {
+  id: string;
+  url: string;
+  sort_order: number;
   created_at: string;
 }

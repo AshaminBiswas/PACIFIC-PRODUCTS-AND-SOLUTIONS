@@ -3,7 +3,7 @@
  */
 import { useState, useEffect, useCallback } from "react";
 import { supabase, isSupabaseConfigured } from "./supabase";
-import type { Product, Blog, Solution, GalleryImage } from "./database.types";
+import type { Product, Blog, Solution, GalleryImage, HeroImage } from "./database.types";
 import {
   demoProducts,
   demoBlogs,
@@ -428,6 +428,73 @@ export function useAdminGallery(): UseDataResult<GalleryImage> {
         .order("sort_order", { ascending: true });
       if (err) throw err;
       setData((rows as GalleryImage[]) || []);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+// ── Hero Images ──────────────────────────────────────────────
+
+export function useHeroImages(): UseDataResult<HeroImage> {
+  const [data, setData] = useState<HeroImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    if (!isSupabaseConfigured()) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data: rows, error: err } = await supabase
+        .from("hero_images")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (err) throw err;
+      setData((rows as HeroImage[]) || []);
+    } catch (e: any) {
+      setError(e.message);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+export function useAdminHeroImages(): UseDataResult<HeroImage> {
+  const [data, setData] = useState<HeroImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: rows, error: err } = await supabase
+        .from("hero_images")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (err) throw err;
+      setData((rows as HeroImage[]) || []);
     } catch (e: any) {
       setError(e.message);
     } finally {

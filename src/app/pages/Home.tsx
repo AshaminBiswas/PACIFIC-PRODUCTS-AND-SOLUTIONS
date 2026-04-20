@@ -18,37 +18,69 @@ import { Button } from "../components/Button";
 import { ServiceCard } from "../components/ServiceCard";
 import { ProductCard } from "../components/ProductCard";
 import { TestimonialCarousel } from "../components/TestimonialCarousel";
-import { AnimatedCounter } from "../components/AnimatedCounter";
+
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+
 // ─────────────────────────────────────────────────────────────
-// BACKGROUND IMAGE SLOT
-// When you're ready to add a background image, uncomment the
-// <BackgroundImage /> block inside HeroSection below and
-// replace the src with your actual image path or URL.
-//
-function BackgroundImage() {
+
+// ── Hero Background Slideshow ─────────────────────────────────
+
+function HeroSlideshow({ images }: { images: string[] }) {
+  const [current, setCurrent] = useState(0);
+  const [, setPrev] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrent((c) => {
+        setPrev(c);
+        return (c + 1) % images.length;
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
   return (
     <div className="absolute inset-0 z-0">
-      <ImageWithFallback
-        src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"
-        alt=""
-        aria-hidden="true"
-        className="w-full h-full object-cover object-center"
+      {images.map((src, i) => (
+        <img
+          key={src}
+          src={src}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000"
+          style={{ opacity: i === current ? 1 : 0 }}
+        />
+      ))}
+      {/* Uniform vignette — equal shadow from all sides */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.95) 100%)",
+        }}
       />
-      {/* Overlay — adjust opacity to control image visibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+
+      {/* Dot indicators */}
+      {images.length > 1 && (
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { setPrev(current); setCurrent(i); }}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === current ? "bg-white w-6" : "bg-white/40 hover:bg-white/70 w-2"
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-// ─────────────────────────────────────────────────────────────
 
-const stats = [
-  { value: 500, suffix: "+", label: "Projects Completed" },
-  { value: 250, suffix: "+", label: "Happy Clients" },
-  { value: 15, suffix: "+", label: "Years Experience" },
-  { value: 5, suffix: "", label: "Countries Served" },
-];
+
 
 // ── Hero Section (extracted as its own component) ─────────────
 
@@ -57,6 +89,7 @@ function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [quoteHovered, setQuoteHovered] = useState(false);
   const [productHovered, setProductHovered] = useState(false);
+  const { data: heroImages } = useHeroImages();
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -72,49 +105,47 @@ function HeroSection() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{ paddingTop: "var(--navbar-height, 64px)" }}
     >
-      {/* Animated blur background */}
-      <motion.div style={{ y }} className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f0ffc8]/80 via-white/60 to-[#e6fdb0]/80 dark:from-[#030213] dark:via-[#030213] dark:to-[#0a0a1a]" />
-        <motion.div
-          className="absolute -top-24 -left-24 w-[480px] h-[480px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(127,183,6,0.35) 0%, rgba(127,183,6,0) 70%)", filter: "blur(48px)" }}
-          animate={{ scale: [1, 1.15, 1], x: [0, 24, 0], y: [0, 16, 0] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/3 -right-32 w-[520px] h-[520px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(181,248,35,0.28) 0%, rgba(181,248,35,0) 70%)", filter: "blur(56px)" }}
-          animate={{ scale: [1, 1.1, 1], x: [0, -20, 0], y: [0, 28, 0] }}
-          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        />
-        <motion.div
-          className="absolute -bottom-32 left-1/3 w-[400px] h-[400px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(127,183,6,0.22) 0%, rgba(127,183,6,0) 70%)", filter: "blur(40px)" }}
-          animate={{ scale: [1, 1.2, 1], x: [0, 30, 0] }}
-          transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(233,253,191,0.5) 0%, rgba(233,253,191,0) 70%)", filter: "blur(32px)" }}
-          animate={{ scaleX: [1, 1.08, 1], scaleY: [1, 1.12, 1] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: "repeating-linear-gradient(0deg, #7FB706 0px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, #7FB706 0px, transparent 1px, transparent 40px)" }}
-        />
-      </motion.div>
-
-      {/* BACKGROUND IMAGE SLOT (uncomment when ready)
-      
-      */}
-
-      {/* <BackgroundImage /> */}
+      {/* Hero Background: slideshow if images exist, else animated gradient */}
+      {heroImages.length > 0 ? (
+        <HeroSlideshow images={heroImages.map((img) => img.url)} />
+      ) : (
+        <motion.div style={{ y }} className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#f0ffc8]/80 via-white/60 to-[#e6fdb0]/80 dark:from-[#030213] dark:via-[#030213] dark:to-[#0a0a1a]" />
+          <motion.div
+            className="absolute -top-24 -left-24 w-[480px] h-[480px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(127,183,6,0.35) 0%, rgba(127,183,6,0) 70%)", filter: "blur(48px)" }}
+            animate={{ scale: [1, 1.15, 1], x: [0, 24, 0], y: [0, 16, 0] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute top-1/3 -right-32 w-[520px] h-[520px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(181,248,35,0.28) 0%, rgba(181,248,35,0) 70%)", filter: "blur(56px)" }}
+            animate={{ scale: [1, 1.1, 1], x: [0, -20, 0], y: [0, 28, 0] }}
+            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          />
+          <motion.div
+            className="absolute -bottom-32 left-1/3 w-[400px] h-[400px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(127,183,6,0.22) 0%, rgba(127,183,6,0) 70%)", filter: "blur(40px)" }}
+            animate={{ scale: [1, 1.2, 1], x: [0, 30, 0] }}
+            transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full"
+            style={{ background: "radial-gradient(ellipse, rgba(233,253,191,0.5) 0%, rgba(233,253,191,0) 70%)", filter: "blur(32px)" }}
+            animate={{ scaleX: [1, 1.08, 1], scaleY: [1, 1.12, 1] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          />
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{ backgroundImage: "repeating-linear-gradient(0deg, #7FB706 0px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, #7FB706 0px, transparent 1px, transparent 40px)" }}
+          />
+        </motion.div>
+      )}
 
       {/* Main content */}
       <motion.div
         style={{ opacity }}
-        className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center py-16 sm:py-20 lg:py-0 lg:min-h-[calc(100vh-64px)] lg:flex lg:flex-col lg:items-center lg:justify-center"
+        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center py-16 sm:py-20 lg:py-0 lg:min-h-[calc(100vh-64px)] lg:flex lg:flex-col lg:items-center lg:justify-center"
       >
         {/* Badge
         <motion.div
@@ -148,7 +179,7 @@ function HeroSection() {
 
         {/* Sub-headline */}
         <motion.p
-          className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-900 dark:text-gray-300 mb-8 sm:mb-10 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed"
+          className="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-8 sm:mb-10 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.6 }}
@@ -210,32 +241,8 @@ function HeroSection() {
           </motion.div>
         </motion.div>
 
-        {/* Stat strip */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9, duration: 0.6 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full max-w-3xl lg:max-w-4xl mx-auto"
-        >
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              className="text-center group relative"
-              whileHover={{ y: -4 }}
-              transition={{ type: "spring", stiffness: 300, damping: 18 }}
-            >
-              <div className="absolute inset-0 rounded-2xl bg-white/10 border border-[#7FB706]/12 " />
-              <div className="relative py-4 px-3">
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#7FB706] mb-1">
-                  <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-                </div>
-                <p className="text-xs sm:text-sm text-black font-medium tracking-wide">
-                  {stat.label}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+
+
       </motion.div>
 
       {/* Scroll indicator */}
@@ -264,7 +271,7 @@ function HeroSection() {
 
 // ── Page ──────────────────────────────────────────────────────
 
-import { useProducts, useSolutions } from "../../lib/hooks";
+import { useProducts, useSolutions, useHeroImages } from "../../lib/hooks";
 import * as Icons from "lucide-react";
 
 export default function HomePage() {

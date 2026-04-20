@@ -27,6 +27,7 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminBlogs from "./pages/admin/AdminBlogs";
 import AdminSolutions from "./pages/admin/AdminSolutions";
 import AdminGallery from "./pages/admin/AdminGallery";
+import AdminHero from "./pages/admin/AdminHero";
 
 function Layout() {
   return (
@@ -143,6 +144,7 @@ export const router = createBrowserRouter([
       { path: "blogs", Component: AdminBlogs },
       { path: "solutions", Component: AdminSolutions },
       { path: "gallery", Component: AdminGallery },
+      { path: "hero", Component: AdminHero },
     ],
   },
 ]);

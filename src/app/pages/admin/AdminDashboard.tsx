@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  MonitorPlay,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -50,6 +51,7 @@ export default function AdminDashboard() {
     { name: "Blogs", path: "/admin/dashboard/blogs", icon: FileText },
     { name: "Solutions", path: "/admin/dashboard/solutions", icon: Lightbulb },
     { name: "Gallery", path: "/admin/dashboard/gallery", icon: ImageIcon },
+    { name: "Hero Images", path: "/admin/dashboard/hero", icon: MonitorPlay },
   ];
 
   if (checking) {
