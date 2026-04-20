@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { X } from "lucide-react";
+import { X, CheckCircle2, AlertCircle } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { Button } from "./Button";
 
 // ─── EmailJS Configuration ────────────────────────────────────────────────────
-// Replace these with your actual EmailJS credentials from https://emailjs.com
-const EMAILJS_SERVICE_ID = "service_jv7krzo";   // e.g. "service_abc123"
-const EMAILJS_TEMPLATE_ID = "template_fg2sxhb"; // e.g. "template_xyz789"
-const EMAILJS_PUBLIC_KEY = "tBXdx5KB_3Nr2C-v-";   // e.g. "abcDEF123..."
+const EMAILJS_SERVICE_ID = "service_jv7krzo";
+const EMAILJS_TEMPLATE_ID = "template_fg2sxhb";
+const EMAILJS_PUBLIC_KEY = "tBXdx5KB_3Nr2C-v-";
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ContactFormProps {
@@ -35,8 +34,6 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
     setIsSubmitting(true);
     setError(null);
 
-    // EmailJS template parameters — these must match the variable names
-    // used in your EmailJS template (e.g. {{from_name}}, {{from_email}}, etc.)
     const templateParams = {
       from_name: formData.name,
       from_email: formData.email,
@@ -56,7 +53,6 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
 
       setSubmitted(true);
 
-      // Reset form after 3 seconds
       setTimeout(() => {
         setSubmitted(false);
         setFormData({
@@ -83,15 +79,18 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const inputClasses = "w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-[#030213] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#7FB706] focus:ring-1 focus:ring-[#7FB706] transition-colors";
+  const labelClasses = "block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300";
+
   const formContent = (
     <form onSubmit={handleSubmit} className="space-y-6">
       {isModal && (
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-semibold text-[#030213]">Get a Quote</h3>
+        <div className="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-white/10 pb-4">
+          <h3 className="text-2xl font-bold text-[#030213] dark:text-white">Get a Quote</h3>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -100,9 +99,7 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label htmlFor="name" className="block text-sm mb-2 text-[#030213]">
-            Full Name *
-          </label>
+          <label htmlFor="name" className={labelClasses}>Full Name *</label>
           <input
             type="text"
             id="name"
@@ -110,15 +107,13 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
             required
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7FB706] focus:border-transparent bg-white"
+            className={inputClasses}
             placeholder="John Doe"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm mb-2 text-[#030213]">
-            Email Address *
-          </label>
+          <label htmlFor="email" className={labelClasses}>Email Address *</label>
           <input
             type="email"
             id="email"
@@ -126,15 +121,13 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
             required
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7FB706] focus:border-transparent bg-white"
+            className={inputClasses}
             placeholder="john@example.com"
           />
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm mb-2 text-[#030213]">
-            Phone Number *
-          </label>
+          <label htmlFor="phone" className={labelClasses}>Phone Number *</label>
           <input
             type="tel"
             id="phone"
@@ -142,37 +135,33 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
             required
             value={formData.phone}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7FB706] focus:border-transparent bg-white"
+            className={inputClasses}
             placeholder="+91 98765 43210"
           />
         </div>
 
         <div>
-          <label htmlFor="company" className="block text-sm mb-2 text-[#030213]">
-            Company Name
-          </label>
+          <label htmlFor="company" className={labelClasses}>Company Name</label>
           <input
             type="text"
             id="company"
             name="company"
             value={formData.company}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7FB706] focus:border-transparent bg-white"
+            className={inputClasses}
             placeholder="Your Company"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="requirement" className="block text-sm mb-2 text-[#030213]">
-          Product/Service Required
-        </label>
+        <label htmlFor="requirement" className={labelClasses}>Product/Service Required</label>
         <select
           id="requirement"
           name="requirement"
           value={formData.requirement}
           onChange={handleChange}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7FB706] focus:border-transparent bg-white"
+          className={`${inputClasses} appearance-none [&>option]:bg-white [&>option]:dark:bg-[#0a0a1a] [&>option]:text-black [&>option]:dark:text-white`}
         >
           <option value="">Select a product/service</option>
           <option value="restroom-cubicles">Restroom Cubicles</option>
@@ -186,48 +175,49 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm mb-2 text-[#030213]">
-          Project Details
-        </label>
+        <label htmlFor="message" className={labelClasses}>Project Details</label>
         <textarea
           id="message"
           name="message"
           value={formData.message}
           onChange={handleChange}
           rows={4}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7FB706] focus:border-transparent resize-none bg-white"
+          className={`${inputClasses} resize-none`}
           placeholder="Tell us about your project requirements..."
         />
       </div>
 
-      {/* Error message */}
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-red-50 border border-red-300 rounded-xl p-4 text-red-700 text-sm"
+          className="flex items-center gap-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-4 text-red-600 dark:text-red-400 text-sm font-medium"
         >
+          <AlertCircle className="w-5 h-5 shrink-0" />
           {error}
         </motion.div>
       )}
 
       {submitted ? (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-[#E9FDBF] border border-[#7FB706] rounded-xl p-6 text-center"
+          className="bg-[#E9FDBF] dark:bg-[#7FB706]/10 border border-[#7FB706]/30 rounded-xl p-6 text-center"
         >
-          <div className="w-16 h-16 bg-[#7FB706] rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+          <div className="w-16 h-16 bg-[#7FB706] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#7FB706]/20">
+            <CheckCircle2 className="w-8 h-8 text-white" />
           </div>
-          <h4 className="text-xl font-semibold text-[#030213] mb-2">Thank You!</h4>
-          <p className="text-gray-600">We'll get back to you within 24 hours.</p>
+          <h4 className="text-xl font-bold text-[#030213] dark:text-white mb-2">Thank You!</h4>
+          <p className="text-gray-700 dark:text-gray-300">Your inquiry has been sent successfully. We'll be in touch shortly.</p>
         </motion.div>
       ) : (
-        <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit Inquiry"}
+        <Button 
+          type="submit" 
+          size="lg" 
+          className="w-full text-base font-semibold tracking-wide" 
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Submitting Inquiry..." : "Submit Inquiry"}
         </Button>
       )}
     </form>
@@ -239,14 +229,14 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.9, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.9, y: 20 }}
-          className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
+          className="bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {formContent}
@@ -255,5 +245,9 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
     );
   }
 
-  return <div className="bg-white rounded-2xl p-8 shadow-lg">{formContent}</div>;
+  return (
+    <div className="bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl transition-colors">
+      {formContent}
+    </div>
+  );
 }
