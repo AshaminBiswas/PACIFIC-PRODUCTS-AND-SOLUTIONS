@@ -12,6 +12,7 @@ import {
   ShoppingBag,
   Plane,
   Home,
+  ChevronDown,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/Button";
@@ -166,7 +167,7 @@ function HeroSection() {
       {/* Main content */}
       <motion.div
         style={{ opacity }}
-        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center py-16 sm:py-20 lg:py-0 lg:min-h-[calc(100vh-64px)] lg:flex lg:flex-col lg:items-center lg:justify-center"
+        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center pb-12 sm:pb-16 lg:pb-0"
       >
         {/* Badge
         <motion.div
@@ -181,7 +182,7 @@ function HeroSection() {
 
         {/* Headline */}
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5rem] font-bold text-white mb-5 sm:mb-6 leading-[1.08] tracking-tight"
+          className="text-5xl sm:text-6xl md:text-[4.5rem] lg:text-7xl xl:text-[5.5rem] font-bold text-white mb-6 sm:mb-8 leading-[1.1] tracking-tight"
           style={{ textShadow: "0 2px 16px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.9)" }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -202,7 +203,7 @@ function HeroSection() {
         {/* Sub-headline — shows current slide description or static fallback */}
         <motion.p
           key={currentSlide}
-          className="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-8 sm:mb-10 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed"
+          className="text-lg sm:text-xl md:text-2xl text-white/95 mb-10 sm:mb-12 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed font-medium"
           style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9), 0 2px 20px rgba(0,0,0,0.7)" }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -273,19 +274,15 @@ function HeroSection() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.4, duration: 0.6 }}
-        className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 z-10"
+        className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 cursor-pointer"
+        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
       >
-
         <motion.div
           animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
-          className="w-6 h-10 border-2 border-[#7FB706]/40 rounded-full flex justify-center pt-1.5"
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/40 hover:scale-105 transition-all"
         >
-          <motion.div
-            animate={{ y: [0, 10, 0], opacity: [1, 0.3, 1] }}
-            transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
-            className="w-1 h-1.5 bg-[#7FB706] rounded-full"
-          />
+          <ChevronDown className="w-5 h-5 opacity-80" />
         </motion.div>
       </motion.div>
     </section>
