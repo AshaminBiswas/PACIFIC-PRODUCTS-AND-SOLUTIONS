@@ -91,12 +91,15 @@ export function Navbar() {
     setActiveMobileDropdown((prev) => (prev === name ? null : name));
   };
 
+  const isHome = location.pathname === "/";
+  const isSolid = isScrolled || isMobileMenuOpen || !isHome;
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled || isMobileMenuOpen
+        isSolid
           ? "bg-white/95 dark:bg-[#030213]/95 backdrop-blur-lg shadow-lg border-b border-transparent dark:border-white/10"
           : "bg-transparent border-b border-transparent"
       }`}
@@ -129,7 +132,7 @@ export function Navbar() {
                     location.pathname === item.path ||
                     location.pathname.startsWith(item.path + "/")
                       ? "text-[#7FB706]"
-                      : isScrolled || isMobileMenuOpen
+                      : isSolid
                         ? "text-[#030213] dark:text-gray-300 hover:text-[#7FB706] dark:hover:text-[#7FB706]"
                         : "text-white hover:text-[#7FB706]"
                   }`}
@@ -207,7 +210,7 @@ export function Navbar() {
                   exit={{ rotate: -90, opacity: 0 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <Menu className={`w-6 h-6 ${isScrolled || isMobileMenuOpen ? "text-[#030213] dark:text-white" : "text-white"}`} />
+                  <Menu className={`w-6 h-6 ${isSolid ? "text-[#030213] dark:text-white" : "text-white"}`} />
                 </motion.div>
               )}
             </AnimatePresence>
