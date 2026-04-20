@@ -166,7 +166,7 @@ function HeroSection() {
       {/* Main content */}
       <motion.div
         style={{ opacity }}
-        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center pb-12 sm:pb-16 lg:pb-0"
+        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center pb-0 sm:pb-16 lg:pb-0"
       >
         {/* Badge
         <motion.div
@@ -213,7 +213,7 @@ function HeroSection() {
 
         {/* CTA buttons */}
         <motion.div
-          className="flex flex-row gap-2 sm:gap-4 justify-center items-center mb-14 sm:mb-16 lg:mb-20 w-full px-4 sm:px-0"
+          className="flex flex-row gap-1.5 sm:gap-4 justify-center items-center mb-6 sm:mb-16 lg:mb-20 w-full px-2 sm:px-0"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.5 }}
@@ -226,10 +226,10 @@ function HeroSection() {
           >
             <Button
               size="lg"
-              className="w-full relative overflow-hidden px-2 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold shadow-lg shadow-[#7FB706]/25 transition-shadow hover:shadow-xl hover:shadow-[#7FB706]/35"
+              className="w-full relative overflow-hidden px-2 sm:px-8 py-3.5 sm:py-4 text-[13px] sm:text-base font-semibold shadow-lg shadow-[#7FB706]/25 transition-shadow hover:shadow-xl hover:shadow-[#7FB706]/35"
               onClick={() => navigate("/contact")}
             >
-              <span className="relative z-10 flex items-center gap-2">
+              <span className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap">
                 Get Quote
                 <motion.span
                   animate={{ x: quoteHovered ? 4 : 0 }}
@@ -250,10 +250,10 @@ function HeroSection() {
             <Button
               size="lg"
               variant="outline"
-              className="w-full px-2 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold backdrop-blur-sm border-[#7FB706]/40 hover:bg-[#7FB706]/5 hover:border-[#7FB706]/30 hover:text-gray-900 dark:hover:text-white dark:text-gray-300 transition-all"
+              className="w-full px-2 sm:px-8 py-3.5 sm:py-4 text-[13px] sm:text-base font-semibold backdrop-blur-sm border-[#7FB706]/40 hover:bg-[#7FB706]/5 hover:border-[#7FB706]/30 hover:text-gray-900 dark:hover:text-white dark:text-gray-300 transition-all"
               onClick={() => navigate("/products")}
             >
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap">
                 View Services
                 <motion.span
                   animate={{ x: productHovered ? 4 : 0 }}
