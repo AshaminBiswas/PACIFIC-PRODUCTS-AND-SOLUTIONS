@@ -8,43 +8,43 @@ export interface Database {
     Tables: {
       products: {
         Row: Product;
-        Insert: Omit<Product, "id" | "created_at" | "updated_at">;
-        Update: Partial<Omit<Product, "id" | "created_at">>;
+        Insert: Partial<Product> & Pick<Product, "slug" | "title">;
+        Update: Partial<Product>;
       };
       blogs: {
         Row: Blog;
-        Insert: Omit<Blog, "id" | "created_at" | "updated_at">;
-        Update: Partial<Omit<Blog, "id" | "created_at">>;
+        Insert: Partial<Blog> & Pick<Blog, "slug" | "title" | "content">;
+        Update: Partial<Blog>;
       };
       solutions: {
         Row: Solution;
-        Insert: Omit<Solution, "id" | "created_at" | "updated_at">;
-        Update: Partial<Omit<Solution, "id" | "created_at">>;
+        Insert: Partial<Solution> & Pick<Solution, "slug" | "title">;
+        Update: Partial<Solution>;
       };
       gallery_images: {
         Row: GalleryImage;
-        Insert: Omit<GalleryImage, "id" | "created_at">;
-        Update: Partial<Omit<GalleryImage, "id" | "created_at">>;
+        Insert: Partial<GalleryImage> & Pick<GalleryImage, "title" | "image_url">;
+        Update: Partial<GalleryImage>;
       };
       hero_images: {
         Row: HeroImage;
-        Insert: Omit<HeroImage, "id" | "created_at">;
-        Update: Partial<Omit<HeroImage, "id" | "created_at">>;
+        Insert: Partial<HeroImage> & Pick<HeroImage, "url">;
+        Update: Partial<HeroImage>;
       };
       core_services: {
         Row: CoreService;
-        Insert: Omit<CoreService, "id" | "created_at">;
-        Update: Partial<Omit<CoreService, "id" | "created_at">>;
+        Insert: Partial<CoreService> & Pick<CoreService, "title" | "image_url">;
+        Update: Partial<CoreService>;
       };
       page_banners: {
         Row: PageBanner;
-        Insert: Omit<PageBanner, "id" | "created_at">;
-        Update: Partial<Omit<PageBanner, "id" | "created_at">>;
+        Insert: Partial<PageBanner> & Pick<PageBanner, "page_slug" | "image_url">;
+        Update: Partial<PageBanner>;
       };
       contact_queries: {
         Row: ContactQuery;
-        Insert: Omit<ContactQuery, "id" | "created_at">;
-        Update: Partial<Omit<ContactQuery, "id" | "created_at">>;
+        Insert: Partial<ContactQuery> & Pick<ContactQuery, "name" | "email" | "phone">;
+        Update: Partial<ContactQuery>;
       };
     };
     Views: {

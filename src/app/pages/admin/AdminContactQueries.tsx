@@ -99,7 +99,7 @@ export default function AdminContactQueries() {
       // Update
       const { error } = await supabase
         .from('contact_queries')
-        .update(formData as any)
+        .update(formData)
         .eq('id', editingItem.id);
       
       if (!error) {
@@ -112,7 +112,7 @@ export default function AdminContactQueries() {
       // Create
       const { error } = await supabase
         .from('contact_queries')
-        .insert([formData as any]);
+        .insert([formData]);
       
       if (!error) {
         fetchQueries();

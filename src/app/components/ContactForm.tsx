@@ -6,9 +6,9 @@ import { Button } from "./Button";
 import { supabase } from "../../lib/supabase";
 
 // ─── EmailJS Configuration ────────────────────────────────────────────────────
-const EMAILJS_SERVICE_ID = "service_jv7krzo";
-const EMAILJS_TEMPLATE_ID = "template_fg2sxhb";
-const EMAILJS_PUBLIC_KEY = "tBXdx5KB_3Nr2C-v-";
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string;
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ContactFormProps {
