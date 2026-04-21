@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { X, CheckCircle2, AlertCircle } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { Button } from "./Button";
+import { supabase } from "../../lib/supabase";
 
 // ─── EmailJS Configuration ────────────────────────────────────────────────────
 const EMAILJS_SERVICE_ID = "service_jv7krzo";
@@ -44,12 +45,35 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
     };
 
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        EMAILJS_PUBLIC_KEY
-      );
+      // 1. Save to Supabase database
+      const { error: dbError } = await supabase
+        .from('contact_queries')
+        .insert([{
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company || null,
+          requirement: formData.requirement || null,
+          message: formData.message || null,
+        }]);
+
+      if (dbError) {
+        console.error("Supabase insert error:", dbError);
+        throw new Error("Failed to save query to database.");
+      }
+
+      // 2. Send Email Notification (Non-fatal if it fails)
+      try {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          templateParams,
+          EMAILJS_PUBLIC_KEY
+        );
+      } catch (emailErr) {
+        console.error("EmailJS notification failed, but data was saved:", emailErr);
+        // We do not throw here so the user still sees a success message!
+      }
 
       setSubmitted(true);
 
@@ -65,9 +89,9 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
         });
         if (onClose) onClose();
       }, 3000);
-    } catch (err) {
-      console.error("EmailJS error:", err);
-      setError("Something went wrong. Please try again or contact us directly.");
+    } catch (err: any) {
+      console.error("Submission error:", err);
+      setError(`Error: ${err.message || "Something went wrong. Please try again."}`);
     } finally {
       setIsSubmitting(false);
     }

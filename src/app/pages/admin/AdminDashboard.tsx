@@ -16,6 +16,7 @@ import {
   MonitorPlay,
   Layers,
   LayoutTemplate,
+  MessageSquare,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -56,6 +57,7 @@ export default function AdminDashboard() {
     { name: "Hero Images", path: "/admin/dashboard/hero", icon: MonitorPlay },
     { name: "Core Services", path: "/admin/dashboard/core-services", icon: Layers },
     { name: "Page Banners", path: "/admin/dashboard/page-banners", icon: LayoutTemplate },
+    { name: "Contact Queries", path: "/admin/dashboard/contact-queries", icon: MessageSquare },
   ];
 
   if (checking) {

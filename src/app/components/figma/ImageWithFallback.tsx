@@ -70,7 +70,8 @@ export function ImageWithFallback({
       style={style}
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
-      fetchPriority={priority ? 'high' : 'low'}
+      // @ts-ignore - fetchpriority is valid HTML but missing from React types
+      fetchpriority={priority ? 'high' : 'low'}
       onError={handleError}
       onLoad={handleLoad}
       {...rest}

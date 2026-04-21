@@ -41,6 +41,11 @@ export interface Database {
         Insert: Omit<PageBanner, "id" | "created_at">;
         Update: Partial<Omit<PageBanner, "id" | "created_at">>;
       };
+      contact_queries: {
+        Row: ContactQuery;
+        Insert: Omit<ContactQuery, "id" | "created_at">;
+        Update: Partial<Omit<ContactQuery, "id" | "created_at">>;
+      };
     };
     Views: {
       [_ in never]: never
@@ -144,5 +149,17 @@ export interface PageBanner {
   image_url: string;
   title: string;
   subtitle: string;
+  created_at: string;
+}
+
+export interface ContactQuery {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string | null;
+  requirement: string | null;
+  message: string | null;
+  status: string;
   created_at: string;
 }

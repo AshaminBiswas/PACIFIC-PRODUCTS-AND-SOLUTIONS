@@ -640,7 +640,7 @@ export function usePageBanner(pageSlug: string): UseSingleResult<PageBanner> {
           .from("page_banners")
           .select("*")
           .eq("page_slug", pageSlug)
-          .single();
+          .maybeSingle();
         if (err) throw err;
         const banner = row as PageBanner;
         memCache.set(cacheKey, { data: banner, timestamp: Date.now() });
