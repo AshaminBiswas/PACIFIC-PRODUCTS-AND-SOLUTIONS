@@ -5,8 +5,7 @@
 -- ============================================================
 
 -- ── 1. Products ──────────────────────────────────────────────
-
-CREATE TABLE IF NOT EXISTS products (
+CREATE TABLE IF NOT EXISTS public.products (
   id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   slug          TEXT UNIQUE NOT NULL,
   title         TEXT NOT NULL,
@@ -26,8 +25,7 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 -- ── 2. Blogs ─────────────────────────────────────────────────
-
-CREATE TABLE IF NOT EXISTS blogs (
+CREATE TABLE IF NOT EXISTS public.blogs (
   id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   slug            TEXT UNIQUE NOT NULL,
   title           TEXT NOT NULL,
@@ -44,8 +42,7 @@ CREATE TABLE IF NOT EXISTS blogs (
 );
 
 -- ── 3. Solutions ─────────────────────────────────────────────
-
-CREATE TABLE IF NOT EXISTS solutions (
+CREATE TABLE IF NOT EXISTS public.solutions (
   id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   slug        TEXT UNIQUE NOT NULL,
   title       TEXT NOT NULL,
@@ -63,8 +60,7 @@ CREATE TABLE IF NOT EXISTS solutions (
 );
 
 -- ── 4. Gallery Images ────────────────────────────────────────
-
-CREATE TABLE IF NOT EXISTS gallery_images (
+CREATE TABLE IF NOT EXISTS public.gallery_images (
   id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title       TEXT NOT NULL,
   category    TEXT NOT NULL DEFAULT '',
@@ -74,9 +70,50 @@ CREATE TABLE IF NOT EXISTS gallery_images (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- ── 5. Updated-at trigger ────────────────────────────────────
+-- ── 5. Hero Images ───────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.hero_images (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  url         TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  sort_order  INTEGER NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- ── 6. Core Services ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.core_services (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title       TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  image_url   TEXT NOT NULL DEFAULT '',
+  sort_order  INTEGER NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ── 7. Page Banners ──────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.page_banners (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  page_slug   TEXT NOT NULL,
+  image_url   TEXT NOT NULL DEFAULT '',
+  title       TEXT NOT NULL DEFAULT '',
+  subtitle    TEXT NOT NULL DEFAULT '',
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ── 8. Contact Queries ───────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.contact_queries (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name        TEXT NOT NULL,
+  email       TEXT NOT NULL,
+  phone       TEXT NOT NULL,
+  company     TEXT,
+  requirement TEXT,
+  message     TEXT,
+  status      TEXT DEFAULT 'new',
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ── 9. Updated-at trigger ────────────────────────────────────
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = now();
@@ -84,57 +121,54 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS products_updated_at ON products;
+DROP TRIGGER IF EXISTS products_updated_at ON public.products;
 CREATE TRIGGER products_updated_at
-  BEFORE UPDATE ON products
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  BEFORE UPDATE ON public.products
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-DROP TRIGGER IF EXISTS blogs_updated_at ON blogs;
+DROP TRIGGER IF EXISTS blogs_updated_at ON public.blogs;
 CREATE TRIGGER blogs_updated_at
-  BEFORE UPDATE ON blogs
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  BEFORE UPDATE ON public.blogs
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
-DROP TRIGGER IF EXISTS solutions_updated_at ON solutions;
+DROP TRIGGER IF EXISTS solutions_updated_at ON public.solutions;
 CREATE TRIGGER solutions_updated_at
-  BEFORE UPDATE ON solutions
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  BEFORE UPDATE ON public.solutions
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- ── 6. Row Level Security ────────────────────────────────────
--- Public read for published items, write requires auth.
+-- ── 10. Row Level Security ────────────────────────────────────
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blogs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.solutions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.gallery_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hero_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.core_services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.page_banners ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.contact_queries ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE products ENABLE ROW LEVEL SECURITY;
-ALTER TABLE blogs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE solutions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE gallery_images ENABLE ROW LEVEL SECURITY;
+-- ─ Public read policies (for published or public content)
+CREATE POLICY "Public can view published products" ON public.products FOR SELECT USING (published = true);
+CREATE POLICY "Public can view published blogs" ON public.blogs FOR SELECT USING (published = true);
+CREATE POLICY "Public can view published solutions" ON public.solutions FOR SELECT USING (published = true);
+CREATE POLICY "Public can view published gallery images" ON public.gallery_images FOR SELECT USING (published = true);
+CREATE POLICY "Public can view hero images" ON public.hero_images FOR SELECT USING (true);
+CREATE POLICY "Public can view core services" ON public.core_services FOR SELECT USING (true);
+CREATE POLICY "Public can view page banners" ON public.page_banners FOR SELECT USING (true);
 
--- Public read
-CREATE POLICY "Public can view published products"
-  ON products FOR SELECT USING (published = true);
+-- ─ Public Insert policies (for visitors submitting forms)
+CREATE POLICY "Allow public insert" ON public.contact_queries FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "Public can view published blogs"
-  ON blogs FOR SELECT USING (published = true);
+-- ─ Authenticated full access policies (Admin Panel)
+CREATE POLICY "Auth users can manage products" ON public.products FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage blogs" ON public.blogs FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage solutions" ON public.solutions FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage gallery images" ON public.gallery_images FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage hero images" ON public.hero_images FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage core services" ON public.core_services FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage page banners" ON public.page_banners FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage contact queries" ON public.contact_queries FOR ALL USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Public can view published solutions"
-  ON solutions FOR SELECT USING (published = true);
-
-CREATE POLICY "Public can view published gallery images"
-  ON gallery_images FOR SELECT USING (published = true);
-
--- Authenticated full access
-CREATE POLICY "Auth users can manage products"
-  ON products FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Auth users can manage blogs"
-  ON blogs FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Auth users can manage solutions"
-  ON solutions FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Auth users can manage gallery images"
-  ON gallery_images FOR ALL USING (auth.role() = 'authenticated');
-
--- ── 7. Storage Bucket ────────────────────────────────────────
-
+-- ── 11. Storage Bucket ────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('uploads', 'uploads', true)
 ON CONFLICT (id) DO NOTHING;
@@ -151,12 +185,18 @@ CREATE POLICY "Auth users can delete uploads"
   ON storage.objects FOR DELETE
   USING (bucket_id = 'uploads' AND auth.role() = 'authenticated');
 
--- ── 8. Indexes ───────────────────────────────────────────────
+CREATE POLICY "Auth users can update uploads"
+  ON storage.objects FOR UPDATE
+  USING (bucket_id = 'uploads' AND auth.role() = 'authenticated');
 
-CREATE INDEX IF NOT EXISTS idx_products_slug ON products (slug);
-CREATE INDEX IF NOT EXISTS idx_products_published ON products (published);
-CREATE INDEX IF NOT EXISTS idx_blogs_slug ON blogs (slug);
-CREATE INDEX IF NOT EXISTS idx_blogs_published ON blogs (published);
-CREATE INDEX IF NOT EXISTS idx_solutions_slug ON solutions (slug);
-CREATE INDEX IF NOT EXISTS idx_solutions_published ON solutions (published);
-CREATE INDEX IF NOT EXISTS idx_gallery_published ON gallery_images (published);
+-- ── 12. Indexes ───────────────────────────────────────────────
+CREATE INDEX IF NOT EXISTS idx_products_slug ON public.products (slug);
+CREATE INDEX IF NOT EXISTS idx_products_published ON public.products (published);
+CREATE INDEX IF NOT EXISTS idx_blogs_slug ON public.blogs (slug);
+CREATE INDEX IF NOT EXISTS idx_blogs_published ON public.blogs (published);
+CREATE INDEX IF NOT EXISTS idx_solutions_slug ON public.solutions (slug);
+CREATE INDEX IF NOT EXISTS idx_solutions_published ON public.solutions (published);
+CREATE INDEX IF NOT EXISTS idx_gallery_published ON public.gallery_images (published);
+
+-- Notify PostgREST to reload schema cache
+NOTIFY pgrst, 'reload schema';
