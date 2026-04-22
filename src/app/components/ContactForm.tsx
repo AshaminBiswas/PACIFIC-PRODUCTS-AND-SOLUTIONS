@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { X, CheckCircle2, AlertCircle } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { Button } from "./Button";
-import { supabase } from "../../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 // ─── EmailJS Configuration ────────────────────────────────────────────────────
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string;
@@ -45,21 +45,25 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
     };
 
     try {
-      // 1. Save to Supabase database
-      const { error: dbError } = await supabase
-        .from('contact_queries')
-        .insert([{
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          company: formData.company || null,
-          requirement: formData.requirement || null,
-          message: formData.message || null,
-        }]);
+      // 1. Save to Supabase database (non-fatal — skipped in demo mode)
+      if (isSupabaseConfigured()) {
+        const { error: dbError } = await supabase
+          .from('contact_queries')
+          .insert([{
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            company: formData.company || null,
+            requirement: formData.requirement || null,
+            message: formData.message || null,
+          }]);
 
-      if (dbError) {
-        console.error("Supabase insert error:", dbError);
-        throw new Error("Failed to save query to database.");
+        if (dbError) {
+          // Log but don't block the user — EmailJS can still deliver the message
+          console.error("Supabase insert error:", dbError);
+        }
+      } else {
+        console.warn("Supabase not configured — skipping database save.");
       }
 
       // 2. Send Email Notification (Non-fatal if it fails)
@@ -71,7 +75,7 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
           EMAILJS_PUBLIC_KEY
         );
       } catch (emailErr) {
-        console.error("EmailJS notification failed, but data was saved:", emailErr);
+        console.error("EmailJS notification failed:", emailErr);
         // We do not throw here so the user still sees a success message!
       }
 
@@ -91,7 +95,7 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
       }, 3000);
     } catch (err: any) {
       console.error("Submission error:", err);
-      setError(`Error: ${err.message || "Something went wrong. Please try again."}`);
+      setError("Something went wrong while sending your inquiry. Please try again or contact us directly.");
     } finally {
       setIsSubmitting(false);
     }
@@ -157,6 +161,10 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
             id="phone"
             name="phone"
             required
+            minLength={7}
+            maxLength={15}
+            pattern="[+\d\s\-().]{7,15}"
+            title="Please enter a valid phone number (7–15 digits, may include +, spaces, or dashes)"
             value={formData.phone}
             onChange={handleChange}
             className={inputClasses}
