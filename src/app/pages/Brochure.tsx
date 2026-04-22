@@ -16,7 +16,7 @@ import {
 
 export default function Brochure() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a1a] text-gray-900 dark:text-white font-sans selection:bg-[#E9FDBF] selection:text-[#7FB706] pt-20 transition-colors">
+    <div className="min-h-screen bg-transparent dark:bg-[#0a0a1a] text-gray-900 dark:text-white font-sans selection:bg-[#E9FDBF] selection:text-[#7FB706] pt-20 transition-colors">
       <div className="w-full max-w-5xl mx-auto shadow-2xl overflow-hidden bg-white dark:bg-[#030213] transition-colors">
         
         {/* ═══ COVER ═══ */}

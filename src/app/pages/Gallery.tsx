@@ -19,7 +19,7 @@ export default function GalleryPage() {
       : galleryImages.filter((img) => img.category === selectedCategory);
 
   return (
-    <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
+    <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       {/* Hero Banner */}
       <section className="relative w-full h-[38vh] min-h-[260px] overflow-hidden">
         <ImageWithFallback
@@ -54,7 +54,7 @@ export default function GalleryPage() {
       </section>
 
       {/* Filter */}
-      <section className="py-8 bg-white dark:bg-[#0a0a1a] border-b border-gray-200 dark:border-white/5 transition-colors">
+      <section className="py-8 bg-transparent dark:bg-[#0a0a1a] border-b border-gray-200 dark:border-white/5 transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-4">
             {categories.map((category) => (

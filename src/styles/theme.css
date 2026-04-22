@@ -129,7 +129,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-to-br from-[#E9FDBF] via-white to-[#E9FDBF] dark:from-background dark:via-background dark:to-background text-foreground;
   }
 
   /**

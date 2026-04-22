@@ -313,7 +313,7 @@ export default function HomePage() {
       {/* Featured Products */}
 
 
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-transparent dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -362,7 +362,7 @@ export default function HomePage() {
       </section>
 
       {/* Services Overview */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gray-50 dark:bg-[#0a0a1a] transition-colors">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white/40 dark:bg-[#0a0a1a] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -395,7 +395,7 @@ export default function HomePage() {
       </section>
 
       {/* Industries Served */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-transparent dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -520,7 +520,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white dark:bg-[#030213] transition-colors">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-transparent dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <motion.div

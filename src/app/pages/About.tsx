@@ -11,7 +11,7 @@ export default function AboutPage() {
   const { data: banner } = usePageBanner("about");
 
   return (
-    <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
+    <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       {/* Hero Banner */}
       <section className="relative w-full h-[38vh] min-h-[260px] overflow-hidden">
         <ImageWithFallback
@@ -48,7 +48,7 @@ export default function AboutPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-white dark:bg-[#030213] transition-colors">
+      <section className="py-16 bg-transparent dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
@@ -99,7 +99,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-24 bg-white dark:bg-[#030213] transition-colors">
+      <section className="py-24 bg-transparent dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">Our Core Values</h2>

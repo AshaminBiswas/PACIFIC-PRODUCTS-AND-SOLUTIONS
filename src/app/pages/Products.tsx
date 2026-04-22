@@ -17,7 +17,7 @@ export default function ProductsPage() {
     : products;
 
   return (
-    <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
+    <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       {/* Hero Banner */}
       <section className="relative w-full h-[38vh] min-h-[260px] overflow-hidden">
         <ImageWithFallback
@@ -54,7 +54,7 @@ export default function ProductsPage() {
       </section>
 
       {/* Products Grid */}
-      <section className="py-16 sm:py-24 bg-white dark:bg-[#030213] transition-colors">
+      <section className="py-16 sm:py-24 bg-transparent dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="text-center text-gray-500 dark:text-gray-400">Loading services...</div>

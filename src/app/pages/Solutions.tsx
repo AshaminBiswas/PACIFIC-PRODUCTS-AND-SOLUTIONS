@@ -17,7 +17,7 @@ export default function SolutionsPage() {
     : solutions;
 
   return (
-    <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
+    <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       {/* Hero Banner */}
       <section className="relative w-full h-[38vh] min-h-[260px] overflow-hidden">
         <ImageWithFallback
