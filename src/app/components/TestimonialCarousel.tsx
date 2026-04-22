@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { CheckCircle2, AlertCircle, MessageSquarePlus } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -352,6 +354,237 @@ function DotIndicator({
   );
 }
 
+// ── Feedback Form ─────────────────────────────────────────────────────────────
+
+function InteractiveStars({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="flex gap-1.5" onMouseLeave={() => setHovered(0)}>
+      {Array.from({ length: 5 }).map((_, i) => {
+        const filled = i < (hovered || value);
+        return (
+          <motion.button
+            key={i}
+            type="button"
+            onClick={() => onChange(i + 1)}
+            onMouseEnter={() => setHovered(i + 1)}
+            whileHover={{ scale: 1.25 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            aria-label={`Rate ${i + 1} star${i !== 0 ? "s" : ""}`}
+            className="focus:outline-none"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="w-8 h-8 transition-colors duration-150"
+              fill={filled ? "#F59E0B" : "none"}
+              stroke={filled ? "#F59E0B" : "#9CA3AF"}
+              strokeWidth={1.5}
+            >
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+}
+
+function FeedbackForm() {
+  const [formData, setFormData] = useState({ name: "", company: "", message: "" });
+  const [stars, setStars] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const inputClasses =
+    "w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-[#030213] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#7FB706] focus:ring-1 focus:ring-[#7FB706] transition-colors text-sm";
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (stars === 0) { setError("Please select a star rating before submitting."); return; }
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      if (isSupabaseConfigured()) {
+        const { error: dbError } = await supabase.from("feedback").insert([{
+          name: formData.name,
+          company: formData.company || null,
+          stars,
+          message: formData.message,
+        }]);
+        if (dbError) console.error("Feedback insert error:", dbError);
+      } else {
+        console.warn("Supabase not configured — feedback not saved.");
+      }
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({ name: "", company: "", message: "" });
+        setStars(0);
+      }, 4000);
+    } catch (err: any) {
+      console.error("Feedback error:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.5, delay: 0.15 }}
+      className="mt-16 sm:mt-20 max-w-2xl mx-auto"
+    >
+      {/* Header */}
+      <div className="text-center mb-8">
+        <span className="inline-flex items-center gap-2 bg-[#7FB706]/10 border border-[#7FB706]/20 text-[#7FB706] text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full mb-4">
+          <MessageSquarePlus className="w-3.5 h-3.5" />
+          Share Your Experience
+        </span>
+        <h3 className="text-xl sm:text-2xl font-bold text-[#030213] dark:text-white transition-colors">
+          Leave a Review
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Your feedback helps us serve you better.
+        </p>
+      </div>
+
+      {/* Card */}
+      <div className="bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl transition-colors">
+        <AnimatePresence mode="wait">
+          {submitted ? (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex flex-col items-center text-center py-6 gap-4"
+            >
+              <div className="w-16 h-16 rounded-full bg-[#7FB706] flex items-center justify-center shadow-lg shadow-[#7FB706]/25">
+                <CheckCircle2 className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h4 className="text-lg font-bold text-[#030213] dark:text-white">Thank you!</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Your review has been submitted successfully.
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.form
+              key="form"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onSubmit={handleSubmit}
+              className="space-y-5"
+            >
+              {/* Star Rating */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Your Rating *
+                </label>
+                <InteractiveStars value={stars} onChange={setStars} />
+              </div>
+
+              {/* Name + Company */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="fb-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Your Name *
+                  </label>
+                  <input
+                    id="fb-name"
+                    type="text"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={inputClasses}
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="fb-company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Company <span className="text-gray-400">(optional)</span>
+                  </label>
+                  <input
+                    id="fb-company"
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    className={inputClasses}
+                    placeholder="Your Company"
+                  />
+                </div>
+              </div>
+
+              {/* Message */}
+              <div>
+                <label htmlFor="fb-message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  Your Review *
+                </label>
+                <textarea
+                  id="fb-message"
+                  name="message"
+                  required
+                  rows={4}
+                  value={formData.message}
+                  onChange={handleChange}
+                  className={`${inputClasses} resize-none`}
+                  placeholder="Tell us about your experience with Pacific Products & Solutions..."
+                />
+              </div>
+
+              {/* Error */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    className="flex items-center gap-2.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl p-3.5 text-red-600 dark:text-red-400 text-sm"
+                  >
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    {error}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Submit */}
+              <motion.button
+                type="submit"
+                disabled={submitting}
+                whileHover={!submitting ? { scale: 1.02, boxShadow: "0 8px 28px rgba(127,183,6,0.35)" } : {}}
+                whileTap={!submitting ? { scale: 0.98 } : {}}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="w-full py-3.5 rounded-xl bg-[#7FB706] hover:bg-[#6fa005] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm tracking-wide transition-colors"
+              >
+                {submitting ? "Submitting..." : "Submit Review"}
+              </motion.button>
+            </motion.form>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
+
 // ── Main Carousel ─────────────────────────────────────────────────────────────
 
 // FIX: changed from `export default` to named export to match the import in Home.tsx
@@ -463,6 +696,9 @@ export function TestimonialCarousel() {
           {/* Dots (all screen sizes) */}
           <DotIndicator count={total} current={current} onSelect={goTo} />
         </div>
+
+        {/* Feedback Form */}
+        <FeedbackForm />
       </div>
     </section>
   );

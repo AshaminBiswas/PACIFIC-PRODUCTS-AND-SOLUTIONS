@@ -112,6 +112,16 @@ CREATE TABLE IF NOT EXISTS public.contact_queries (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- ── 9. Feedback ───────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.feedback (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name        TEXT NOT NULL,
+  company     TEXT,
+  stars       INTEGER NOT NULL CHECK (stars BETWEEN 1 AND 5),
+  message     TEXT NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- ── 9. Updated-at trigger ────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -145,6 +155,7 @@ ALTER TABLE public.hero_images ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.core_services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.page_banners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contact_queries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
 
 -- ─ Public read policies (for published or public content)
 CREATE POLICY "Public can view published products" ON public.products FOR SELECT USING (published = true);
@@ -157,6 +168,8 @@ CREATE POLICY "Public can view page banners" ON public.page_banners FOR SELECT U
 
 -- ─ Public Insert policies (for visitors submitting forms)
 CREATE POLICY "Allow public insert" ON public.contact_queries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public feedback insert" ON public.feedback FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public can view approved feedback" ON public.feedback FOR SELECT USING (true);
 
 -- ─ Authenticated full access policies (Admin Panel)
 CREATE POLICY "Auth users can manage products" ON public.products FOR ALL USING (auth.role() = 'authenticated');
@@ -167,6 +180,7 @@ CREATE POLICY "Auth users can manage hero images" ON public.hero_images FOR ALL 
 CREATE POLICY "Auth users can manage core services" ON public.core_services FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Auth users can manage page banners" ON public.page_banners FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Auth users can manage contact queries" ON public.contact_queries FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage feedback" ON public.feedback FOR ALL USING (auth.role() = 'authenticated');
 
 -- ── 11. Storage Bucket ────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public)
@@ -197,6 +211,7 @@ CREATE INDEX IF NOT EXISTS idx_blogs_published ON public.blogs (published);
 CREATE INDEX IF NOT EXISTS idx_solutions_slug ON public.solutions (slug);
 CREATE INDEX IF NOT EXISTS idx_solutions_published ON public.solutions (published);
 CREATE INDEX IF NOT EXISTS idx_gallery_published ON public.gallery_images (published);
+CREATE INDEX IF NOT EXISTS idx_feedback_created ON public.feedback (created_at DESC);
 
 -- Notify PostgREST to reload schema cache
 NOTIFY pgrst, 'reload schema';
