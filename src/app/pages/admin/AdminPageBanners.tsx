@@ -99,8 +99,8 @@ export default function AdminPageBanners() {
       )}
 
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Page Banners</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">
+        <h1 className="text-2xl font-bold text-white mb-1">Page Banners</h1>
+        <p className="text-gray-400 text-sm">
           Manage the hero background images for About, Services, Solutions, and Gallery pages.
         </p>
       </div>
@@ -118,9 +118,9 @@ export default function AdminPageBanners() {
             const isEditing = editingSlug === slug;
 
             return (
-              <div key={slug} className="bg-white dark:bg-[#0a0a1a] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm">
+              <div key={slug} className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden shadow-sm">
                 {/* Image Preview */}
-                <div className={`relative w-full ${spec.aspect} bg-gray-100 dark:bg-gray-900 overflow-hidden`}>
+                <div className={`relative w-full ${spec.aspect} bg-[#030213] overflow-hidden`}>
                   {banner?.image_url ? (
                     <img src={banner.image_url} alt={spec.label} className="w-full h-full object-cover" />
                   ) : (
@@ -144,10 +144,10 @@ export default function AdminPageBanners() {
                 {/* Content */}
                 <div className="p-5 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-base font-bold text-gray-900 dark:text-white">{spec.label}</h2>
+                    <h2 className="text-base font-bold text-white">{spec.label}</h2>
                     <button
                       onClick={() => { setEditingSlug(isEditing ? null : slug); }}
-                      className="flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-[#7FB706] transition-colors"
+                      className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-[#7FB706] transition-colors"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                       {isEditing ? "Cancel" : "Edit text"}
@@ -157,23 +157,23 @@ export default function AdminPageBanners() {
                   {isEditing ? (
                     <div className="space-y-3">
                       <div>
-                        <label className="text-xs font-medium text-gray-500 mb-1 block">Title</label>
+                        <label className="text-xs font-medium text-gray-400 mb-1 block">Title</label>
                         <input
                           type="text"
                           value={getEdit(slug, "title", banner?.title ?? "")}
                           onChange={(e) => setEdit(slug, "title", e.target.value)}
                           placeholder={`e.g. "About Us"`}
-                          className="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#030213] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#7FB706]"
+                          className="w-full px-3 py-2 text-sm rounded-xl border border-white/10 bg-[#0a0a1a] text-white focus:outline-none focus:ring-2 focus:ring-[#7FB706]"
                         />
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500 mb-1 block">Subtitle</label>
+                        <label className="text-xs font-medium text-gray-400 mb-1 block">Subtitle</label>
                         <input
                           type="text"
                           value={getEdit(slug, "subtitle", banner?.subtitle ?? "")}
                           onChange={(e) => setEdit(slug, "subtitle", e.target.value)}
                           placeholder="Short description"
-                          className="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#030213] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#7FB706]"
+                          className="w-full px-3 py-2 text-sm rounded-xl border border-white/10 bg-[#0a0a1a] text-white focus:outline-none focus:ring-2 focus:ring-[#7FB706]"
                         />
                       </div>
                       <button
@@ -187,8 +187,8 @@ export default function AdminPageBanners() {
                     </div>
                   ) : (
                     <div className="space-y-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{banner?.title || <span className="text-gray-400 italic">No title set</span>}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{banner?.subtitle || <span className="italic">No subtitle set</span>}</p>
+                      <p className="text-sm font-medium text-white">{banner?.title || <span className="text-gray-500 italic">No title set</span>}</p>
+                      <p className="text-xs text-gray-400">{banner?.subtitle || <span className="text-gray-500 italic">No subtitle set</span>}</p>
                     </div>
                   )}
 

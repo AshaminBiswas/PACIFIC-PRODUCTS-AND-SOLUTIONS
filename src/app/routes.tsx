@@ -42,6 +42,7 @@ const AdminHero       = lazy(() => import("./pages/admin/AdminHero"));
 const AdminCoreServices = lazy(() => import("./pages/admin/AdminCoreServices"));
 const AdminPageBanners  = lazy(() => import("./pages/admin/AdminPageBanners"));
 const AdminContactQueries = lazy(() => import("./pages/admin/AdminContactQueries"));
+const AdminFeedback     = lazy(() => import("./pages/admin/AdminFeedback"));
 
 // ── Layout ────────────────────────────────────────────────────────────────
 function Layout() {
@@ -344,6 +345,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageSkeleton />}>
             <AdminContactQueries />
+          </Suspense>
+        ),
+      },
+      {
+        path: "feedback",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminFeedback />
           </Suspense>
         ),
       },
