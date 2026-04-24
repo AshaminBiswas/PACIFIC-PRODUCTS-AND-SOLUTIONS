@@ -293,7 +293,7 @@ function HeroSection() {
 // ── Page ──────────────────────────────────────────────────────
 
 import { useProducts, useSolutions, useHeroImages, useCoreServices } from "../../lib/hooks";
-import * as Icons from "lucide-react";
+import { DynamicIcon } from "../components/DynamicIcon";
 import { CoreServiceCard } from "../components/CoreServiceCard";
 
 export default function HomePage() {
@@ -416,7 +416,6 @@ export default function HomePage() {
           ) : solutions && solutions.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {solutions.map((industry, index) => {
-                const Icon = (Icons as any)[industry.icon_name || "Building2"] || Icons.Building2;
                 return (
                   <motion.div
                     key={industry.id}
@@ -440,7 +439,7 @@ export default function HomePage() {
                     {/* Overlapping Floating Icon */}
                     <div className="absolute top-48 sm:top-52 right-6 -translate-y-1/2 z-10">
                       <div className="w-14 h-14 rounded-full bg-[#7FB706] text-white flex items-center justify-center shadow-lg shadow-[#7FB706]/30 transform transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
-                        <Icon className="w-6 h-6" />
+                        <DynamicIcon name={industry.icon_name} className="w-6 h-6" />
                       </div>
                     </div>
 

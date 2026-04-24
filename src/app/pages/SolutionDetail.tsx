@@ -5,7 +5,7 @@ import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
 import { useSolution } from "../../lib/hooks";
-import * as Icons from "lucide-react";
+import { DynamicIcon } from "../components/DynamicIcon";
 
 export default function SolutionDetailPage() {
   const { industry } = useParams<{ industry: string }>();
@@ -30,8 +30,6 @@ export default function SolutionDetailPage() {
     );
   }
 
-  // Fallback to Building2 if the icon doesn't exist
-  const Icon = (Icons as any)[solution.icon_name || "Building2"] || Icons.Building2;
 
   return (
     <div className="min-h-screen pt-20">
@@ -42,7 +40,7 @@ export default function SolutionDetailPage() {
             <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}>
               <div className="flex items-center space-x-4 mb-6">
                 <div className="w-16 h-16 bg-gradient-to-br from-[#7FB706] to-[#B5F823] rounded-xl flex items-center justify-center">
-                  <Icon className="w-8 h-8 text-white" />
+                  <DynamicIcon name={solution.icon_name} className="w-8 h-8 text-white" />
                 </div>
                 <h1 className="text-5xl font-bold text-[#030213]">{solution.title}</h1>
               </div>

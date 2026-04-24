@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Link, useSearchParams } from "react-router";
-import * as Icons from "lucide-react";
+import { DynamicIcon } from "../components/DynamicIcon";
 import { useSolutions, usePageBanner } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
@@ -61,7 +61,7 @@ export default function SolutionsPage() {
           ) : filteredSolutions.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredSolutions.map((solution, index) => {
-                const Icon = (Icons as any)[solution.icon_name || "Building2"] || Icons.Building2;
+
                 return (
                   <motion.div
                     key={solution.id}
@@ -83,7 +83,7 @@ export default function SolutionsPage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                         <div className="absolute bottom-6 left-6">
                           <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center mb-3 group-hover:bg-[#7FB706]/20 group-hover:border-[#7FB706]/50 transition-colors">
-                            <Icon className="w-6 h-6 text-[#B5F823]" />
+                            <DynamicIcon name={solution.icon_name} className="w-6 h-6 text-[#B5F823]" />
                           </div>
                         </div>
                       </div>
