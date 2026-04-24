@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
 import { useNavigate } from "react-router";
 // @ts-ignore
-import logo from "../../../image/logo/pacific-product-and-solution-logo.png";
+import logo from "../../../image/logo/logo.svg";
 
 /**
  * Admin login gate — uses Supabase email/password auth.

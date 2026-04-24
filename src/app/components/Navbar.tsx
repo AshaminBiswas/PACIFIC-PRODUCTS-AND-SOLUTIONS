@@ -6,7 +6,7 @@ import { Button } from "./Button";
 import { ThemeToggle } from "./ThemeToggle";
 import { useProducts, useSolutions } from "../../lib/hooks";
 // @ts-ignore
-import logo from "../../image/logo/pacific-product-and-solution-logo.png";
+import logo from "../../image/logo/logo.svg";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
