@@ -42,14 +42,65 @@ export interface Database {
         Update: Partial<PageBanner>;
       };
       contact_queries: {
-        Row: ContactQuery;
-        Insert: Partial<ContactQuery> & Pick<ContactQuery, "name" | "email" | "phone">;
-        Update: Partial<ContactQuery>;
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          phone: string;
+          company: string | null;
+          requirement: string | null;
+          message: string | null;
+          status: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          email: string;
+          phone: string;
+          company?: string | null;
+          requirement?: string | null;
+          message?: string | null;
+          status?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          email?: string;
+          phone?: string;
+          company?: string | null;
+          requirement?: string | null;
+          message?: string | null;
+          status?: string;
+          created_at?: string;
+        };
       };
       feedback: {
-        Row: Feedback;
-        Insert: Omit<Feedback, "id" | "created_at">;
-        Update: Partial<Feedback>;
+        Row: {
+          id: string;
+          name: string;
+          company: string | null;
+          stars: number;
+          message: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          company?: string | null;
+          stars: number;
+          message: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          company?: string | null;
+          stars?: number;
+          message?: string;
+          created_at?: string;
+        };
       };
     };
     Views: {
