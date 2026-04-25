@@ -30,8 +30,8 @@ export default defineConfig({
             if (id.includes('lucide-react')) {
               return 'lucide';
             }
-            if (id.includes('framer-motion')) {
-              return 'framer';
+            if (id.includes('motion')) {
+              return 'motion';
             }
             if (id.includes('@supabase')) {
               return 'supabase';

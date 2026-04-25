@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Plane,
   ShoppingBag,
@@ -9,7 +10,6 @@ import {
   Award,
   Target,
   Lightbulb,
-  HelpCircle,
   type LucideProps
 } from "lucide-react";
 

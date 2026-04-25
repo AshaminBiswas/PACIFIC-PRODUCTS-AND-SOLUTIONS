@@ -619,7 +619,7 @@ export default function HomePage() {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <button
-                onClick={() => window.open("https://wa.me/919876543210", "_blank")}
+              onClick={() => window.open("https://wa.me/919818592113", "_blank")}
                 className="inline-flex items-center justify-center w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg bg-white text-[#7FB706] rounded-xl hover:bg-gray-100 transition-all duration-300 hover:scale-105 font-medium"
               >
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">

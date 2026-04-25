@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import { useParams } from "react-router";
-import { Plane, ShoppingBag, Building2, Home } from "lucide-react";
 import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 

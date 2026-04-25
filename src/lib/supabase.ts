@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import imageCompression from "browser-image-compression";
 import type { Database } from "./database.types";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
@@ -27,14 +28,37 @@ export function isSupabaseConfigured(): boolean {
 // ── Storage helpers ───────────────────────────────────────────
 const BUCKET = "uploads";
 
+async function optimizeImage(file: File): Promise<File> {
+  // Keep GIF/SVG untouched to avoid breaking animations/vector assets.
+  const skipTypes = ["image/gif", "image/svg+xml"];
+  if (skipTypes.includes(file.type)) return file;
+
+  try {
+    return await imageCompression(file, {
+      maxSizeMB: 1.2,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      initialQuality: 0.8,
+      fileType: "image/webp",
+    });
+  } catch (error) {
+    console.warn("Image optimization failed, uploading original file:", error);
+    return file;
+  }
+}
+
 export async function uploadImage(
   file: File,
   folder: string = "images"
 ): Promise<string | null> {
-  const ext = file.name.split(".").pop();
+  const optimizedFile = await optimizeImage(file);
+  const ext =
+    optimizedFile.type === "image/webp"
+      ? "webp"
+      : optimizedFile.name.split(".").pop() || "jpg";
   const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-  const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, {
+  const { error } = await supabase.storage.from(BUCKET).upload(fileName, optimizedFile, {
     cacheControl: "3600",
     upsert: false,
   });
