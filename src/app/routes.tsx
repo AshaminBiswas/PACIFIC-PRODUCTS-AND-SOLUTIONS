@@ -30,6 +30,8 @@ const BlogDetail  = lazy(() => import("./pages/BlogDetail"));
 const Brochure    = lazy(() => import("./pages/Brochure"));
 const NotFound    = lazy(() => import("./pages/NotFound"));
 const FAQ         = lazy(() => import("./pages/FAQ"));
+const PrivacyPolicy  = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 
 // ── Lazy-loaded Admin Pages ───────────────────────────────────────────────
 const AdminLogin      = lazy(() => import("./pages/admin/AdminLogin"));
@@ -73,46 +75,6 @@ function Layout() {
   );
 }
 
-// ── Privacy & Terms (inline, no lazy needed) ──────────────────────────────
-function PrivacyPage() {
-  return (
-    <div className="min-h-screen pt-20 py-24 bg-white dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-        <h1 className="text-5xl font-bold text-[#030213] dark:text-white mb-8">Privacy Policy</h1>
-        <div className="prose prose-lg dark:prose-invert">
-          <p className="text-gray-700 dark:text-gray-300 mb-4">Last updated: March 29, 2026</p>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">Pacific Products & Solutions ("we", "our", or "us") is committed to protecting your privacy.</p>
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Information We Collect</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">We collect information that you provide directly to us, including name, email, phone number, and project details when you contact us or request a quote.</p>
-          <h2 className="text-2xl font-semibold mt-8 mb-4">How We Use Your Information</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">We use the information we collect to respond to your inquiries, provide quotes, and communicate about our products and services.</p>
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Contact Us</h2>
-          <p className="text-gray-700 dark:text-gray-300">If you have questions about this Privacy Policy, please contact us at info@pacificproducts.com</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TermsPage() {
-  return (
-    <div className="min-h-screen pt-20 py-24 bg-white dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-        <h1 className="text-5xl font-bold text-[#030213] dark:text-white mb-8">Terms of Service</h1>
-        <div className="prose prose-lg dark:prose-invert">
-          <p className="text-gray-700 dark:text-gray-300 mb-4">Last updated: March 29, 2026</p>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">Welcome to Pacific Products & Solutions. By accessing our website, you agree to these terms of service.</p>
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Use of Website</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">You may use our website for lawful purposes only. You agree not to use our website in any way that could damage or impair our services.</p>
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Intellectual Property</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">All content on this website, including text, graphics, logos, and images, is the property of Pacific Products & Solutions and protected by copyright laws.</p>
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Contact Information</h2>
-          <p className="text-gray-700 dark:text-gray-300">For questions about these Terms, contact us at info@pacificproducts.com</p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── Router ────────────────────────────────────────────────────────────────
 export const router = createBrowserRouter([
@@ -258,8 +220,8 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      { path: "privacy", Component: PrivacyPage },
-      { path: "terms",   Component: TermsPage },
+      { path: "privacy", element: (<Suspense fallback={<PageSkeleton />}><PrivacyPolicy /></Suspense>) },
+      { path: "terms",   element: (<Suspense fallback={<PageSkeleton />}><TermsOfService /></Suspense>) },
       {
         path: "*",
         element: (
