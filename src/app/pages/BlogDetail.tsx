@@ -1,5 +1,7 @@
 import { motion } from "motion/react";
 import { useParams, useNavigate, Link } from "react-router";
+import { useMemo } from "react";
+import DOMPurify from "dompurify";
 import { useBlog } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Button } from "../components/Button";
@@ -28,6 +30,14 @@ export default function BlogDetailPage() {
       </div>
     );
   }
+
+  const sanitizedContent = useMemo(
+    () =>
+      DOMPurify.sanitize(blog.content, {
+        USE_PROFILES: { html: true },
+      }),
+    [blog.content]
+  );
 
 
   return (
@@ -84,7 +94,7 @@ export default function BlogDetailPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
             <div 
               className="prose prose-lg max-w-none prose-headings:text-[#030213] prose-a:text-[#7FB706] prose-img:rounded-2xl" 
-              dangerouslySetInnerHTML={{ __html: blog.content }} 
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }} 
             />
 
             {/* Tags */}

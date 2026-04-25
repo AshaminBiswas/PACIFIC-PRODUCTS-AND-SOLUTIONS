@@ -50,6 +50,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // On Windows paths with spaces, forked workers can fail to boot.
+    // Threads pool is stable for this project and avoids worker startup timeouts.
+    pool: 'threads',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
     coverage: {
