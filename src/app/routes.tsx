@@ -29,6 +29,7 @@ const Blog        = lazy(() => import("./pages/Blog"));
 const BlogDetail  = lazy(() => import("./pages/BlogDetail"));
 const Brochure    = lazy(() => import("./pages/Brochure"));
 const NotFound    = lazy(() => import("./pages/NotFound"));
+const FAQ         = lazy(() => import("./pages/FAQ"));
 
 // ── Lazy-loaded Admin Pages ───────────────────────────────────────────────
 const AdminLogin      = lazy(() => import("./pages/admin/AdminLogin"));
@@ -43,6 +44,7 @@ const AdminCoreServices = lazy(() => import("./pages/admin/AdminCoreServices"));
 const AdminPageBanners  = lazy(() => import("./pages/admin/AdminPageBanners"));
 const AdminContactQueries = lazy(() => import("./pages/admin/AdminContactQueries"));
 const AdminFeedback     = lazy(() => import("./pages/admin/AdminFeedback"));
+const AdminFAQ          = lazy(() => import("./pages/admin/AdminFAQ"));
 
 // ── Layout ────────────────────────────────────────────────────────────────
 function Layout() {
@@ -214,6 +216,14 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "faq",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <FAQ />
+          </Suspense>
+        ),
+      },
 
       // Additional aliased paths
       {
@@ -353,6 +363,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageSkeleton />}>
             <AdminFeedback />
+          </Suspense>
+        ),
+      },
+      {
+        path: "faq",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminFAQ />
           </Suspense>
         ),
       },

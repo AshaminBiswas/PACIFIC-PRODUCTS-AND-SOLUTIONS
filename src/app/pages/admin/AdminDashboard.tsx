@@ -18,6 +18,7 @@ import {
   LayoutTemplate,
   MessageSquare,
   Star,
+  HelpCircle,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -60,6 +61,7 @@ export default function AdminDashboard() {
     { name: "Page Banners", path: "/admin/dashboard/page-banners", icon: LayoutTemplate },
     { name: "Contact Queries", path: "/admin/dashboard/contact-queries", icon: MessageSquare },
     { name: "Feedback", path: "/admin/dashboard/feedback", icon: Star },
+    { name: "FAQ", path: "/admin/dashboard/faq", icon: HelpCircle },
   ];
 
   if (checking) {
