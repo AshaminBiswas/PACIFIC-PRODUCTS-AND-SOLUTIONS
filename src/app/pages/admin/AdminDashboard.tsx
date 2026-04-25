@@ -19,6 +19,7 @@ import {
   MessageSquare,
   Star,
   HelpCircle,
+  Users,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -62,6 +63,7 @@ export default function AdminDashboard() {
     { name: "Contact Queries", path: "/admin/dashboard/contact-queries", icon: MessageSquare },
     { name: "Feedback", path: "/admin/dashboard/feedback", icon: Star },
     { name: "FAQ", path: "/admin/dashboard/faq", icon: HelpCircle },
+    { name: "Visitor Leads", path: "/admin/dashboard/leads", icon: Users },
   ];
 
   if (checking) {

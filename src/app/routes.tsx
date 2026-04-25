@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
+import CookieConsent from "./components/CookieConsent";
 import { Outlet } from "react-router";
 import { Suspense, lazy } from "react";
 import {
@@ -47,6 +48,7 @@ const AdminPageBanners  = lazy(() => import("./pages/admin/AdminPageBanners"));
 const AdminContactQueries = lazy(() => import("./pages/admin/AdminContactQueries"));
 const AdminFeedback     = lazy(() => import("./pages/admin/AdminFeedback"));
 const AdminFAQ          = lazy(() => import("./pages/admin/AdminFAQ"));
+const AdminLeads        = lazy(() => import("./pages/admin/AdminLeads"));
 
 // ── Layout ────────────────────────────────────────────────────────────────
 function Layout() {
@@ -58,6 +60,9 @@ function Layout() {
         <Outlet />
       </main>
       <Footer />
+
+      {/* Cookie Consent Popup */}
+      <CookieConsent />
 
       {/* Floating WhatsApp Button */}
       <a
@@ -333,6 +338,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageSkeleton />}>
             <AdminFAQ />
+          </Suspense>
+        ),
+      },
+      {
+        path: "leads",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminLeads />
           </Suspense>
         ),
       },
