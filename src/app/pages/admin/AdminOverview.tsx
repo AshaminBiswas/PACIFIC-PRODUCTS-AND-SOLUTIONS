@@ -63,19 +63,26 @@ export default function AdminOverview() {
         <h2 className="text-lg font-semibold text-white mb-4">Quick Start</h2>
         <div className="space-y-3 text-gray-400 text-sm">
           <p>
-            ✅ Use the sidebar to manage <strong className="text-white">Services</strong>,{" "}
-            <strong className="text-white">Blogs</strong>,{" "}
-            <strong className="text-white">Solutions</strong>, and{" "}
-            <strong className="text-white">Gallery</strong> images.
+            ✅ Start with <strong className="text-white">Hero Images</strong> and{" "}
+            <strong className="text-white">Page Banners</strong> so your key pages have the right visual assets first.
           </p>
           <p>
-            📤 Upload images directly when creating or editing content — they're stored in Supabase Storage.
+            🧩 Then update core content in <strong className="text-white">Services</strong>,{" "}
+            <strong className="text-white">Solutions</strong>, <strong className="text-white">Blogs</strong>, and{" "}
+            <strong className="text-white">Gallery</strong>.
           </p>
           <p>
-            🔒 Only published items are visible on the public website. Use the toggle to control visibility.
+            📤 Upload images while editing — files are stored in Supabase Storage and linked automatically.
           </p>
           <p>
-            🌐 Click <strong className="text-white">"View Site →"</strong> in the top bar to see changes live.
+            🔒 Use the publish toggle to control what appears on the live website.
+          </p>
+          <p>
+            💬 Review <strong className="text-white">Contact Queries</strong> and{" "}
+            <strong className="text-white">Feedback</strong> regularly to prioritize follow-ups.
+          </p>
+          <p>
+            🌐 Use <strong className="text-white">"View Site →"</strong> in the top bar to verify updates on the public site.
           </p>
         </div>
       </div>
