@@ -1,8 +1,9 @@
 import { motion } from "motion/react";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, ArrowRight } from "lucide-react";
 import { ContactForm } from "../components/ContactForm";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { usePageBanner } from "../../lib/hooks";
+import { Link } from "react-router";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80";
 
@@ -12,24 +13,28 @@ export default function ContactPage() {
   const locations = [
     {
       city: "Mumbai (Head Office)",
+      slug: "mumbai",
       address: "Plot No. 123, MIDC Industrial Area, Andheri East, Mumbai - 400093, Maharashtra, India",
       phone: "+91 22 1234 5678",
       email: "mumbai@pacificproducts.com",
     },
     {
       city: "Delhi",
+      slug: "delhi",
       address: "Sector 18, Udyog Vihar, Gurugram - 122015, Haryana, India",
       phone: "+91 11 9876 5432",
       email: "delhi@pacificproducts.com",
     },
     {
       city: "Bangalore",
+      slug: "bangalore",
       address: "Electronic City Phase 1, Bangalore - 560100, Karnataka, India",
       phone: "+91 80 5555 6666",
       email: "bangalore@pacificproducts.com",
     },
     {
       city: "Dubai, UAE",
+      slug: "uae",
       address: "Al Quoz Industrial Area 3, Dubai, United Arab Emirates",
       phone: "+971 4 333 4444",
       email: "dubai@pacificproducts.com",
@@ -193,23 +198,32 @@ export default function ContactPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="bg-[#030213] rounded-3xl p-8 border border-white/5 hover:border-[#7FB706]/30 hover:shadow-2xl hover:shadow-[#7FB706]/5 transition-all group"
               >
-                <h3 className="text-2xl font-bold text-white mb-6 group-hover:text-[#B5F823] transition-colors">{location.city}</h3>
-                <div className="space-y-4 text-gray-400">
-                  <div className="flex items-start space-x-4">
-                    <MapPin className="w-6 h-6 text-[#7FB706] flex-shrink-0" />
-                    <p className="leading-relaxed">{location.address}</p>
+                <Link
+                  to={`/locations/${location.slug}`}
+                  className="block bg-[#030213] rounded-3xl p-8 border border-white/5 hover:border-[#7FB706]/30 hover:shadow-2xl hover:shadow-[#7FB706]/5 transition-all group"
+                >
+                  <div className="flex items-start justify-between mb-6">
+                    <h3 className="text-2xl font-bold text-white group-hover:text-[#B5F823] transition-colors">{location.city}</h3>
+                    <span className="flex items-center gap-1 text-xs text-gray-500 group-hover:text-[#7FB706] transition-colors font-medium mt-1">
+                      View Details <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                    </span>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <Phone className="w-5 h-5 text-[#7FB706]" />
-                    <p>{location.phone}</p>
+                  <div className="space-y-4 text-gray-400">
+                    <div className="flex items-start space-x-4">
+                      <MapPin className="w-6 h-6 text-[#7FB706] flex-shrink-0" />
+                      <p className="leading-relaxed">{location.address}</p>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <Phone className="w-5 h-5 text-[#7FB706]" />
+                      <p>{location.phone}</p>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <Mail className="w-5 h-5 text-[#7FB706]" />
+                      <p>{location.email}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <Mail className="w-5 h-5 text-[#7FB706]" />
-                    <p>{location.email}</p>
-                  </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>
