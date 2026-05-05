@@ -45,6 +45,7 @@ const AdminGallery    = lazy(() => import("./pages/admin/AdminGallery"));
 const AdminHero       = lazy(() => import("./pages/admin/AdminHero"));
 const AdminCoreServices = lazy(() => import("./pages/admin/AdminCoreServices"));
 const AdminPageBanners  = lazy(() => import("./pages/admin/AdminPageBanners"));
+const AdminCatalogs         = lazy(() => import("./pages/admin/AdminCatalogs"));
 const AdminContactQueries = lazy(() => import("./pages/admin/AdminContactQueries"));
 const AdminFeedback     = lazy(() => import("./pages/admin/AdminFeedback"));
 const AdminFAQ          = lazy(() => import("./pages/admin/AdminFAQ"));
@@ -314,6 +315,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageSkeleton />}>
             <AdminPageBanners />
+          </Suspense>
+        ),
+      },
+      {
+        path: "catalogs",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminCatalogs />
           </Suspense>
         ),
       },

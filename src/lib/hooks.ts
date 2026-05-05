@@ -3,7 +3,7 @@
  */
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase, isSupabaseConfigured } from "./supabase";
-import type { Product, Blog, Solution, GalleryImage, HeroImage, CoreService, PageBanner } from "./database.types";
+import type { Product, Blog, Solution, GalleryImage, HeroImage, CoreService, PageBanner, Catalog } from "./database.types";
 import {
   demoProducts,
   demoBlogs,
@@ -671,6 +671,84 @@ export function useAdminPageBanners(): UseDataResult<PageBanner> {
         .order("page_slug", { ascending: true });
       if (err) throw err;
       setData((rows as PageBanner[]) || []);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+// ── Catalogs ─────────────────────────────────────────────────
+
+export function useCatalogs(productId?: string): UseDataResult<Catalog> {
+  const cacheKey = `catalogs:${productId || 'all'}`;
+  const [data, setData] = useState<Catalog[]>(() => getCached<Catalog>(cacheKey) ?? []);
+  const [loading, setLoading] = useState(() => !getCached<Catalog>(cacheKey));
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async (bust = false) => {
+    if (!bust) {
+      const cached = getCached<Catalog>(cacheKey);
+      if (cached) { setData(cached); setLoading(false); return; }
+    }
+    setLoading(true);
+    setError(null);
+
+    if (!isSupabaseConfigured()) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      let query = supabase
+        .from("catalogs")
+        .select("*")
+        .eq("published", true)
+        .order("sort_order", { ascending: true });
+
+      if (productId) {
+        query = query.eq("product_id", productId);
+      }
+
+      const { data: rows, error: err } = await query;
+      if (err) throw err;
+      const result = (rows as Catalog[]) || [];
+      setCache(cacheKey, result);
+      setData(result);
+    } catch (e: any) {
+      console.error("Failed to fetch catalogs:", e);
+      setError(e.message);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [productId, cacheKey]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  return { data, loading, error, refetch: () => fetchData(true) };
+}
+
+export function useAdminCatalogs(): UseDataResult<Catalog> {
+  const [data, setData] = useState<Catalog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: rows, error: err } = await supabase
+        .from("catalogs")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (err) throw err;
+      setData((rows as Catalog[]) || []);
     } catch (e: any) {
       setError(e.message);
     } finally {

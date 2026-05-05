@@ -4,7 +4,9 @@ import { CheckCircle2, Shield, Zap, Award } from "lucide-react";
 import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
-import { useProduct } from "../../lib/hooks";
+import { useProduct, useCatalogs } from "../../lib/hooks";
+import { CatalogCard, CatalogViewerModal } from "../components/CatalogViewer";
+import { useState } from "react";
 
 interface ProductSpecification {
   label: string;
@@ -18,6 +20,8 @@ export default function ProductDetailPage() {
   const navigate = useNavigate(); 
   
   const { data: product, loading } = useProduct(slug);
+  const { data: catalogs } = useCatalogs(product?.id || undefined);
+  const [showCatalogViewer, setShowCatalogViewer] = useState(false);
 
   if (loading) {
     return (
@@ -61,9 +65,24 @@ export default function ProductDetailPage() {
                 <Button size="lg" onClick={() => navigate("/contact")}>
                   Request Quote
                 </Button>
-                <Button size="lg" variant="outline">
-                  Download Catalog
-                </Button>
+                {catalogs.length > 0 && (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => {
+                      // Directly download the first catalog file
+                      const link = document.createElement('a');
+                      link.href = catalogs[0].file_url;
+                      link.target = '_blank';
+                      link.download = catalogs[0].title || 'catalog';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    Download Catalog
+                  </Button>
+                )}
               </div>
             </motion.div>
             <motion.div
@@ -234,6 +253,41 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* Catalogs Section */}
+      {catalogs.length > 0 && (
+        <section className="py-24 bg-white dark:bg-[#030213]">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">
+                Download Catalogs
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Access detailed product catalogs, brochures, and resources
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {catalogs.map((catalog) => (
+                <CatalogCard key={catalog.id} catalog={catalog} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Catalog Viewer Modal */}
+      {showCatalogViewer && catalogs.length > 0 && (
+        <CatalogViewerModal
+          catalog={catalogs[0]}
+          onClose={() => setShowCatalogViewer(false)}
+        />
+      )}
 
       {/* CTA */}
       <section className="py-24 bg-gradient-to-br from-[#030213] to-[#1a1a2e] text-white">

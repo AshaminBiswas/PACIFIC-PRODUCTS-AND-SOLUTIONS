@@ -41,6 +41,11 @@ export interface Database {
         Insert: Partial<PageBanner> & Pick<PageBanner, "page_slug" | "image_url">;
         Update: Partial<PageBanner>;
       };
+      catalogs: {
+        Row: Catalog;
+        Insert: Partial<Catalog> & Pick<Catalog, "title" | "file_url">;
+        Update: Partial<Catalog>;
+      };
       contact_queries: {
         Row: {
           id: string;
@@ -206,6 +211,21 @@ export interface PageBanner {
   title: string;
   subtitle: string;
   created_at: string;
+}
+
+export interface Catalog {
+  id: string;
+  title: string;
+  description: string;
+  file_url: string;
+  file_type: 'pdf' | 'image';
+  file_size: number;            // bytes
+  thumbnail_url: string;
+  product_id: string | null;
+  sort_order: number;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ContactQuery {
