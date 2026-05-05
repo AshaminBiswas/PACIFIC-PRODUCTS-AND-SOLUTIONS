@@ -17,39 +17,39 @@ import {
 } from "./components/Skeletons";
 
 // ── Lazy-loaded Pages ─────────────────────────────────────────────────────
-const Home        = lazy(() => import("./pages/Home"));
-const About       = lazy(() => import("./pages/About"));
-const Products    = lazy(() => import("./pages/Products"));
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+const Products = lazy(() => import("./pages/Products"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
-const Solutions   = lazy(() => import("./pages/Solutions"));
+const Solutions = lazy(() => import("./pages/Solutions"));
 const SolutionDetail = lazy(() => import("./pages/SolutionDetail"));
 const LocationDetail = lazy(() => import("./pages/LocationDetail"));
-const Gallery     = lazy(() => import("./pages/Gallery"));
-const Contact     = lazy(() => import("./pages/Contact"));
-const Blog        = lazy(() => import("./pages/Blog"));
-const BlogDetail  = lazy(() => import("./pages/BlogDetail"));
-const Brochure    = lazy(() => import("./pages/Brochure"));
-const NotFound    = lazy(() => import("./pages/NotFound"));
-const FAQ         = lazy(() => import("./pages/FAQ"));
-const PrivacyPolicy  = lazy(() => import("./pages/PrivacyPolicy"));
+const Gallery = lazy(() => import("./pages/Gallery"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
+const Brochure = lazy(() => import("./pages/Brochure"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 
 // ── Lazy-loaded Admin Pages ───────────────────────────────────────────────
-const AdminLogin      = lazy(() => import("./pages/admin/AdminLogin"));
-const AdminDashboard  = lazy(() => import("./pages/admin/AdminDashboard"));
-const AdminOverview   = lazy(() => import("./pages/admin/AdminOverview"));
-const AdminProducts   = lazy(() => import("./pages/admin/AdminProducts"));
-const AdminBlogs      = lazy(() => import("./pages/admin/AdminBlogs"));
-const AdminSolutions  = lazy(() => import("./pages/admin/AdminSolutions"));
-const AdminGallery    = lazy(() => import("./pages/admin/AdminGallery"));
-const AdminHero       = lazy(() => import("./pages/admin/AdminHero"));
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
+const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
+const AdminBlogs = lazy(() => import("./pages/admin/AdminBlogs"));
+const AdminSolutions = lazy(() => import("./pages/admin/AdminSolutions"));
+const AdminGallery = lazy(() => import("./pages/admin/AdminGallery"));
+const AdminHero = lazy(() => import("./pages/admin/AdminHero"));
 const AdminCoreServices = lazy(() => import("./pages/admin/AdminCoreServices"));
-const AdminPageBanners  = lazy(() => import("./pages/admin/AdminPageBanners"));
-const AdminCatalogs         = lazy(() => import("./pages/admin/AdminCatalogs"));
+const AdminPageBanners = lazy(() => import("./pages/admin/AdminPageBanners"));
+const AdminCatalogs = lazy(() => import("./pages/admin/AdminCatalogs"));
 const AdminContactQueries = lazy(() => import("./pages/admin/AdminContactQueries"));
-const AdminFeedback     = lazy(() => import("./pages/admin/AdminFeedback"));
-const AdminFAQ          = lazy(() => import("./pages/admin/AdminFAQ"));
-const AdminLeads        = lazy(() => import("./pages/admin/AdminLeads"));
+const AdminFeedback = lazy(() => import("./pages/admin/AdminFeedback"));
+const AdminFAQ = lazy(() => import("./pages/admin/AdminFAQ"));
+const AdminLeads = lazy(() => import("./pages/admin/AdminLeads"));
 
 // ── Layout ────────────────────────────────────────────────────────────────
 function Layout() {
@@ -227,7 +227,7 @@ export const router = createBrowserRouter([
         ),
       },
       { path: "privacy", element: (<Suspense fallback={<PageSkeleton />}><PrivacyPolicy /></Suspense>) },
-      { path: "terms",   element: (<Suspense fallback={<PageSkeleton />}><TermsOfService /></Suspense>) },
+      { path: "terms", element: (<Suspense fallback={<PageSkeleton />}><TermsOfService /></Suspense>) },
       {
         path: "*",
         element: (

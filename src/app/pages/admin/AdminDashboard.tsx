@@ -85,16 +85,15 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#0a0a1a] flex">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#030213] border-r border-white/5 flex flex-col transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#030213] border-r border-white/5 flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         {/* Logo */}
         <div className="p-6 border-b border-white/5">
           <Link to="/" className="block">
-            <img 
-              src={logo} 
-              alt="Pacific Products & Solutions" 
+            <img
+              src={logo}
+              alt="Pacific Products & Solutions"
               className="h-16 w-auto object-contain mb-1 rounded-full bg-white/5 p-2"
             />
             <p className="text-[10px] tracking-wider text-gray-500">
@@ -110,11 +109,10 @@ export default function AdminDashboard() {
               key={item.path}
               to={item.path}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                isActive(item.path)
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive(item.path)
                   ? "bg-[#7FB706]/15 text-[#7FB706]"
                   : "text-gray-400 hover:text-white hover:bg-white/5"
-              }`}
+                }`}
             >
               <item.icon className="w-5 h-5" />
               {item.name}

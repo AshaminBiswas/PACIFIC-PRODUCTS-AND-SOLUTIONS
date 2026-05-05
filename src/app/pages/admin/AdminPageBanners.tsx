@@ -64,9 +64,9 @@ export default function AdminPageBanners() {
     const banner = getBanner(slug);
     let err;
     if (banner) {
-      ({ error: err } = await supabase.from("page_banners").update({ image_url: url }).eq("id", banner.id));
+      ({ error: err } = await supabase.from("page_banners").update({ image_url: url } as any).eq("id", banner.id));
     } else {
-      ({ error: err } = await supabase.from("page_banners").insert({ page_slug: slug, image_url: url, title: "", subtitle: "" }));
+      ({ error: err } = await supabase.from("page_banners").insert({ page_slug: slug, image_url: url, title: "", subtitle: "" } as any));
     }
 
     if (err) { showToast("error", "Failed to save to database."); }
@@ -82,7 +82,7 @@ export default function AdminPageBanners() {
     const { error: err } = await supabase.from("page_banners").update({
       title: getEdit(slug, "title", banner.title),
       subtitle: getEdit(slug, "subtitle", banner.subtitle),
-    }).eq("id", banner.id);
+    } as any).eq("id", banner.id);
     if (err) showToast("error", "Failed to save text.");
     else { showToast("success", "Text updated!"); refetch(); setEditingSlug(null); }
     setSavingSlug(null);

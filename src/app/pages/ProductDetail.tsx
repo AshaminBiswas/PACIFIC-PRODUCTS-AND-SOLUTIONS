@@ -25,17 +25,17 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center">
-        <div className="text-center text-gray-500">Loading service...</div>
+      <div className="min-h-screen pt-20 flex items-center justify-center bg-white dark:bg-[#030213]">
+        <div className="text-center text-gray-500 dark:text-gray-400">Loading service...</div>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center">
+      <div className="min-h-screen pt-20 flex items-center justify-center bg-white dark:bg-[#030213]">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-[#030213] mb-4">Service Not Found</h1>
+          <h1 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">Service Not Found</h1>
           {/* 4. Swapped window.location for navigate() */}
           <Button onClick={() => navigate("/products")}>View All Services</Button>
         </div>
@@ -44,20 +44,20 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
       {/* Hero */}
-      <section className="py-24 bg-gradient-to-br from-[#E9FDBF] to-white">
+      <section className="py-24 bg-gradient-to-br from-[#E9FDBF] to-white dark:from-[#0a1a00] dark:to-[#030213]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <h1 className="text-5xl sm:text-6xl font-bold text-[#030213] mb-4">
+              <h1 className="text-5xl sm:text-6xl font-bold text-[#030213] dark:text-white mb-4">
                 {product.title}
               </h1>
               <p className="text-2xl text-[#7FB706] mb-6">{product.subtitle}</p>
-              <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
                 {product.description}
               </p>
               <div className="flex flex-wrap gap-4">
@@ -102,7 +102,7 @@ export default function ProductDetailPage() {
 
       {/* Product Gallery */}
       {product.additional_images && product.additional_images.length > 0 && (
-        <section className="py-12 bg-white">
+        <section className="py-12 bg-white dark:bg-[#030213] transition-colors">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {product.additional_images.map((img: string, idx: number) => (
@@ -126,7 +126,7 @@ export default function ProductDetailPage() {
       )}
 
       {/* Features */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-white dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -134,8 +134,8 @@ export default function ProductDetailPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-[#030213] mb-4">Key Features</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">Key Features</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               What makes our {product.title.toLowerCase()} stand out
             </p>
           </motion.div>
@@ -148,10 +148,10 @@ export default function ProductDetailPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                className="flex items-start space-x-3 bg-gray-50 rounded-xl p-6 hover:bg-[#E9FDBF]/30 transition-colors"
+                className="flex items-start space-x-3 bg-gray-50 dark:bg-white/5 rounded-xl p-6 hover:bg-[#E9FDBF]/30 dark:hover:bg-[#7FB706]/10 transition-colors border border-transparent dark:border-white/5"
               >
                 <CheckCircle2 className="w-6 h-6 text-[#7FB706] flex-shrink-0 mt-1" />
-                <span className="text-gray-700">{feature}</span>
+                <span className="text-gray-700 dark:text-gray-300">{feature}</span>
               </motion.div>
             ))}
           </div>
@@ -159,7 +159,7 @@ export default function ProductDetailPage() {
       </section>
 
       {/* Specifications */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-gray-50 dark:bg-[#060620] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12">
             <motion.div
@@ -167,16 +167,16 @@ export default function ProductDetailPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-bold text-[#030213] mb-8">Technical Specifications</h2>
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
+              <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-8">Technical Specifications</h2>
+              <div className="bg-white dark:bg-white/5 rounded-2xl p-8 shadow-lg dark:shadow-none dark:border dark:border-white/10">
                 {/* 6. Applied ProductSpecification type */}
                 {product.specifications.map((spec: ProductSpecification, index: number) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center py-4 border-b border-gray-200 last:border-0"
+                    className="flex justify-between items-center py-4 border-b border-gray-200 dark:border-white/10 last:border-0"
                   >
-                    <span className="font-semibold text-[#030213]">{spec.label}</span>
-                    <span className="text-gray-600">{spec.value}</span>
+                    <span className="font-semibold text-[#030213] dark:text-white">{spec.label}</span>
+                    <span className="text-gray-600 dark:text-gray-400">{spec.value}</span>
                   </div>
                 ))}
               </div>
@@ -187,7 +187,7 @@ export default function ProductDetailPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-bold text-[#030213] mb-8">Why Choose Us</h2>
+              <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-8">Why Choose Us</h2>
               <div className="space-y-6">
                 {[
                   {
@@ -206,13 +206,13 @@ export default function ProductDetailPage() {
                     description: "Technical assistance throughout your project",
                   },
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start space-x-4 bg-white rounded-xl p-6">
-                    <div className="w-12 h-12 bg-[#E9FDBF] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div key={index} className="flex items-start space-x-4 bg-white dark:bg-white/5 rounded-xl p-6 dark:border dark:border-white/10">
+                    <div className="w-12 h-12 bg-[#E9FDBF] dark:bg-[#7FB706]/15 rounded-xl flex items-center justify-center flex-shrink-0">
                       <item.icon className="w-6 h-6 text-[#7FB706]" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#030213] mb-1">{item.title}</h3>
-                      <p className="text-gray-600">{item.description}</p>
+                      <h3 className="font-semibold text-[#030213] dark:text-white mb-1">{item.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-400">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -223,7 +223,7 @@ export default function ProductDetailPage() {
       </section>
 
       {/* Applications */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-white dark:bg-[#030213] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -231,8 +231,8 @@ export default function ProductDetailPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-[#030213] mb-4">Ideal Applications</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">Ideal Applications</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Perfect for various commercial and residential settings
             </p>
           </motion.div>
@@ -256,7 +256,7 @@ export default function ProductDetailPage() {
 
       {/* Catalogs Section */}
       {catalogs.length > 0 && (
-        <section className="py-24 bg-white dark:bg-[#030213]">
+        <section className="py-24 bg-gray-50 dark:bg-[#060620] transition-colors">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
