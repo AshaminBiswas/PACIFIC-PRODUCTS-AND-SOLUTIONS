@@ -12,6 +12,7 @@ import { SectorsGrid } from "../components/AboutSectors";
 import { usePageBanner } from "../../lib/hooks";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router";
+import aboutImg from "../../image/about.png";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -236,8 +237,8 @@ export default function AboutPage() {
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1761819951977-022b27502018?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtYW51ZmFjdHVyaW5nJTIwZmFjdG9yeSUyMGludGVyaW9yfGVufDF8fHx8MTc3NDc3Mjg3MHww&ixlib=rb-4.1.0&q=80&w=1080"
-                  alt="Manufacturing Facility"
+                  src="https://images.unsplash.com/photo-1554200876-56c2f25224fa?q=80&w=1080&auto=format&fit=crop"
+                  alt="Modern Locker Solutions"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
@@ -292,7 +293,7 @@ export default function AboutPage() {
             <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="relative order-2 lg:order-1">
               <div className="rounded-2xl overflow-hidden shadow-2xl">
                 <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                  src={aboutImg}
                   alt="Premium interior solutions"
                   className="w-full h-full object-cover"
                 />
