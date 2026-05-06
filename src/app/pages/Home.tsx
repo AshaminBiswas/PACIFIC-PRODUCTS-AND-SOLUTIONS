@@ -81,9 +81,8 @@ function HeroSlideshow({ images, onSlideChange }: HeroSlideshowProps) {
             <button
               key={i}
               onClick={() => goTo(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === current ? "bg-white w-6" : "bg-white/40 hover:bg-white/70 w-2"
-              }`}
+              className={`h-2 rounded-full transition-all duration-300 ${i === current ? "bg-white w-6" : "bg-white/40 hover:bg-white/70 w-2"
+                }`}
               aria-label={`Go to slide ${i + 1}`}
             />
           ))}
@@ -187,7 +186,7 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.7 }}
         >
-          Engineering Excellence in
+          Precision Solutions for
           <br />
           <motion.span
             className="text-[#7FB706] inline-block"
@@ -195,7 +194,7 @@ function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45, duration: 0.6 }}
           >
-            Interior Solutions
+            Modern Infrastructure
           </motion.span>
         </motion.h1>
 
@@ -619,7 +618,7 @@ export default function HomePage() {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <button
-              onClick={() => window.open("https://wa.me/919818592113", "_blank")}
+                onClick={() => window.open("https://wa.me/919818592113", "_blank")}
                 className="inline-flex items-center justify-center w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg bg-white text-[#7FB706] rounded-xl hover:bg-gray-100 transition-all duration-300 hover:scale-105 font-medium"
               >
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
