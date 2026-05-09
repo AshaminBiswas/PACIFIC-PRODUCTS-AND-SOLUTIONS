@@ -181,6 +181,8 @@ export interface GalleryImage {
   id: string;
   title: string;
   category: string;
+  location_slug: string | null;
+  placement: 'general' | 'hero' | 'gallery';
   image_url: string;
   sort_order: number;
   published: boolean;
@@ -248,4 +250,3 @@ export interface Feedback {
   message: string;
   created_at?: string;   // set by the database automatically
 }
-

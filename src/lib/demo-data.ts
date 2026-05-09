@@ -371,6 +371,8 @@ export const demoGalleryImages: GalleryImage[] = [
     id: "demo-g1",
     title: "Airport Restroom Facility",
     category: "airports",
+    location_slug: null,
+    placement: "general",
     image_url:
       "https://images.unsplash.com/photo-1759497904878-82c9bb21b2f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     sort_order: 1,
@@ -381,6 +383,8 @@ export const demoGalleryImages: GalleryImage[] = [
     id: "demo-g2",
     title: "Shopping Mall Interior",
     category: "malls",
+    location_slug: null,
+    placement: "general",
     image_url:
       "https://images.unsplash.com/photo-1542883339-f2680a3e3996?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     sort_order: 2,
@@ -391,6 +395,8 @@ export const demoGalleryImages: GalleryImage[] = [
     id: "demo-g3",
     title: "Corporate Office Washroom",
     category: "offices",
+    location_slug: null,
+    placement: "general",
     image_url:
       "https://images.unsplash.com/photo-1686100510109-d520e59bf0ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     sort_order: 3,
@@ -401,6 +407,8 @@ export const demoGalleryImages: GalleryImage[] = [
     id: "demo-g4",
     title: "Luxury Residential Bathroom",
     category: "residential",
+    location_slug: null,
+    placement: "general",
     image_url:
       "https://images.unsplash.com/photo-1774578342098-66adff9c1fe1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     sort_order: 4,
@@ -411,6 +419,8 @@ export const demoGalleryImages: GalleryImage[] = [
     id: "demo-g5",
     title: "Commercial Restroom Cubicles",
     category: "offices",
+    location_slug: null,
+    placement: "general",
     image_url:
       "https://images.unsplash.com/photo-1635493637999-ed6a733d2334?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     sort_order: 5,
@@ -421,6 +431,8 @@ export const demoGalleryImages: GalleryImage[] = [
     id: "demo-g6",
     title: "Retail Space Interior Paneling",
     category: "malls",
+    location_slug: null,
+    placement: "general",
     image_url:
       "https://images.unsplash.com/photo-1696454822226-3c57759522ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     sort_order: 6,

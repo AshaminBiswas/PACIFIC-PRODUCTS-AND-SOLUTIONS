@@ -64,11 +64,19 @@ CREATE TABLE IF NOT EXISTS public.gallery_images (
   id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title       TEXT NOT NULL,
   category    TEXT NOT NULL DEFAULT '',
+  location_slug TEXT,
+  placement   TEXT NOT NULL DEFAULT 'general' CHECK (placement IN ('general', 'hero', 'gallery')),
   image_url   TEXT NOT NULL DEFAULT '',
   sort_order  INTEGER NOT NULL DEFAULT 0,
   published   BOOLEAN NOT NULL DEFAULT true,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE public.gallery_images
+  ADD COLUMN IF NOT EXISTS location_slug TEXT;
+
+ALTER TABLE public.gallery_images
+  ADD COLUMN IF NOT EXISTS placement TEXT NOT NULL DEFAULT 'general';
 
 -- ── 5. Hero Images ───────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.hero_images (
@@ -211,6 +219,8 @@ CREATE INDEX IF NOT EXISTS idx_blogs_published ON public.blogs (published);
 CREATE INDEX IF NOT EXISTS idx_solutions_slug ON public.solutions (slug);
 CREATE INDEX IF NOT EXISTS idx_solutions_published ON public.solutions (published);
 CREATE INDEX IF NOT EXISTS idx_gallery_published ON public.gallery_images (published);
+CREATE INDEX IF NOT EXISTS idx_gallery_location_slug ON public.gallery_images (location_slug);
+CREATE INDEX IF NOT EXISTS idx_gallery_location_placement ON public.gallery_images (location_slug, placement, published, sort_order);
 CREATE INDEX IF NOT EXISTS idx_feedback_created ON public.feedback (created_at DESC);
 
 -- Notify PostgREST to reload schema cache

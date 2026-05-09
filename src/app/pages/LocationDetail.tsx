@@ -1,175 +1,706 @@
+import { useEffect } from "react";
 import { motion } from "motion/react";
-import { useParams, useNavigate } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import {
-  MapPin, Phone, Mail, ArrowRight, Clock, Building2,
-  CheckCircle2, ChevronLeft, ExternalLink,
+  ArrowRight,
+  Award,
+  Building2,
+  CheckCircle2,
+  ChevronLeft,
+  Clock,
+  DoorOpen,
+  Dumbbell,
+  ExternalLink,
+  Factory,
+  GraduationCap,
+  HeartPulse,
+  Landmark,
+  Layers3,
+  Mail,
+  MapPin,
+  MenuSquare,
+  Phone,
+  Plane,
+  ShieldCheck,
+  ShoppingBag,
+  ShowerHead,
+  Sparkles,
+  Train,
+  Trophy,
+  Wrench,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "../components/Button";
+import { ContactForm } from "../components/ContactForm";
+import { useLocationGallery } from "../../lib/hooks";
+import { locations, type LocationData } from "./locations/locationData";
 
-// ─── Location Data ────────────────────────────────────────────
+type LocationSlug = keyof typeof locations;
 
-const locationData: Record<string, {
-  city: string;
-  region: string;
-  address: string;
-  phone: string;
-  email: string;
-  description: string;
-  projects: string[];
-  mapSrc: string;
-  stats: { label: string; value: string }[];
-  services: string[];
-  hours: string;
-}> = {
-  delhi: {
-    city: "Delhi NCR",
-    region: "North India",
-    address: "Sector 18, Udyog Vihar, Gurugram - 122015, Haryana, India",
-    phone: "+91 11 9876 5432",
-    email: "delhi@pacificproducts.com",
-    description:
-      "Serving the National Capital Region with premium interior contracting solutions for over 10 years. Our Delhi office specializes in large-scale commercial projects, delivering world-class restroom cubicles, cladding, and paneling solutions to India's most prestigious addresses.",
-    projects: ["Delhi Metro Stations", "DLF Cyber Hub", "Aerocity Hotels", "Select Citywalk Mall", "Ambience Mall Gurugram", "Worldmark Aerocity"],
-    mapSrc:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112130.34005085694!2d76.99403816684724!3d28.514782017772656!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d19d582e38859%3A0x2cf5fe8e5c64b1e!2sGurugram%2C%20Haryana!5e0!3m2!1sen!2sin!4v1713550212891!5m2!1sen!2sin",
-    stats: [
-      { label: "Projects Completed", value: "120+" },
-      { label: "Years in NCR", value: "10+" },
-      { label: "Sq. Ft. Installed", value: "2M+" },
-      { label: "Corporate Clients", value: "80+" },
-    ],
-    services: [
-      "Commercial Office Fit-outs",
-      "Restroom Cubicles & Partitions",
-      "High-Pressure Laminate Cladding",
-      "Airport & Metro Installations",
-      "Retail Interior Solutions",
-      "Hospital & Healthcare Spaces",
-    ],
-    hours: "Mon–Sat: 9:00 AM – 6:00 PM",
-  },
-  mumbai: {
-    city: "Mumbai",
-    region: "West India · Head Office",
-    address: "Plot No. 123, MIDC Industrial Area, Andheri East, Mumbai - 400093, Maharashtra",
-    phone: "+91 22 1234 5678",
-    email: "mumbai@pacificproducts.com",
-    description:
-      "Our head office and primary manufacturing facility. The Mumbai hub drives all pan-India operations and international exports, backed by an ISO-certified production line.",
-    projects: ["Mumbai International Airport", "BKC Corporate Towers", "Phoenix Market City", "Palladium Mall", "NESCO Complex", "Bandra-Kurla Complex"],
-    mapSrc:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60340.42786064015!2d72.84784987061093!3d19.113093095744804!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c84c4ad0a22d%3A0x5c3a0a4c1a7a1b7e!2sAndheri%20East%2C%20Mumbai!5e0!3m2!1sen!2sin!4v1713550212891!5m2!1sen!2sin",
-    stats: [
-      { label: "Projects Completed", value: "300+" },
-      { label: "Years Operating", value: "15+" },
-      { label: "Sq. Ft. Installed", value: "5M+" },
-      { label: "Enterprise Clients", value: "200+" },
-    ],
-    services: [
-      "Manufacturing & R&D",
-      "Large-Scale Commercial Projects",
-      "Airport Installations",
-      "Luxury Retail Fit-outs",
-      "Corporate Campuses",
-      "Export & International Projects",
-    ],
-    hours: "Mon–Sat: 9:00 AM – 6:00 PM",
-  },
-  bangalore: {
-    city: "Bangalore",
-    region: "South India",
-    address: "Electronic City Phase 1, Bangalore - 560100, Karnataka, India",
-    phone: "+91 80 5555 6666",
-    email: "bangalore@pacificproducts.com",
-    description:
-      "Catering to the tech capital of India, our Bangalore office specialises in corporate office solutions and IT park facilities for the country's most innovative companies.",
-    projects: ["Infosys Campus", "Embassy Tech Village", "UB City Mall", "Manyata Tech Park", "RMZ Infinity", "Prestige Tech Park"],
-    mapSrc:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d62208.08538793374!2d77.6062843!3d12.8399746!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae6b13a3a3a3a3%3A0x1a7a7a7a7a7a7a7a!2sElectronic%20City%2C%20Bengaluru!5e0!3m2!1sen!2sin!4v1713550212891!5m2!1sen!2sin",
-    stats: [
-      { label: "Projects Completed", value: "150+" },
-      { label: "Years in Bangalore", value: "8+" },
-      { label: "Sq. Ft. Installed", value: "3M+" },
-      { label: "Tech Clients", value: "90+" },
-    ],
-    services: [
-      "IT Park & Tech Campus Fit-outs",
-      "Open Office Partitioning",
-      "Restroom Cubicles",
-      "Cladding & Wall Paneling",
-      "Retail & F&B Interiors",
-      "Healthcare Facilities",
-    ],
-    hours: "Mon–Sat: 9:00 AM – 6:00 PM",
-  },
-  ahmedabad: {
-    city: "Ahmedabad",
-    region: "West India",
-    address: "GIDC Industrial Estate, Ahmedabad - 382424, Gujarat, India",
-    phone: "+91 79 4444 3333",
-    email: "ahmedabad@pacificproducts.com",
-    description:
-      "Serving Gujarat and surrounding states with high-quality interior solutions for commercial and residential projects. A key gateway for our western India operations.",
-    projects: ["Ahmedabad Metro", "Torrent Power Campus", "One Horizon Center", "Vibrant Gujarat Expo", "Adani Corporate Park", "SG Highway Retail"],
-    mapSrc:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117875.16048395284!2d72.43965!3d23.020918!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e848aba5bd449%3A0x4fcedd11614f6516!2sAhmedabad%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1713550212891!5m2!1sen!2sin",
-    stats: [
-      { label: "Projects Completed", value: "90+" },
-      { label: "Years in Gujarat", value: "6+" },
-      { label: "Sq. Ft. Installed", value: "1.5M+" },
-      { label: "Local Clients", value: "60+" },
-    ],
-    services: [
-      "Commercial Interiors",
-      "Industrial Facility Fit-outs",
-      "Restroom Solutions",
-      "Retail Interior Design",
-      "Hospitality Projects",
-      "Educational Institutions",
-    ],
-    hours: "Mon–Sat: 9:00 AM – 6:00 PM",
-  },
-  uae: {
-    city: "Dubai, UAE",
-    region: "Middle East",
-    address: "Al Quoz Industrial Area 3, Dubai, United Arab Emirates",
-    phone: "+971 4 333 4444",
-    email: "dubai@pacificproducts.com",
-    description:
-      "Expanding our reach across the Middle East, our Dubai office serves clients in UAE, Saudi Arabia, and other GCC countries with world-class interior contracting solutions.",
-    projects: ["Dubai International Airport", "Mall of the Emirates", "DIFC Corporate Towers", "Burj Khalifa Lobby", "Dubai Frame", "Expo City Dubai"],
-    mapSrc:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d57840.02!2d55.2308!3d25.1972!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f696ef9df4b4d%3A0x2e3e16da3b3b3b3b!2sAl%20Quoz%2C%20Dubai!5e0!3m2!1sen!2sae!4v1713550212891!5m2!1sen!2sae",
-    stats: [
-      { label: "Projects Completed", value: "70+" },
-      { label: "GCC Countries Served", value: "5+" },
-      { label: "Sq. Ft. Installed", value: "1M+" },
-      { label: "International Clients", value: "45+" },
-    ],
-    services: [
-      "Luxury Commercial Fit-outs",
-      "Airport & Transit Hubs",
-      "Hotel & Hospitality Interiors",
-      "High-End Retail Spaces",
-      "Corporate Headquarters",
-      "GCC Export & Supply",
-    ],
-    hours: "Sun–Thu: 9:00 AM – 6:00 PM",
-  },
+const iconMap: Record<string, LucideIcon> = {
+  Plane,
+  GraduationCap,
+  Heart: HeartPulse,
+  Building2,
+  Trophy,
+  Dumbbell,
+  Train,
+  ShoppingBag,
+  Landmark,
 };
 
-// ─── Page Component ────────────────────────────────────────────
+const serviceIcons: LucideIcon[] = [DoorOpen, ShowerHead, MenuSquare, Layers3, Wrench, Building2];
+
+const adjacentLocations: Record<LocationSlug, string[]> = {
+  delhi: ["mumbai", "bangalore", "ahmedabad"],
+  mumbai: ["delhi", "uae", "ahmedabad"],
+  bangalore: ["mumbai", "delhi", "uae"],
+  ahmedabad: ["delhi", "mumbai", "bangalore"],
+  uae: ["mumbai", "delhi", "bangalore"],
+};
+
+function cleanText(value: string) {
+  return value
+    .replaceAll("â€”", "-")
+    .replaceAll("â€“", "-")
+    .replaceAll("Â·", "|")
+    .replaceAll("Â", "");
+}
+
+function applySeo(data: LocationData) {
+  document.title = cleanText(data.meta.title);
+  const description = cleanText(data.meta.description);
+  let metaDescription = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+
+  if (!metaDescription) {
+    metaDescription = document.createElement("meta");
+    metaDescription.name = "description";
+    document.head.appendChild(metaDescription);
+  }
+
+  metaDescription.content = description;
+}
+
+function scrollToInquiry() {
+  document.getElementById("location-inquiry")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function openWhatsapp(data: LocationData) {
+  const message = encodeURIComponent(`Hi Pacific Products, I want to discuss a commercial infrastructure project in ${cleanText(data.city)}.`);
+  window.open(`https://wa.me/${data.whatsapp}?text=${message}`, "_blank", "noopener,noreferrer");
+}
+
+function mergeBackendImages(data: LocationData, locationImages: ReturnType<typeof useLocationGallery>["data"]): LocationData {
+  const heroImage = locationImages.find((image) => image.placement === "hero")?.image_url || data.heroImage;
+  const galleryImages = locationImages
+    .filter((image) => image.placement !== "hero")
+    .map((image) => image.image_url);
+  const repeatedGalleryImages = galleryImages.length > 0
+    ? Array.from({ length: Math.max(6, galleryImages.length) }, (_, index) => galleryImages[index % galleryImages.length])
+    : data.galleryImages;
+
+  return {
+    ...data,
+    heroImage,
+    galleryImages: repeatedGalleryImages,
+  };
+}
+
+function Eyebrow({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#7FB706] ${className}`}>
+      <span className="h-px w-8 bg-[#7FB706]" />
+      {children}
+    </span>
+  );
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+  copy,
+  align = "left",
+}: {
+  eyebrow: string;
+  title: string;
+  copy?: string;
+  align?: "left" | "center";
+}) {
+  return (
+    <div className={align === "center" ? "mx-auto mb-12 max-w-3xl text-center" : "mb-12 max-w-3xl"}>
+      <Eyebrow className={align === "center" ? "justify-center" : ""}>{eyebrow}</Eyebrow>
+      <h2 className="mt-4 text-3xl font-bold leading-tight text-[#030213] dark:text-white sm:text-4xl lg:text-5xl">{title}</h2>
+      {copy && <p className="mt-5 text-base leading-8 text-gray-600 dark:text-gray-400 sm:text-lg">{copy}</p>}
+    </div>
+  );
+}
+
+function StatStrip({ data, compact = false }: { data: LocationData; compact?: boolean }) {
+  return (
+    <div className={`grid ${compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4"} border border-black/10 bg-white/90 shadow-xl shadow-black/5 backdrop-blur dark:border-white/10 dark:bg-white/5`}>
+      {data.stats.map((stat) => (
+        <div key={stat.label} className="border-r border-black/10 p-5 last:border-r-0 dark:border-white/10 sm:p-7">
+          <div className="text-3xl font-bold text-[#7FB706] dark:text-[#B5F823]">{stat.value}</div>
+          <div className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug }) {
+  const isMumbai = slug === "mumbai";
+  const isDubai = slug === "uae";
+  const isDelhi = slug === "delhi";
+  const isBangalore = slug === "bangalore";
+
+  if (isMumbai) {
+    return (
+      <section className="relative overflow-hidden bg-[#030213] pt-28 text-white">
+        <div className="absolute inset-y-0 right-0 w-full opacity-55 lg:w-[58%]">
+          <img src={data.heroImage} alt={`${cleanText(data.city)} commercial infrastructure solutions`} className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#030213] via-[#030213]/75 to-[#030213]/20" />
+        </div>
+        <div className="container relative z-10 mx-auto px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+          <Link to="/contact" className="mb-10 inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition hover:text-[#B5F823]">
+            <ChevronLeft className="h-4 w-4" />
+            All Locations
+          </Link>
+          <div className="max-w-2xl">
+            <Eyebrow>{cleanText(data.region)}</Eyebrow>
+            <h1 className="mt-6 text-5xl font-bold leading-[1.02] sm:text-6xl lg:text-7xl">{cleanText(data.tagline)}</h1>
+            <p className="mt-7 text-lg leading-8 text-white/75">{cleanText(data.description)}</p>
+            <HeroActions data={data} light />
+          </div>
+          <div className="mt-16 max-w-4xl">
+            <StatStrip data={data} />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (isDubai) {
+    return (
+      <section className="relative min-h-[760px] overflow-hidden bg-[#030213] text-white">
+        <img src={data.heroImage} alt={`${cleanText(data.city)} luxury commercial interiors`} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#030213]/50 via-[#030213]/60 to-[#030213]" />
+        <div className="container relative z-10 mx-auto flex min-h-[760px] flex-col justify-end px-4 pb-16 pt-32 sm:px-6 lg:px-8">
+          <Link to="/contact" className="mb-auto inline-flex w-fit items-center gap-2 text-sm font-semibold text-white/75 transition hover:text-[#B5F823]">
+            <ChevronLeft className="h-4 w-4" />
+            All Locations
+          </Link>
+          <div className="grid items-end gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+            <div>
+              <Eyebrow>{cleanText(data.region)}</Eyebrow>
+              <h1 className="mt-6 max-w-4xl text-5xl font-bold leading-[1.02] sm:text-6xl lg:text-7xl">{cleanText(data.tagline)}</h1>
+            </div>
+            <div className="border-l border-white/25 pl-6">
+              <p className="text-lg leading-8 text-white/78">{cleanText(data.description)}</p>
+              <HeroActions data={data} light />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className={`relative overflow-hidden pt-28 ${isDelhi ? "bg-[#f7f8f3]" : "bg-white"} dark:bg-[#030213]`}>
+      <div className="container mx-auto px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <Link to="/contact" className="mb-10 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-[#7FB706] dark:text-gray-400">
+          <ChevronLeft className="h-4 w-4" />
+          All Locations
+        </Link>
+        <div className={`grid items-center gap-12 ${isBangalore ? "lg:grid-cols-[0.9fr_1.1fr]" : "lg:grid-cols-[1.05fr_0.95fr]"}`}>
+          <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className={isBangalore ? "lg:order-2" : ""}>
+            <Eyebrow>{cleanText(data.region)}</Eyebrow>
+            <h1 className="mt-6 text-5xl font-bold leading-[1.03] text-[#030213] dark:text-white sm:text-6xl lg:text-7xl">{cleanText(data.tagline)}</h1>
+            <p className="mt-7 text-lg leading-8 text-gray-600 dark:text-gray-400">{cleanText(data.description)}</p>
+            <HeroActions data={data} />
+          </motion.div>
+          <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1 }} className={`relative ${isBangalore ? "lg:order-1" : ""}`}>
+            <div className={`overflow-hidden ${isDelhi ? "rounded-t-[4rem]" : "rounded-none"} border border-black/10 bg-white p-3 shadow-2xl shadow-black/10 dark:border-white/10 dark:bg-white/5`}>
+              <img src={data.heroImage} alt={`${cleanText(data.city)} restroom cubicles and cladding projects`} className="h-[520px] w-full object-cover" />
+            </div>
+            <div className={`absolute ${isBangalore ? "-bottom-8 left-8" : "-bottom-8 right-8"} w-[min(86%,420px)]`}>
+              <StatStrip data={data} compact />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HeroActions({ data, light = false }: { data: LocationData; light?: boolean }) {
+  return (
+    <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+      <Button size="lg" onClick={scrollToInquiry} className="font-semibold">
+        Request Project Quote
+        <ArrowRight className="ml-2 h-5 w-5" />
+      </Button>
+      <button
+        onClick={() => openWhatsapp(data)}
+        className={`inline-flex items-center justify-center rounded-xl border px-8 py-4 text-lg font-semibold transition ${
+          light
+            ? "border-white/35 text-white hover:border-[#B5F823] hover:text-[#B5F823]"
+            : "border-[#7FB706]/40 text-[#030213] hover:border-[#7FB706] hover:bg-[#7FB706]/10 dark:text-white"
+        }`}
+      >
+        WhatsApp Team
+      </button>
+    </div>
+  );
+}
+
+function ServicesSection({ data, layout = "grid" }: { data: LocationData; layout?: "grid" | "split" | "rail" }) {
+  const copy = `${cleanText(data.city)} teams support commercial restroom cubicles, shower cubicles, locker solutions, exterior cladding, custom hardware, and interior packages for demanding B2B environments.`;
+
+  if (layout === "split") {
+    return (
+      <section className="bg-white py-24 dark:bg-[#030213]">
+        <div className="container mx-auto grid gap-14 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
+          <SectionHeading eyebrow={`${cleanText(data.city)} Services`} title="Specification-led manufacturing for regional projects" copy={copy} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            {data.services.map((service, index) => <ServiceCard key={service.title} service={service} index={index} />)}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (layout === "rail") {
+    return (
+      <section className="bg-[#030213] py-24 text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading eyebrow={`${cleanText(data.city)} Product Scope`} title="Integrated systems for large built environments" copy={copy} />
+          <div className="grid overflow-hidden border border-white/10 lg:grid-cols-6">
+            {data.services.map((service, index) => {
+              const Icon = serviceIcons[index % serviceIcons.length];
+              return (
+                <div key={service.title} className="min-h-64 border-b border-r border-white/10 p-6 last:border-r-0 lg:border-b-0">
+                  <Icon className="h-8 w-8 text-[#B5F823]" />
+                  <h3 className="mt-8 text-xl font-bold">{service.title}</h3>
+                  <p className="mt-4 text-sm leading-7 text-white/65">{service.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="bg-white py-24 dark:bg-[#030213]">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow={`${cleanText(data.city)} Capabilities`} title="Commercial infrastructure solutions from one project partner" copy={copy} align="center" />
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {data.services.map((service, index) => <ServiceCard key={service.title} service={service} index={index} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ServiceCard({ service, index }: { service: LocationData["services"][number]; index: number }) {
+  const Icon = serviceIcons[index % serviceIcons.length];
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.04, duration: 0.4 }}
+      className="group border border-black/10 bg-white p-7 transition hover:-translate-y-1 hover:border-[#7FB706]/40 hover:shadow-xl hover:shadow-black/5 dark:border-white/10 dark:bg-white/[0.03]"
+    >
+      <div className="flex h-12 w-12 items-center justify-center bg-[#7FB706]/10 text-[#7FB706] transition group-hover:bg-[#7FB706] group-hover:text-white">
+        <Icon className="h-6 w-6" />
+      </div>
+      <h3 className="mt-7 text-xl font-bold text-[#030213] dark:text-white">{service.title}</h3>
+      <p className="mt-4 text-sm leading-7 text-gray-600 dark:text-gray-400">{service.desc}</p>
+    </motion.article>
+  );
+}
+
+function IndustrySection({ data, dark = false }: { data: LocationData; dark?: boolean }) {
+  return (
+    <section className={`${dark ? "bg-[#030213] text-white" : "bg-[#f6f7f2] text-[#030213] dark:bg-[#090918] dark:text-white"} py-24`}>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+          <SectionHeading
+            eyebrow="Industry Solutions"
+            title={`Built for high-traffic ${cleanText(data.city)} environments`}
+            copy="From transit hubs and education campuses to hospitals, malls, stadiums, gyms, corporate offices, and public infrastructure, each system is specified around traffic load, cleaning cycles, privacy, safety, and long-term maintenance."
+          />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {data.industries.map((industry, index) => {
+              const Icon = iconMap[industry.icon] || Building2;
+              return (
+                <motion.div
+                  key={industry.name}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.03, duration: 0.35 }}
+                  className="border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]"
+                >
+                  <Icon className="h-6 w-6 text-[#7FB706] dark:text-[#B5F823]" />
+                  <p className="mt-5 text-sm font-bold">{industry.name}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ShowcaseSection({ data, variant }: { data: LocationData; variant: "mosaic" | "editorial" | "band" | "stack" | "gallery" }) {
+  const images = data.galleryImages;
+
+  if (variant === "band") {
+    return (
+      <section className="bg-white py-24 dark:bg-[#030213]">
+        <div className="mb-12 px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto">
+            <SectionHeading eyebrow="Visual Product Showcase" title={`${cleanText(data.city)} project finish palette`} copy="Architectural surfaces, durable cubicle systems, hardware detailing, and clean commercial interiors composed for premium B2B spaces." />
+          </div>
+        </div>
+        <div className="grid h-auto grid-cols-1 md:h-[520px] md:grid-cols-4">
+          {images.slice(0, 4).map((image, index) => (
+            <img key={image} src={image} alt={`${cleanText(data.city)} commercial product showcase ${index + 1}`} className="h-80 w-full object-cover md:h-full" />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (variant === "editorial") {
+    return (
+      <section className="bg-white py-24 dark:bg-[#030213]">
+        <div className="container mx-auto grid gap-8 px-4 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
+          <div>
+            <SectionHeading eyebrow="Visual Product Showcase" title="Commercial-grade details with a refined architectural presence" />
+            <img src={images[0]} alt={`${cleanText(data.city)} interior architecture`} className="h-[620px] w-full object-cover" />
+          </div>
+          <div className="grid gap-8">
+            <img src={images[1]} alt={`${cleanText(data.city)} restroom cubicle installation`} className="h-72 w-full object-cover" />
+            <div className="bg-[#030213] p-8 text-white">
+              <Sparkles className="h-8 w-8 text-[#B5F823]" />
+              <p className="mt-8 text-2xl font-bold leading-snug">Precision finishes for corporate, transit, retail, hospitality, and institutional spaces.</p>
+            </div>
+            <img src={images[2]} alt={`${cleanText(data.city)} exterior cladding system`} className="h-72 w-full object-cover" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (variant === "stack") {
+    return (
+      <section className="bg-[#f6f7f2] py-24 dark:bg-[#090918]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading eyebrow="Visual Product Showcase" title="Layered infrastructure packages for fast-moving commercial programs" align="center" />
+          <div className="grid gap-6 lg:grid-cols-3">
+            {images.slice(0, 6).map((image, index) => (
+              <div key={image} className={index === 1 || index === 4 ? "lg:translate-y-12" : ""}>
+                <img src={image} alt={`${cleanText(data.city)} infrastructure solution ${index + 1}`} className="h-96 w-full object-cover" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (variant === "gallery") {
+    return (
+      <section className="bg-white py-24 dark:bg-[#030213]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading eyebrow="Visual Product Showcase" title="A premium material language for Gulf commercial projects" copy="Balanced between clean corporate interiors, hospitality-grade surfaces, and robust public-use systems." />
+          <div className="grid auto-rows-[240px] gap-4 md:grid-cols-4">
+            {images.slice(0, 6).map((image, index) => (
+              <img
+                key={image}
+                src={image}
+                alt={`${cleanText(data.city)} premium commercial showcase ${index + 1}`}
+                className={`h-full w-full object-cover ${index === 0 ? "md:col-span-2 md:row-span-2" : ""} ${index === 3 ? "md:col-span-2" : ""}`}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="bg-white py-24 dark:bg-[#030213]">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Visual Product Showcase" title={`${cleanText(data.city)} installations shaped for modern infrastructure`} copy="Alternating product, interior, cladding, and public-space compositions create a complete specification view for commercial buyers." />
+        <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+          <img src={images[0]} alt={`${cleanText(data.city)} commercial interiors`} className="h-[560px] w-full object-cover" />
+          <div className="grid gap-5 sm:grid-cols-2">
+            {images.slice(1, 5).map((image, index) => (
+              <img key={image} src={image} alt={`${cleanText(data.city)} product detail ${index + 1}`} className="h-[270px] w-full object-cover" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WhyChooseSection({ data, compact = false }: { data: LocationData; compact?: boolean }) {
+  return (
+    <section className="bg-[#030213] py-24 text-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <Eyebrow>Why Choose Pacific</Eyebrow>
+            <h2 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl">Built for durability, speed, and B2B accountability.</h2>
+            <p className="mt-6 text-lg leading-8 text-white/65">Local coordination in {cleanText(data.city)} is backed by custom manufacturing, national execution capability, project documentation, and quality-led installation teams.</p>
+          </div>
+          <div className={`grid gap-4 ${compact ? "md:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
+            {data.whyChoose.map((item, index) => (
+              <div key={item.title} className="border border-white/10 bg-white/[0.04] p-6">
+                {index % 2 === 0 ? <ShieldCheck className="h-7 w-7 text-[#B5F823]" /> : <Award className="h-7 w-7 text-[#B5F823]" />}
+                <h3 className="mt-6 text-lg font-bold">{item.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-white/62">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProjectsCredibility({ data }: { data: LocationData }) {
+  return (
+    <section className="bg-[#f6f7f2] py-24 dark:bg-[#090918]">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
+          <SectionHeading eyebrow="Trust & Credibility" title={`Commercial project experience across ${cleanText(data.city)}`} copy="A client-focused process with certification-ready documentation, quality assurance checkpoints, and durable product systems for public and private infrastructure." />
+          <div className="grid gap-4 sm:grid-cols-2">
+            {data.projects.map((project) => (
+              <div key={project} className="border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]">
+                <Factory className="h-6 w-6 text-[#7FB706]" />
+                <p className="mt-5 font-bold text-[#030213] dark:text-white">{project}</p>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Commercial specification and installation reference</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          {["ISO quality assurance placeholder", "Material test documentation placeholder", "B2B project handover checklist"].map((item) => (
+            <div key={item} className="flex items-center gap-3 border border-[#7FB706]/25 bg-[#7FB706]/8 p-5 text-sm font-semibold text-[#030213] dark:text-white">
+              <CheckCircle2 className="h-5 w-5 text-[#7FB706]" />
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FaqSection({ data }: { data: LocationData }) {
+  return (
+    <section className="bg-white py-24 dark:bg-[#030213]">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Local SEO FAQ" title={`${cleanText(data.city)} restroom cubicles, cladding, lockers, and commercial interiors`} align="center" />
+        <div className="mx-auto grid max-w-5xl gap-4">
+          {data.faqs.map((faq) => (
+            <details key={faq.question} className="group border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-white/[0.03]">
+              <summary className="cursor-pointer list-none text-lg font-bold text-[#030213] dark:text-white">
+                {cleanText(faq.question)}
+                <span className="float-right text-[#7FB706] group-open:rotate-45">+</span>
+              </summary>
+              <p className="mt-4 leading-7 text-gray-600 dark:text-gray-400">{cleanText(faq.answer)}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InquirySection({ data, slug }: { data: LocationData; slug: LocationSlug }) {
+  return (
+    <section id="location-inquiry" className="bg-[#f6f7f2] py-24 dark:bg-[#090918]">
+      <div className="container mx-auto grid gap-12 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+        <div>
+          <SectionHeading eyebrow={`${cleanText(data.city)} Inquiry`} title="Plan your next commercial infrastructure package" copy={`Share drawings, BOQ details, project size, or a site visit request. Our ${cleanText(data.city)} team will help with specification, costing, timelines, and installation planning.`} />
+          <div className="space-y-4">
+            {[
+              { icon: MapPin, label: "Regional Office", value: data.address },
+              { icon: Phone, label: "Phone", value: data.phone },
+              { icon: Mail, label: "Email", value: data.email },
+              { icon: Clock, label: "Business Hours", value: data.hours },
+            ].map(({ icon: Icon, label, value }) => (
+              <div key={label} className="flex gap-4 border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]">
+                <Icon className="mt-1 h-5 w-5 shrink-0 text-[#7FB706]" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{label}</p>
+                  <p className="mt-1 font-semibold text-[#030213] dark:text-white">{cleanText(value)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <button onClick={() => openWhatsapp(data)} className="inline-flex items-center justify-center rounded-xl bg-[#25D366] px-6 py-3 font-bold text-white transition hover:bg-[#1fb457]">
+              WhatsApp {cleanText(data.city)}
+            </button>
+            <button
+              onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(cleanText(data.address))}`, "_blank", "noopener,noreferrer")}
+              className="inline-flex items-center justify-center rounded-xl border border-[#7FB706]/40 px-6 py-3 font-bold text-[#030213] transition hover:bg-[#7FB706]/10 dark:text-white"
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Open Map
+            </button>
+          </div>
+          <div className="mt-8 text-sm text-gray-600 dark:text-gray-400">
+            Also serving: {adjacentLocations[slug].map((item, index) => (
+              <span key={item}>
+                <Link className="font-semibold text-[#7FB706] hover:underline" to={`/locations/${item}`}>{cleanText(locations[item].city)}</Link>
+                {index < adjacentLocations[slug].length - 1 ? ", " : "."}
+              </span>
+            ))}
+          </div>
+        </div>
+        <ContactForm />
+      </div>
+    </section>
+  );
+}
+
+function MapSection({ data }: { data: LocationData }) {
+  return (
+    <section className="relative h-[460px] overflow-hidden border-t border-black/10 dark:border-white/10">
+      <iframe
+        src={data.mapSrc}
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        title={`${cleanText(data.city)} Pacific Products location map`}
+        className="grayscale transition duration-500 hover:grayscale-0"
+      />
+      <div className="absolute left-6 top-6 border border-black/10 bg-white/95 p-5 shadow-xl backdrop-blur dark:border-white/10 dark:bg-[#030213]/92">
+        <p className="font-bold text-[#030213] dark:text-white">{cleanText(data.city)}</p>
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{cleanText(data.region)}</p>
+      </div>
+    </section>
+  );
+}
+
+function StickyCta({ data }: { data: LocationData }) {
+  return (
+    <div className="fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 items-center justify-between gap-3 border border-black/10 bg-white/95 p-3 shadow-2xl shadow-black/15 backdrop-blur dark:border-white/10 dark:bg-[#030213]/95 sm:rounded-2xl">
+      <div className="min-w-0 pl-2">
+        <p className="truncate text-sm font-bold text-[#030213] dark:text-white">{cleanText(data.city)} project inquiry</p>
+        <p className="truncate text-xs text-gray-500 dark:text-gray-400">Restroom cubicles, cladding, lockers and interiors</p>
+      </div>
+      <Button size="sm" onClick={scrollToInquiry} className="shrink-0">
+        Get Quote
+      </Button>
+    </div>
+  );
+}
+
+function renderLocationFlow(data: LocationData, slug: LocationSlug) {
+  switch (slug) {
+    case "delhi":
+      return (
+        <>
+          <ServicesSection data={data} layout="split" />
+          <ShowcaseSection data={data} variant="mosaic" />
+          <IndustrySection data={data} />
+          <WhyChooseSection data={data} />
+          <ProjectsCredibility data={data} />
+          <FaqSection data={data} />
+          <InquirySection data={data} slug={slug} />
+          <MapSection data={data} />
+        </>
+      );
+    case "mumbai":
+      return (
+        <>
+          <IndustrySection data={data} dark />
+          <ServicesSection data={data} layout="rail" />
+          <ShowcaseSection data={data} variant="editorial" />
+          <ProjectsCredibility data={data} />
+          <WhyChooseSection data={data} compact />
+          <InquirySection data={data} slug={slug} />
+          <FaqSection data={data} />
+          <MapSection data={data} />
+        </>
+      );
+    case "bangalore":
+      return (
+        <>
+          <ShowcaseSection data={data} variant="stack" />
+          <ServicesSection data={data} layout="grid" />
+          <WhyChooseSection data={data} compact />
+          <IndustrySection data={data} />
+          <FaqSection data={data} />
+          <ProjectsCredibility data={data} />
+          <InquirySection data={data} slug={slug} />
+          <MapSection data={data} />
+        </>
+      );
+    case "ahmedabad":
+      return (
+        <>
+          <ServicesSection data={data} layout="split" />
+          <IndustrySection data={data} />
+          <ProjectsCredibility data={data} />
+          <ShowcaseSection data={data} variant="band" />
+          <WhyChooseSection data={data} />
+          <FaqSection data={data} />
+          <InquirySection data={data} slug={slug} />
+          <MapSection data={data} />
+        </>
+      );
+    case "uae":
+      return (
+        <>
+          <ShowcaseSection data={data} variant="gallery" />
+          <WhyChooseSection data={data} />
+          <ServicesSection data={data} layout="rail" />
+          <IndustrySection data={data} dark />
+          <ProjectsCredibility data={data} />
+          <InquirySection data={data} slug={slug} />
+          <FaqSection data={data} />
+          <MapSection data={data} />
+        </>
+      );
+    default:
+      return null;
+  }
+}
 
 export default function LocationPage() {
   const { location } = useParams<{ location: string }>();
   const navigate = useNavigate();
-  const data = location ? locationData[location] : null;
+  const slug = location as LocationSlug | undefined;
+  const data = slug ? locations[slug] : null;
+  const { data: locationImages } = useLocationGallery(slug);
+  const pageData = data ? mergeBackendImages(data, locationImages) : null;
 
-  if (!data) {
+  useEffect(() => {
+    if (pageData) applySeo(pageData);
+  }, [pageData]);
+
+  if (!pageData || !slug) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center bg-white dark:bg-[#030213]">
+      <div className="flex min-h-screen items-center justify-center bg-white pt-20 dark:bg-[#030213]">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-[#030213] dark:text-white mb-4">Location Not Found</h1>
+          <h1 className="mb-4 text-4xl font-bold text-[#030213] dark:text-white">Location Not Found</h1>
           <Button onClick={() => navigate("/contact")}>View All Locations</Button>
         </div>
       </div>
@@ -177,271 +708,10 @@ export default function LocationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#030213] text-[#030213] dark:text-white transition-colors">
-
-      {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative pt-32 pb-24 overflow-hidden">
-        {/* Animated gradient orbs */}
-        <motion.div
-          className="absolute -top-24 -left-24 w-[500px] h-[500px] rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(127,183,6,0.18) 0%, transparent 70%)", filter: "blur(60px)" }}
-          animate={{ scale: [1, 1.15, 1], x: [0, 30, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/2 -right-32 w-[420px] h-[420px] rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(181,248,35,0.12) 0%, transparent 70%)", filter: "blur(50px)" }}
-          animate={{ scale: [1, 1.1, 1], y: [0, 30, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 opacity-[0.025] pointer-events-none"
-          style={{ backgroundImage: "repeating-linear-gradient(0deg,#7FB706 0,transparent 1px,transparent 48px),repeating-linear-gradient(90deg,#7FB706 0,transparent 1px,transparent 48px)" }}
-        />
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Back link */}
-          <motion.button
-            initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            onClick={() => navigate("/contact")}
-            className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-[#7FB706] dark:hover:text-[#B5F823] transition-colors mb-10 group text-sm font-medium"
-          >
-            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            All Locations
-          </motion.button>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl"
-          >
-            {/* Region badge */}
-            <span className="inline-flex items-center gap-2 bg-[#7FB706]/10 border border-[#7FB706]/25 text-[#B5F823] text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#B5F823] animate-pulse" />
-              {data.region}
-            </span>
-
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-[#030213] dark:text-white leading-tight mb-6">
-              {data.city}
-              <span className="block text-[#7FB706] mt-1">Office</span>
-            </h1>
-
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl">
-              {data.description}
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── Stats Bar ────────────────────────────────────────── */}
-      <section className="border-y border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#0a0a1a] transition-colors">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200 dark:divide-white/5">
-            {data.stats.map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="py-10 px-6 text-center"
-              >
-                <div className="text-3xl sm:text-4xl font-bold text-[#7FB706] dark:text-[#B5F823] mb-2">{stat.value}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-500 font-medium">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Contact Cards + Services ──────────────────────────── */}
-      <section className="py-24 bg-white dark:bg-[#030213] transition-colors">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
-
-            {/* Contact Info */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-10">
-                Contact <span className="text-[#7FB706]">Information</span>
-              </h2>
-
-              <div className="space-y-5">
-                {[
-                  { icon: MapPin, label: "Address", value: data.address, href: undefined },
-                  { icon: Phone, label: "Phone", value: data.phone, href: `tel:${data.phone}` },
-                  { icon: Mail, label: "Email", value: data.email, href: `mailto:${data.email}` },
-                  { icon: Clock, label: "Business Hours", value: data.hours, href: undefined },
-                ].map(({ icon: Icon, label, value, href }) => (
-                  <div
-                    key={label}
-                    className="flex items-start gap-5 bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/5 rounded-2xl p-5 hover:border-[#7FB706]/30 hover:bg-[#7FB706]/5 dark:hover:bg-white/[0.06] transition-all duration-300 group"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-[#7FB706]/10 border border-[#7FB706]/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#7FB706]/20 transition-colors">
-                      <Icon className="w-5 h-5 text-[#B5F823]" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">{label}</p>
-                      {href ? (
-                        <a href={href} className="text-gray-700 dark:text-gray-300 hover:text-[#7FB706] dark:hover:text-[#B5F823] transition-colors font-medium leading-relaxed">
-                          {value}
-                        </a>
-                      ) : (
-                        <p className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed">{value}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* WhatsApp CTA */}
-              <div className="mt-8 relative overflow-hidden bg-gradient-to-br from-[#7FB706]/15 to-[#7FB706]/5 border border-[#7FB706]/25 rounded-3xl p-7">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[#B5F823]/10 rounded-full blur-3xl" />
-                <h3 className="text-xl font-bold text-[#030213] dark:text-white mb-2 relative z-10">Need Instant Support?</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-5 text-sm relative z-10">Chat directly with our {data.city} team on WhatsApp</p>
-                <button
-                  onClick={() => window.open("https://wa.me/919876543210", "_blank")}
-                  className="relative z-10 inline-flex items-center px-6 py-3 bg-[#7FB706] text-white font-semibold rounded-xl hover:bg-[#8cc70a] shadow-lg shadow-[#7FB706]/25 transition-all hover:scale-105 active:scale-95 text-sm"
-                >
-                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
-                  Chat on WhatsApp
-                </button>
-              </div>
-            </motion.div>
-
-            {/* Services */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-10">
-                Services <span className="text-[#7FB706]">Offered</span>
-              </h2>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                {data.services.map((service, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.08, duration: 0.4 }}
-                    className="flex items-start gap-3 bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/5 rounded-xl p-4 hover:border-[#7FB706]/30 hover:bg-[#7FB706]/5 dark:hover:bg-white/[0.06] transition-colors"
-                  >
-                    <CheckCircle2 className="w-5 h-5 text-[#7FB706] flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 dark:text-gray-300 text-sm font-medium leading-snug">{service}</span>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Notable Projects */}
-              <div>
-                <h3 className="text-xl font-bold text-[#030213] dark:text-white mb-5 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-[#7FB706]" />
-                  Notable Projects
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {data.projects.map((project, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.07, duration: 0.4 }}
-                      className="bg-gradient-to-br from-[#7FB706]/10 to-transparent border border-[#7FB706]/15 rounded-xl p-3 text-center hover:border-[#7FB706]/40 hover:from-[#7FB706]/20 transition-all duration-300 group"
-                    >
-                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-[#030213] dark:group-hover:text-white transition-colors leading-tight">
-                        {project}
-                      </p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Map ──────────────────────────────────────────────── */}
-      <section className="relative border-t border-gray-100 dark:border-white/5">
-        <div className="h-[440px] sm:h-[520px] w-full relative overflow-hidden">
-          {/* Overlay label */}
-          <div className="absolute top-6 left-6 z-20 bg-white/90 dark:bg-[#030213]/90 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl px-5 py-3 flex items-center gap-3 shadow-xl">
-            <MapPin className="w-5 h-5 text-[#7FB706] dark:text-[#B5F823]" />
-            <div>
-              <p className="text-[#030213] dark:text-white font-semibold text-sm">{data.city}</p>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">{data.region}</p>
-            </div>
-          </div>
-          <iframe
-            src={data.mapSrc}
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="grayscale opacity-70 hover:opacity-90 transition-opacity duration-500"
-            title={`${data.city} Office Location`}
-          />
-          {/* Bottom fade */}
-          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-white dark:from-[#030213] to-transparent pointer-events-none" />
-        </div>
-      </section>
-
-      {/* ── CTA ──────────────────────────────────────────────── */}
-      <section className="py-24 bg-gradient-to-br from-[#7FB706] to-[#5a8c04] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-80 h-80 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#B5F823] rounded-full blur-3xl" />
-        </div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl mx-auto"
-          >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-              Ready to Start Your Project?
-            </h2>
-            <p className="text-lg text-white/80 mb-10">
-              Our {data.city} team is ready to help. Get a free consultation and detailed quote today.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="font-semibold shadow-xl shadow-black/20"
-                onClick={() => navigate("/contact")}
-              >
-                Schedule a Visit
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-              <button
-                onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(data.address)}`, "_blank")}
-                className="inline-flex items-center justify-center px-8 py-4 text-white border-2 border-white/40 rounded-xl font-semibold hover:bg-white/10 hover:border-white/70 transition-all duration-300 text-lg gap-2"
-              >
-                <ExternalLink className="w-5 h-5" />
-                Open in Maps
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-    </div>
+    <main className="min-h-screen bg-white text-[#030213] dark:bg-[#030213] dark:text-white">
+      <HeroSection data={pageData} slug={slug} />
+      {renderLocationFlow(pageData, slug)}
+      <StickyCta data={pageData} />
+    </main>
   );
 }

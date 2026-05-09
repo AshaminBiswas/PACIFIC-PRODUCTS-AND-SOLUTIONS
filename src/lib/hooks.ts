@@ -366,6 +366,52 @@ export function useGallery(): UseDataResult<GalleryImage> {
   return { data, loading, error, refetch: fetchData };
 }
 
+export function useLocationGallery(locationSlug: string | undefined): UseDataResult<GalleryImage> {
+  const [data, setData] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!locationSlug) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    if (!isSupabaseConfigured()) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data: rows, error: err } = await supabase
+        .from("gallery_images")
+        .select("*")
+        .eq("published", true)
+        .eq("location_slug", locationSlug)
+        .order("sort_order", { ascending: true });
+      if (err) throw err;
+      setData((rows as GalleryImage[]) || []);
+    } catch (e: any) {
+      console.error("Failed to fetch location gallery images:", e);
+      setError(e.message);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [locationSlug]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
 // ── Admin hooks (all items, including unpublished) ───────────
 
 export function useAdminProducts(): UseDataResult<Product> {
