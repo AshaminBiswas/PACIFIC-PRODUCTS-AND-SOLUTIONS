@@ -293,6 +293,7 @@ function HeroSection() {
 
 import { useProducts, useSolutions, useHeroImages, useCoreServices } from "../../lib/hooks";
 import { DynamicIcon } from "../components/DynamicIcon";
+import { ImageWithFallback as SolutionImage } from "../components/figma/ImageWithFallback";
 import { CoreServiceCard } from "../components/CoreServiceCard";
 
 export default function HomePage() {
@@ -360,7 +361,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Services Overview */}
+      {/* Our Solutions */}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white/40 dark:bg-[#0a0a1a] transition-colors">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -370,96 +371,107 @@ export default function HomePage() {
             className="text-center mb-10 sm:mb-14 lg:mb-16"
           >
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-3 sm:mb-4">
-              Our Core Services
+              Our Solutions
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
-              Comprehensive interior contracting solutions engineered for excellence
-            </p>
-          </motion.div>
-
-          {loadingCoreServices ? (
-            <div className="text-center text-gray-500 py-10">Loading core services...</div>
-          ) : coreServices.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {coreServices.map((service, index) => (
-                <CoreServiceCard key={service.id} service={service} index={index} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500 py-10">
-              No core services yet. Add some from the Admin Dashboard!
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Industries Served */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-transparent dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-10 sm:mb-14 lg:mb-16"
-          >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[#7FB706]">
-              Industries We Serve
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
-              Trusted by leading organizations across multiple sectors
+              Industry-specific solutions tailored to meet your unique requirements
             </p>
           </motion.div>
 
           {loadingSolutions ? (
-            <div className="text-center text-gray-400 py-10">Loading industries...</div>
+            <div className="text-center text-gray-500 py-10">Loading solutions...</div>
           ) : solutions && solutions.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-              {solutions.map((industry, index) => {
-                return (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                {solutions.slice(0, 6).map((solution, index) => (
                   <motion.div
-                    key={industry.id}
+                    key={solution.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="group relative flex flex-col bg-white dark:bg-[#0a0a1a] rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer h-full"
-                    onClick={() => navigate(`/solutions/${industry.slug}`)}
+                    whileHover={{ y: -8 }}
+                    className="group relative flex flex-col bg-white dark:bg-[#0a0a1a] rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer"
+                    onClick={() => navigate(`/solutions/${solution.slug}`)}
                   >
-                    {/* Top Image */}
-                    <div className="relative h-48 sm:h-52 overflow-hidden bg-gray-100 dark:bg-gray-900 shrink-0">
-                      <ImageWithFallback
-                        src={industry.image_url}
-                        alt={industry.title}
+                    {/* Dynamic Hover Glow Border */}
+                    <div
+                      className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
+                      style={{ boxShadow: `inset 0 0 0 1.5px #7FB706` }}
+                    />
+
+                    {/* Top Section: Image area */}
+                    <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-900 z-10">
+                      <SolutionImage
+                        src={solution.image_url}
+                        alt={solution.title}
                         className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
-                    </div>
 
-                    {/* Overlapping Floating Icon */}
-                    <div className="absolute top-48 sm:top-52 right-6 -translate-y-1/2 z-10">
-                      <div className="w-14 h-14 rounded-full bg-[#7FB706] text-white flex items-center justify-center shadow-lg shadow-[#7FB706]/30 transform transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
-                        <DynamicIcon name={industry.icon_name} className="w-6 h-6" />
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+
+                      {/* Brand Green overlay on hover */}
+                      <div
+                        className="absolute inset-0 bg-[#7FB706] opacity-0 group-hover:opacity-20 transition-opacity duration-500 mix-blend-overlay"
+                      />
+
+                      {/* Floating Icon */}
+                      <div className="absolute bottom-4 left-6 flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center group-hover:bg-[#7FB706]/20 group-hover:border-[#7FB706]/50 transition-colors duration-500">
+                          <DynamicIcon name={solution.icon_name} className="w-6 h-6 text-[#B5F823]" />
+                        </div>
                       </div>
                     </div>
 
-                    {/* Bottom Content Area */}
-                    <div className="flex flex-col flex-1 p-6 pt-10">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-[#7FB706] transition-colors duration-300 pr-8">
-                        {industry.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-6 leading-relaxed flex-1">
-                        {industry.subtitle}
+                    {/* Bottom Section: Content area */}
+                    <div className="flex flex-col flex-1 p-6 sm:p-8 z-10 relative bg-white dark:bg-[#0a0a1a]">
+                      {/* Title & Arrow */}
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-[#7FB706]">
+                          {solution.title}
+                        </h3>
+                        <motion.div
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 dark:bg-white/5 text-gray-400 group-hover:bg-[#7FB706] group-hover:text-white transition-colors duration-500 shrink-0 mt-1"
+                        >
+                          <ArrowRight className="w-5 h-5 transform transition-transform duration-500 group-hover:translate-x-1" />
+                        </motion.div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed flex-1 mb-6 line-clamp-3">
+                        {solution.subtitle || solution.description}
                       </p>
-                      <div className="mt-auto flex items-center text-sm font-semibold text-gray-400 group-hover:text-[#7FB706] transition-colors duration-300">
-                        Explore <ArrowRight className="w-4 h-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" />
+
+                      {/* Footer */}
+                      <div className="mt-auto pt-5 border-t border-gray-100 dark:border-white/10 flex items-center text-sm font-semibold text-gray-400 group-hover:text-[#7FB706] transition-colors duration-300 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#7FB706] to-[#B5F823] group-hover:w-full transition-all duration-700 ease-out" />
+                        Explore Solution
+                        <ArrowRight className="w-4 h-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" />
                       </div>
                     </div>
                   </motion.div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+
+              {solutions.length > 6 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="text-center mt-8 sm:mt-12"
+                >
+                  <Button size="lg" variant="outline" onClick={() => navigate("/solutions")}>
+                    View All Solutions
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </motion.div>
+              )}
+            </>
           ) : (
-            <div className="text-center text-gray-400 py-10">No industries added yet.</div>
+            <div className="text-center text-gray-500 py-10">
+              No solutions yet. Add some from the Admin Dashboard!
+            </div>
           )}
         </div>
       </section>
@@ -514,6 +526,39 @@ export default function HomePage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Our Core Services */}
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-transparent dark:bg-[#030213] transition-colors">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-10 sm:mb-14 lg:mb-16"
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-3 sm:mb-4">
+              Our Core Services
+            </h2>
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
+              Comprehensive interior contracting solutions engineered for excellence
+            </p>
+          </motion.div>
+
+          {loadingCoreServices ? (
+            <div className="text-center text-gray-500 py-10">Loading core services...</div>
+          ) : coreServices.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              {coreServices.map((service, index) => (
+                <CoreServiceCard key={service.id} service={service} index={index} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-10">
+              No core services yet. Add some from the Admin Dashboard!
+            </div>
+          )}
         </div>
       </section>
 
