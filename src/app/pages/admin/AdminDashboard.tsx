@@ -11,7 +11,6 @@ import {
   ImageIcon,
   LogOut,
   Menu,
-  X,
   ChevronRight,
   MonitorPlay,
   Layers,
@@ -22,6 +21,8 @@ import {
   Users,
   FileDown,
   Clock,
+  ExternalLink,
+  Search,
 } from "lucide-react";
 
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
@@ -168,9 +169,9 @@ export default function AdminDashboard() {
         className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#030213] border-r border-white/5 flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
           }`}
       >
-        {/* Logo */}
+        {/* Logo — no redirect, stays in admin */}
         <div className="p-6 border-b border-white/5">
-          <Link to="/" className="block">
+          <div className="block">
             <img
               src={logo}
               alt="Pacific Products & Solutions"
@@ -179,11 +180,11 @@ export default function AdminDashboard() {
             <p className="text-[10px] tracking-wider text-gray-500">
               ADMIN PANEL
             </p>
-          </Link>
+          </div>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 p-4 space-y-1">
+        {/* Nav — independently scrollable */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1 scrollbar-thin" style={{ scrollbarWidth: "thin", scrollbarColor: "#ffffff15 transparent" }}>
           {navItems.map((item) => (
             <Link
               key={item.path}
@@ -235,32 +236,70 @@ export default function AdminDashboard() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top bar */}
-        <header className="bg-[#030213]/80 backdrop-blur-lg border-b border-white/5 px-4 sm:px-6 py-4 flex items-center gap-4 sticky top-0 z-30">
-          <button
-            className="lg:hidden p-2 rounded-lg hover:bg-white/5 text-white"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold text-white">
-              {navItems.find((i) => isActive(i.path))?.name || "Dashboard"}
-            </h2>
+        {/* Top bar — Redesigned */}
+        <header className="bg-[#030213]/90 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 py-3 sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+            {/* Mobile menu */}
+            <button
+              className="lg:hidden p-2 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            {/* Page title + breadcrumb */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 text-xs text-gray-500 mb-0.5">
+                <span>Admin</span>
+                <ChevronRight className="w-3 h-3" />
+                <span className="text-gray-300">
+                  {navItems.find((i) => isActive(i.path))?.name || "Dashboard"}
+                </span>
+              </div>
+              <h2 className="text-base sm:text-lg font-bold text-white truncate">
+                {navItems.find((i) => isActive(i.path))?.name || "Dashboard"}
+              </h2>
+            </div>
+
+            {/* View Site button */}
+            <Link
+              to="/"
+              target="_blank"
+              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-gray-400 hover:text-[#B5F823] bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 hover:border-[#7FB706]/30 transition-all"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              View Site
+            </Link>
+
+            {/* User avatar */}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#7FB706] to-[#B5F823] rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-[#7FB706]/20">
+                {user?.email?.[0]?.toUpperCase() || "A"}
+              </div>
+              <div className="hidden md:block min-w-0">
+                <p className="text-xs text-white font-medium truncate max-w-[120px]">
+                  {user?.email || "Admin"}
+                </p>
+                <p className="text-[10px] text-gray-500">Administrator</p>
+              </div>
+            </div>
           </div>
-          <Link
-            to="/"
-            target="_blank"
-            className="text-sm text-gray-400 hover:text-[#7FB706] transition-colors"
-          >
-            View Site →
-          </Link>
         </header>
 
-        {/* Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <Outlet />
+        {/* Content area */}
+        <main className="flex-1 p-3 sm:p-5 lg:p-6">
+          <div className="bg-[#0d0d20]/50 rounded-2xl border border-white/[0.03] min-h-full p-4 sm:p-6 lg:p-8">
+            <Outlet />
+          </div>
         </main>
+
+        {/* Footer */}
+        <footer className="px-4 sm:px-6 py-3 border-t border-white/5">
+          <div className="flex items-center justify-between text-[10px] text-gray-600">
+            <span>© {new Date().getFullYear()} Pacific Products & Solutions</span>
+            <span>Admin Panel v2.0</span>
+          </div>
+        </footer>
       </div>
 
       {/* Inactivity Warning Toast */}
