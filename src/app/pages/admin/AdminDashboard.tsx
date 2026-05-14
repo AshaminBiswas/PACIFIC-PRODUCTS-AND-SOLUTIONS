@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
 // @ts-ignore
@@ -21,7 +21,11 @@ import {
   HelpCircle,
   Users,
   FileDown,
+  Clock,
 } from "lucide-react";
+
+const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+const WARNING_BEFORE = 60 * 1000; // show warning 1 min before logout
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -29,7 +33,15 @@ export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [checking, setChecking] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(60);
 
+  const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastActivityRef = useRef<number>(Date.now());
+
+  // ── Auth check ──────────────────────────────────────────
   useEffect(() => {
     async function check() {
       if (!isSupabaseConfigured()) {
@@ -47,10 +59,78 @@ export default function AdminDashboard() {
     check();
   }, [navigate]);
 
-  const handleLogout = async () => {
+  // ── Logout handler ──────────────────────────────────────
+  const handleLogout = useCallback(async () => {
+    // Clear all timers
+    if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
+    if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    setShowTimeoutWarning(false);
+
     await supabase.auth.signOut();
     navigate("/admin");
-  };
+  }, [navigate]);
+
+  // ── Reset inactivity timer ──────────────────────────────
+  const resetInactivityTimer = useCallback(() => {
+    lastActivityRef.current = Date.now();
+    setShowTimeoutWarning(false);
+
+    // Clear existing timers
+    if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
+    if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+    if (countdownRef.current) clearInterval(countdownRef.current);
+
+    // Set warning timer (fires 1 min before logout)
+    warningTimerRef.current = setTimeout(() => {
+      setShowTimeoutWarning(true);
+      setSecondsLeft(60);
+
+      // Start countdown
+      countdownRef.current = setInterval(() => {
+        setSecondsLeft((prev) => {
+          if (prev <= 1) {
+            if (countdownRef.current) clearInterval(countdownRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }, INACTIVITY_TIMEOUT - WARNING_BEFORE);
+
+    // Set logout timer (fires at 10 min)
+    logoutTimerRef.current = setTimeout(() => {
+      handleLogout();
+    }, INACTIVITY_TIMEOUT);
+  }, [handleLogout]);
+
+  // ── Attach activity listeners ───────────────────────────
+  useEffect(() => {
+    if (!user) return;
+
+    const activityEvents = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "click"];
+
+    const onActivity = () => {
+      resetInactivityTimer();
+    };
+
+    // Start the timer
+    resetInactivityTimer();
+
+    // Listen for user activity
+    activityEvents.forEach((event) => {
+      document.addEventListener(event, onActivity, { passive: true });
+    });
+
+    return () => {
+      activityEvents.forEach((event) => {
+        document.removeEventListener(event, onActivity);
+      });
+      if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
+      if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
+  }, [user, resetInactivityTimer]);
 
   const navItems = [
     { name: "Overview", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -182,6 +262,31 @@ export default function AdminDashboard() {
           <Outlet />
         </main>
       </div>
+
+      {/* Inactivity Warning Toast */}
+      {showTimeoutWarning && (
+        <div className="fixed bottom-6 right-6 z-[100] animate-[slideUp_0.3s_ease-out]">
+          <div className="bg-[#1a1a2e] border border-yellow-500/30 rounded-2xl p-5 shadow-2xl shadow-black/40 max-w-sm">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-yellow-500/15 flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-white mb-1">Session Expiring</h4>
+                <p className="text-xs text-gray-400 mb-3">
+                  You'll be logged out in <span className="text-yellow-400 font-bold">{secondsLeft}s</span> due to inactivity.
+                </p>
+                <button
+                  onClick={resetInactivityTimer}
+                  className="px-4 py-2 text-xs font-semibold bg-[#7FB706] hover:bg-[#6fa005] text-white rounded-lg transition-colors w-full"
+                >
+                  Stay Logged In
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
