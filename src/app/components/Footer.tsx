@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { Facebook, Youtube, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
 import { useProducts, useSolutions } from "../../lib/hooks";
 // @ts-ignore
-import logo from "../../image/logo/logo.svg";
+import logo from "../../image/logo/logo.png";
 
 export function Footer() {
   const { data: products } = useProducts();
@@ -56,6 +56,7 @@ export function Footer() {
                   src={logo} 
                   alt="Pacific Products & Solutions" 
                   className="h-16 w-auto object-contain rounded-full bg-white/5 p-1"
+                  style={{ transform: "rotate(-90deg)" }}
                 />
               </Link>
             </div>

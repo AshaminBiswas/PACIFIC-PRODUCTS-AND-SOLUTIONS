@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
 import { useNavigate } from "react-router";
 // @ts-ignore
-import logo from "../../../image/logo/logo.svg";
+import logo from "../../../image/logo/logo.png";
 
 /**
  * Admin login gate — uses Supabase email/password auth.
@@ -67,6 +67,7 @@ export default function AdminLogin() {
             src={logo} 
             alt="Pacific Products & Solutions" 
             className="h-20 w-auto object-contain mb-2 rounded-full bg-white/5 p-2"
+            style={{ transform: "rotate(-90deg)" }}
           />
           <p className="text-xs tracking-wider text-gray-400">
             ADMIN PANEL

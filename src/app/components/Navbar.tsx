@@ -6,7 +6,7 @@ import { Button } from "./Button";
 import { ThemeToggle } from "./ThemeToggle";
 import { useProducts, useSolutions } from "../../lib/hooks";
 // @ts-ignore
-import logo from "../../image/logo/logo.svg";
+import logo from "../../image/logo/logo.png";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -113,6 +113,7 @@ export function Navbar() {
                 src={logo} 
                 alt="Pacific Products & Solutions" 
                 className="h-12 sm:h-16 w-auto object-contain rounded-full"
+                style={{ transform: "rotate(-90deg)" }}
               />
             </motion.div>
           </Link>

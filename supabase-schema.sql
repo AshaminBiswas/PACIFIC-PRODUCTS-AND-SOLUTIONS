@@ -130,7 +130,25 @@ CREATE TABLE IF NOT EXISTS public.feedback (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- ── 9. Updated-at trigger ────────────────────────────────────
+-- ── 10. Visitor Leads ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.visitor_leads (
+  id                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  ip_address        TEXT,
+  country           TEXT,
+  city              TEXT,
+  region            TEXT,
+  email             TEXT,
+  age               INTEGER,
+  device_type       TEXT,
+  browser           TEXT,
+  os                TEXT,
+  screen_resolution TEXT,
+  referrer          TEXT,
+  consent_given     BOOLEAN NOT NULL DEFAULT false
+);
+
+-- ── 11. Updated-at trigger ────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -164,6 +182,7 @@ ALTER TABLE public.core_services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.page_banners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contact_queries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.visitor_leads ENABLE ROW LEVEL SECURITY;
 
 -- ─ Public read policies (for published or public content)
 CREATE POLICY "Public can view published products" ON public.products FOR SELECT USING (published = true);
@@ -178,6 +197,7 @@ CREATE POLICY "Public can view page banners" ON public.page_banners FOR SELECT U
 CREATE POLICY "Allow public insert" ON public.contact_queries FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public feedback insert" ON public.feedback FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public can view approved feedback" ON public.feedback FOR SELECT USING (true);
+CREATE POLICY "Allow public insert visitor leads" ON public.visitor_leads FOR INSERT WITH CHECK (true);
 
 -- ─ Authenticated full access policies (Admin Panel)
 CREATE POLICY "Auth users can manage products" ON public.products FOR ALL USING (auth.role() = 'authenticated');
@@ -189,6 +209,7 @@ CREATE POLICY "Auth users can manage core services" ON public.core_services FOR 
 CREATE POLICY "Auth users can manage page banners" ON public.page_banners FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Auth users can manage contact queries" ON public.contact_queries FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Auth users can manage feedback" ON public.feedback FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth users can manage visitor leads" ON public.visitor_leads FOR ALL USING (auth.role() = 'authenticated');
 
 -- ── 11. Storage Bucket ────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public)
@@ -222,6 +243,8 @@ CREATE INDEX IF NOT EXISTS idx_gallery_published ON public.gallery_images (publi
 CREATE INDEX IF NOT EXISTS idx_gallery_location_slug ON public.gallery_images (location_slug);
 CREATE INDEX IF NOT EXISTS idx_gallery_location_placement ON public.gallery_images (location_slug, placement, published, sort_order);
 CREATE INDEX IF NOT EXISTS idx_feedback_created ON public.feedback (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_visitor_leads_created ON public.visitor_leads (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_visitor_leads_consent ON public.visitor_leads (consent_given);
 
 -- Notify PostgREST to reload schema cache
 NOTIFY pgrst, 'reload schema';

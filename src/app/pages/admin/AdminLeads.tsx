@@ -253,15 +253,26 @@ export default function AdminLeads() {
     setDeleting(true);
     setConfirmDelete(null);
     try {
-      const { error: err } = await (supabase as any)
+      const { error: err, data } = await (supabase as any)
         .from("visitor_leads")
         .delete()
-        .in("id", ids);
+        .in("id", ids)
+        .select("id");
+
       if (err) throw err;
-      setLeads((prev) => prev.filter((l) => !ids.includes(l.id)));
+
+      // Supabase RLS may silently block deletes — verify rows were actually removed
+      const deletedIds = (data ?? []).map((r: any) => r.id);
+      if (deletedIds.length === 0 && ids.length > 0) {
+        throw new Error(
+          "Delete was blocked by database policies. Please check that RLS policies allow authenticated users to delete from visitor_leads."
+        );
+      }
+
+      setLeads((prev) => prev.filter((l) => !deletedIds.includes(l.id)));
       setSelectedIds((prev) => {
         const next = new Set(prev);
-        ids.forEach((id) => next.delete(id));
+        deletedIds.forEach((id: string) => next.delete(id));
         return next;
       });
     } catch (e: any) {
