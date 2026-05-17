@@ -145,8 +145,8 @@ export function Footer() {
               </li>
               <li className="flex items-start space-x-2">
                 <Mail className="w-4 h-4 mt-1 text-[#7FB706] shrink-0" />
-                <a href="mailto:info@pacificproducts.com" className="text-gray-400 hover:text-[#7FB706] text-sm transition-colors">
-                  info@pacificproducts.com
+                <a href="mailto:info@pacificproduct.in" className="text-gray-400 hover:text-[#7FB706] text-sm transition-colors">
+                  info@pacificproduct.in
                 </a>
               </li>
               <li className="flex items-start space-x-2">

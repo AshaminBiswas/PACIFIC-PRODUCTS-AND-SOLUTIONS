@@ -328,7 +328,7 @@ export default function TermsOfServicePage() {
 
             <div className="mt-6 grid sm:grid-cols-2 gap-4">
               <a
-                href="mailto:info@pacificproducts.com"
+                href="mailto:info@pacificproduct.in"
                 className="flex items-start gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-[#7FB706]/40 transition-colors group"
               >
                 <div className="w-10 h-10 rounded-xl bg-[#7FB706]/15 flex items-center justify-center flex-shrink-0">
@@ -337,7 +337,7 @@ export default function TermsOfServicePage() {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">Email</p>
                   <p className="text-gray-900 dark:text-white font-medium group-hover:text-[#7FB706] transition-colors text-sm">
-                    info@pacificproducts.com
+                    info@pacificproduct.in
                   </p>
                 </div>
               </a>

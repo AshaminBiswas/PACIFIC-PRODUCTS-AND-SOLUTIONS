@@ -1,15 +1,10 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { X, CheckCircle2, AlertCircle } from "lucide-react";
-import emailjs from "@emailjs/browser";
 import { Button } from "./Button";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
-// ─── EmailJS Configuration ────────────────────────────────────────────────────
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string;
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string;
-// ─────────────────────────────────────────────────────────────────────────────
+const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as string;
 
 interface ContactFormProps {
   onClose?: () => void;
@@ -66,17 +61,35 @@ export function ContactForm({ onClose, isModal = false }: ContactFormProps) {
         console.warn("Supabase not configured — skipping database save.");
       }
 
-      // 2. Send Email Notification (Non-fatal if it fails)
+      // 2. Send Email Notification via Web3Forms (Non-fatal if it fails)
       try {
-        await emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
-          templateParams,
-          EMAILJS_PUBLIC_KEY
-        );
+        if (!WEB3FORMS_ACCESS_KEY) {
+          console.warn("Web3Forms access key is missing. Skipping email send.");
+        } else {
+          await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              access_key: WEB3FORMS_ACCESS_KEY,
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              company: formData.company || "N/A",
+              requirement: formData.requirement || "Not specified",
+              message: formData.message || "No additional details provided.",
+              subject: `New Website Query from ${formData.name}`,
+              from_name: "Pacific Products Website",
+              replyTo: formData.email,
+              // Web3Forms automatically sends this exact message back to the customer!
+              autoresponse: `Hi ${formData.name},\n\nThank you for reaching out to Pacific Products and Solutions!\n\nWe have received your inquiry regarding ${formData.requirement || 'our services'}. One of our team members will review your details and get back to you shortly.\n\nBest regards,\nThe Pacific Products Team`,
+            }),
+          });
+        }
       } catch (emailErr) {
-        console.error("EmailJS notification failed:", emailErr);
-        // We do not throw here so the user still sees a success message!
+        console.error("Web3Forms notification failed:", emailErr);
       }
 
       setSubmitted(true);

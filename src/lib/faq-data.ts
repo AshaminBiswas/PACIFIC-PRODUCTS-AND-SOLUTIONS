@@ -65,7 +65,7 @@ const DEFAULT_FAQS: FAQ[] = [
     id: "faq-7",
     question: "How do I request a quote for my project?",
     answer:
-      "You can request a quote through multiple channels: use the 'Get Quote' form on our website, email us at info@pacificproducts.com, call us at +91 98185 92113, or connect with us on WhatsApp. Our team will respond within 24 hours with an initial estimate after reviewing your requirements and project drawings.",
+      "You can request a quote through multiple channels: use the 'Get Quote' form on our website, email us at info@pacificproduct.in, call us at +91 98185 92113, or connect with us on WhatsApp. Our team will respond within 24 hours with an initial estimate after reviewing your requirements and project drawings.",
     category: "General",
     sort_order: 7,
   },

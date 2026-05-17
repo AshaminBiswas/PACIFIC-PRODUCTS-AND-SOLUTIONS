@@ -12,7 +12,6 @@ import {
   ShoppingBag,
   Plane,
   Home,
-  ChevronDown,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/Button";
@@ -48,7 +47,7 @@ function HeroSlideshow({ images, onSlideChange }: HeroSlideshowProps) {
         onSlideChange(next);
         return next;
       });
-    }, 5000);
+    }, 8000);
     return () => clearInterval(interval);
   }, [images.length, onSlideChange]);
 
@@ -120,7 +119,7 @@ function HeroSection() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-0 sm:pt-16 lg:pt-20"
+      className="relative min-h-screen flex items-end justify-center overflow-hidden pt-0 sm:pt-16 lg:pt-20"
     >
       {/* Hero Background: slideshow if images exist, else animated gradient */}
       {heroImages.length > 0 ? (
@@ -165,7 +164,7 @@ function HeroSection() {
       {/* Main content */}
       <motion.div
         style={{ opacity }}
-        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center pb-0 sm:pb-16 lg:pb-0"
+        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center pb-[20vh]"
       >
         {/* Badge
         <motion.div
@@ -178,25 +177,7 @@ function HeroSection() {
           Trusted by 250+ clients worldwide
         </motion.div> */}
 
-        {/* Headline */}
-        <motion.h1
-          className="text-5xl sm:text-6xl md:text-[4.5rem] lg:text-7xl xl:text-[5.5rem] font-bold text-white mb-6 sm:mb-8 leading-[1.1] tracking-tight"
-          style={{ textShadow: "0 2px 16px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.9)" }}
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.7 }}
-        >
-          Precision Solutions for
-          <br />
-          <motion.span
-            className="text-[#7FB706] inline-block"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45, duration: 0.6 }}
-          >
-            Modern Infrastructure
-          </motion.span>
-        </motion.h1>
+
 
         {/* Sub-headline — shows current slide description or static fallback */}
         <motion.p
@@ -212,7 +193,7 @@ function HeroSection() {
 
         {/* CTA buttons */}
         <motion.div
-          className="flex flex-row gap-1.5 sm:gap-4 justify-center items-center mb-6 sm:mb-16 lg:mb-20 w-full px-2 sm:px-0"
+          className="flex flex-row gap-1.5 sm:gap-4 justify-center items-center mb-6 sm:mb-16 lg:mb-2 w-full px-2 sm:px-0"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.5 }}
@@ -269,22 +250,7 @@ function HeroSection() {
 
       </motion.div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4, duration: 0.6 }}
-        className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20 cursor-pointer"
-        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/40 hover:scale-105 transition-all"
-        >
-          <ChevronDown className="w-5 h-5 opacity-80" />
-        </motion.div>
-      </motion.div>
+
     </section>
   );
 }

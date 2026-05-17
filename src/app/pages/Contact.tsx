@@ -16,28 +16,28 @@ export default function ContactPage() {
       slug: "mumbai",
       address: "Plot No. 123, MIDC Industrial Area, Andheri East, Mumbai - 400093, Maharashtra, India",
       phone: "+91 22 1234 5678",
-      email: "mumbai@pacificproducts.com",
+      email: "info@pacificproduct.in",
     },
     {
       city: "Delhi",
       slug: "delhi",
       address: "Sector 18, Udyog Vihar, Gurugram - 122015, Haryana, India",
       phone: "+91 11 9876 5432",
-      email: "delhi@pacificproducts.com",
+      email: "info@pacificproduct.in",
     },
     {
       city: "Bangalore",
       slug: "bangalore",
       address: "Electronic City Phase 1, Bangalore - 560100, Karnataka, India",
       phone: "+91 80 5555 6666",
-      email: "bangalore@pacificproducts.com",
+      email: "info@pacificproduct.in",
     },
     {
       city: "Dubai, UAE",
       slug: "uae",
       address: "Al Quoz Industrial Area 3, Dubai, United Arab Emirates",
       phone: "+971 4 333 4444",
-      email: "dubai@pacificproducts.com",
+      email: "ejaj@pacificproduct.in",
     },
   ];
 
@@ -123,8 +123,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-white text-lg mb-2">Email</h4>
-                    <p className="text-gray-400 hover:text-white transition-colors cursor-pointer">info@pacificproducts.com</p>
-                    <p className="text-gray-400 hover:text-white transition-colors cursor-pointer">sales@pacificproducts.com</p>
+                    <a href="mailto:info@pacificproduct.in" className="text-gray-400 hover:text-white transition-colors cursor-pointer block">info@pacificproduct.in</a>
+                    <a href="mailto:ejaj@pacificproduct.in" className="text-gray-400 hover:text-white transition-colors cursor-pointer block">ejaj@pacificproduct.in</a>
                   </div>
                 </div>
 
