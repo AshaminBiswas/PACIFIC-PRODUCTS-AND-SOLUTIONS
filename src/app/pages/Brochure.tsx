@@ -71,8 +71,8 @@ export default function Brochure() {
         {/* ═══ GREEN BAR ═══ */}
         <div className="grid grid-cols-2 md:grid-cols-4 bg-[#7FB706] divide-x divide-white/20">
           {[
-            { num: "10+", lbl: "Years of Expertise" },
-            { num: "500+", lbl: "Projects Completed" },
+            { num: "12+", lbl: "Years of Expertise" },
+            { num: "600+", lbl: "Projects Completed" },
             { num: "100+", lbl: "Prestigious Clients" },
             { num: "4", lbl: "Offices Across India" }
           ].map((stat, i) => (

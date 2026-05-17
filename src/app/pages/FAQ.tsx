@@ -344,8 +344,8 @@ export default function FAQPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
             {[
-              { number: "15+", label: "Years Experience" },
-              { number: "250+", label: "Projects Completed" },
+              { number: "12+", label: "Years Experience" },
+              { number: "600+", label: "Projects Completed" },
               { number: "50+", label: "Cities Covered" },
               { number: "5yr", label: "Product Warranty" },
             ].map((stat, i) => (

@@ -95,7 +95,7 @@ export default function ProductDetailPage() {
               {/* Inline stats */}
               <div className="flex flex-wrap gap-6 mb-8 pb-8 border-b border-white/10">
                 {[
-                  { val: "15+", lbl: "Years Experience" },
+                  { val: "12+", lbl: "Years Experience" },
                   { val: "5 Yr", lbl: "Warranty" },
                   { val: "ISO", lbl: "Certified" },
                 ].map((s, i) => (

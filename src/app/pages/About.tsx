@@ -119,9 +119,9 @@ export default function AboutPage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   const stats = [
-    { value: 500, suffix: "+", label: "Projects Delivered", icon: CheckCircle2 },
+    { value: 600, suffix: "+", label: "Projects Delivered", icon: CheckCircle2 },
     { value: 250, suffix: "+", label: "Happy Clients", icon: Users },
-    { value: 15, suffix: "+", label: "Years Experience", icon: Award },
+    { value: 12, suffix: "+", label: "Years Experience", icon: Award },
     { value: 5, suffix: "", label: "Countries", icon: Globe },
   ];
 
@@ -250,7 +250,7 @@ export default function AboutPage() {
                 transition={{ delay: 0.4, type: "spring" }}
                 className="absolute -bottom-5 -left-5 bg-[#7FB706] text-white rounded-2xl p-5 shadow-xl shadow-[#7FB706]/30"
               >
-                <div className="text-3xl font-bold">15+</div>
+                <div className="text-3xl font-bold">12+</div>
                 <div className="text-sm opacity-90">Years of Excellence</div>
               </motion.div>
             </motion.div>

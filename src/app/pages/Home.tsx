@@ -575,7 +575,7 @@ export default function HomePage() {
                 Why Choose Pacific Products?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8">
-                With over 15 years of experience, we deliver unmatched quality and
+                With over 12 years of experience, we deliver unmatched quality and
                 innovation in every project we undertake.
               </p>
               <div className="space-y-3 sm:space-y-4">
@@ -622,7 +622,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-[#7FB706]/20 to-transparent" />
               </div>
               <div className="absolute -bottom-4 -left-4 bg-[#7FB706] text-white rounded-2xl p-4 sm:p-6 shadow-xl">
-                <div className="text-2xl sm:text-3xl font-bold">15+</div>
+                <div className="text-2xl sm:text-3xl font-bold">12+</div>
                 <div className="text-xs sm:text-sm opacity-90">Years of Excellence</div>
               </div>
             </motion.div>
