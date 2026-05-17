@@ -51,13 +51,16 @@ export function Footer() {
           {/* Company Info */}
           <div className="lg:col-span-1">
             <div className="mb-6">
-              <Link to="/">
+              <Link to="/" className="flex items-center gap-3">
                 <img 
                   src={logo} 
                   alt="Pacific Products & Solutions" 
                   className="h-16 w-auto object-contain rounded-full bg-white/5 p-1"
                   style={{ transform: "rotate(-90deg)" }}
                 />
+                <span className="text-lg font-bold text-[#7FB706] tracking-tight leading-tight">
+                  Pacific Product<br />& Solutions
+                </span>
               </Link>
             </div>
             <p className="text-gray-400 mb-6">
