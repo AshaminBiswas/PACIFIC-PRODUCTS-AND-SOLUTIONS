@@ -28,6 +28,7 @@ export default function AdminGallery() {
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState("");
   const [title, setTitle] = useState("");
+  const [altText, setAltText] = useState("");
   const [category, setCategory] = useState("other");
   const [locationSlug, setLocationSlug] = useState("");
   const [placement, setPlacement] = useState<Placement>("general");
@@ -45,6 +46,7 @@ export default function AdminGallery() {
 
   const resetForm = () => {
     setTitle("");
+    setAltText("");
     setCategory("other");
     setLocationSlug("");
     setPlacement("general");
@@ -74,6 +76,7 @@ export default function AdminGallery() {
       const normalizedPlacement = locationSlug ? placement : "general";
       const { error } = await supabase.from("gallery_images").insert({
         title,
+        alt_text: altText || null,
         category,
         location_slug: locationSlug || null,
         placement: normalizedPlacement,
@@ -169,9 +172,15 @@ export default function AdminGallery() {
             <div className="p-6 space-y-4">
               {err && <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl p-3 text-sm">{err}</div>}
 
-              <div>
-                <label className="block text-sm text-gray-300 mb-1">Title *</label>
-                <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]" />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">Title *</label>
+                  <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">Alt Text (SEO)</label>
+                  <input value={altText} onChange={(e) => setAltText(e.target.value)} placeholder="Describe image for screen readers" className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]" />
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">

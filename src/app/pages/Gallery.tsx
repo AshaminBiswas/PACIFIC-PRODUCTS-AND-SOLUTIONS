@@ -1,7 +1,9 @@
-import { motion } from "motion/react";
-import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { useState, useEffect } from "react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useGallery, usePageBanner } from "../../lib/hooks";
+import { X, ZoomIn, ChevronLeft, ChevronRight, Image as ImageIcon, LayoutGrid } from "lucide-react";
+import type { GalleryImage } from "../../lib/database.types";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -10,104 +12,271 @@ export default function GalleryPage() {
   const { data: galleryImages, loading } = useGallery();
   const { data: banner } = usePageBanner("gallery");
 
+  // Lightbox State
+  const [lightboxIndex, setLightboxIndex] = useState<number>(-1);
+
+  // Categories & Counts
   const uniqueCategories = Array.from(new Set(galleryImages.map(img => img.category))).filter(Boolean);
   const categories = ["all", ...uniqueCategories];
+
+  const getCategoryCount = (cat: string) => {
+    if (cat === "all") return galleryImages.length;
+    return galleryImages.filter(img => img.category === cat).length;
+  };
 
   const filteredImages =
     selectedCategory === "all"
       ? galleryImages
       : galleryImages.filter((img) => img.category === selectedCategory);
 
+  // Lightbox Navigation
+  const openLightbox = (index: number) => setLightboxIndex(index);
+  const closeLightbox = () => setLightboxIndex(-1);
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLightboxIndex((prev) => (prev === 0 ? filteredImages.length - 1 : prev - 1));
+  };
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLightboxIndex((prev) => (prev === filteredImages.length - 1 ? 0 : prev + 1));
+  };
+
+  // Keyboard Navigation for Lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (lightboxIndex === -1) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") setLightboxIndex((prev) => (prev === 0 ? filteredImages.length - 1 : prev - 1));
+      if (e.key === "ArrowRight") setLightboxIndex((prev) => (prev === filteredImages.length - 1 ? 0 : prev + 1));
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxIndex, filteredImages.length]);
+
   return (
-    <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
+    <div className="min-h-screen pt-20 bg-[#f8f9fa] dark:bg-[#030213] transition-colors selection:bg-[#7FB706]/30">
       {/* Hero Banner */}
-      <section className="relative w-full h-[38vh] min-h-[260px] overflow-hidden">
+      <section className="relative w-full h-[45vh] min-h-[300px] overflow-hidden">
         <ImageWithFallback
           src={banner?.image_url || DEFAULT_BG}
           alt="Gallery banner"
           className="absolute inset-0 w-full h-full object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-[#f8f9fa] dark:to-[#030213] transition-colors" />
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay" />
+        
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-16 h-16 bg-[#7FB706]/20 border border-[#7FB706]/40 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md shadow-lg shadow-[#7FB706]/20"
+          >
+            <ImageIcon className="w-8 h-8 text-[#B5F823]" />
+          </motion.div>
+          
           <motion.h1
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight"
+            style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}
           >
             {banner?.title ? (
               banner.title
             ) : (
-              <>Project <span className="text-[#B5F823]">Gallery</span></>
+              <>Our <span className="text-[#B5F823]">Portfolio</span></>
             )}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="text-lg sm:text-xl text-gray-200 max-w-2xl"
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg sm:text-xl text-gray-200 max-w-2xl font-medium"
           >
-            {banner?.subtitle || "Explore our portfolio of completed projects across various industries and applications"}
+            {banner?.subtitle || "Explore our detailed gallery of precision-engineered installations across commercial, industrial, and institutional sectors."}
           </motion.p>
         </div>
       </section>
 
-      {/* Filter */}
-      <section className="py-8 bg-transparent dark:bg-[#0a0a1a] border-b border-gray-200 dark:border-white/5 transition-colors">
+      {/* Filter Section */}
+      <section className="sticky top-20 z-30 py-6 bg-white/80 dark:bg-[#0a0a1a]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-colors shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center gap-4">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-6 py-3 rounded-xl transition-all capitalize font-medium ${
-                  selectedCategory === category
-                    ? "bg-[#7FB706] text-white shadow-lg shadow-[#7FB706]/30"
-                    : "bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-[#E9FDBF] dark:hover:bg-white/10"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 font-semibold">
+              <LayoutGrid className="w-5 h-5 text-[#7FB706]" />
+              <span>Filter by Industry</span>
+            </div>
+            
+            <div className="flex flex-wrap justify-center md:justify-end gap-3">
+              {categories.map((category) => {
+                const isSelected = selectedCategory === category;
+                return (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`relative overflow-hidden group flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 font-medium text-sm ${
+                      isSelected
+                        ? "bg-[#7FB706] text-white shadow-lg shadow-[#7FB706]/30 border border-[#7FB706]"
+                        : "bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-white/5 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <span className="capitalize relative z-10">{category}</span>
+                    <span className={`relative z-10 px-2 py-0.5 rounded-full text-xs ${
+                      isSelected ? "bg-white/20 text-white" : "bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-gray-300 dark:group-hover:bg-white/20"
+                    }`}>
+                      {getCategoryCount(category)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Gallery Grid */}
-      <section className="py-16 sm:py-24 bg-gray-50 dark:bg-[#030213] transition-colors">
+      <section className="py-16 sm:py-24 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
-             <div className="text-center text-gray-500 py-10">Loading gallery images...</div>
+             <div className="flex flex-col items-center justify-center py-20 text-[#7FB706]">
+                <div className="w-12 h-12 border-4 border-[#7FB706]/20 border-t-[#7FB706] rounded-full animate-spin mb-4" />
+                <p className="font-medium">Loading portfolio...</p>
+             </div>
           ) : filteredImages.length > 0 ? (
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-              {filteredImages.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="group relative overflow-hidden rounded-2xl shadow-lg border border-gray-200/50 dark:border-white/5 hover:shadow-2xl transition-all cursor-pointer break-inside-avoid"
-                >
-                  <ImageWithFallback
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-6 left-6 right-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      <h3 className="text-white text-xl font-bold mb-1">{item.title}</h3>
-                      <p className="text-[#B5F823] text-sm font-medium capitalize">{item.category}</p>
+            <motion.div layout className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+              <AnimatePresence>
+                {filteredImages.map((item, index) => (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    key={item.id}
+                    onClick={() => openLightbox(index)}
+                    className="group relative overflow-hidden rounded-2xl bg-gray-200 dark:bg-white/5 cursor-pointer break-inside-avoid transform-gpu"
+                  >
+                    <ImageWithFallback
+                      src={item.image_url}
+                      alt={item.alt_text || item.title}
+                      className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                    />
+                    
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#030213]/90 via-[#030213]/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      
+                      {/* Zoom Icon */}
+                      <div className="absolute top-4 right-4 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+                        <ZoomIn className="w-5 h-5 text-white" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-6 group-hover:translate-y-0 transition-transform duration-500">
+                        <div className="inline-block px-3 py-1 bg-[#7FB706] text-white text-xs font-bold uppercase tracking-wider rounded-lg mb-3">
+                          {item.category}
+                        </div>
+                        <h3 className="text-white text-xl md:text-2xl font-bold leading-tight mb-2">
+                          {item.title}
+                        </h3>
+                        {/* Fake Description for detail — can be replaced with DB field later */}
+                        <p className="text-gray-300 text-sm line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-150">
+                          High-quality installation showcasing precision engineering and premium materials designed for long-lasting durability.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           ) : (
-            <div className="text-center text-gray-500 py-10">No gallery images found.</div>
+            <div className="text-center py-24">
+              <div className="w-20 h-20 bg-gray-200 dark:bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <ImageIcon className="w-10 h-10 text-gray-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Projects Found</h3>
+              <p className="text-gray-500 dark:text-gray-400">There are currently no images in this category.</p>
+            </div>
           )}
         </div>
       </section>
+
+      {/* Lightbox / Modal */}
+      <AnimatePresence>
+        {lightboxIndex !== -1 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-[#030213]/95 backdrop-blur-xl"
+            onClick={closeLightbox}
+          >
+            {/* Close Button */}
+            <button
+              onClick={closeLightbox}
+              className="absolute top-6 right-6 z-50 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Navigation Buttons */}
+            {filteredImages.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-50 w-12 h-12 sm:w-16 sm:h-16 bg-white/5 hover:bg-white/20 border border-white/10 rounded-full flex items-center justify-center text-white transition-all hover:scale-110"
+                >
+                  <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-50 w-12 h-12 sm:w-16 sm:h-16 bg-white/5 hover:bg-white/20 border border-white/10 rounded-full flex items-center justify-center text-white transition-all hover:scale-110"
+                >
+                  <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+                </button>
+              </>
+            )}
+
+            {/* Image Container */}
+            <div 
+              className="relative w-full max-w-6xl max-h-[90vh] px-4 sm:px-20 flex flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.img
+                key={lightboxIndex}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                src={filteredImages[lightboxIndex].image_url}
+                alt={filteredImages[lightboxIndex].alt_text || filteredImages[lightboxIndex].title}
+                className="max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl shadow-black/50"
+              />
+              
+              {/* Image Details in Lightbox */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mt-6 text-center max-w-2xl"
+              >
+                <span className="inline-block px-3 py-1 bg-[#7FB706]/20 text-[#B5F823] text-xs font-bold uppercase tracking-wider rounded-lg mb-3">
+                  {filteredImages[lightboxIndex].category}
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                  {filteredImages[lightboxIndex].title}
+                </h3>
+                <p className="text-gray-400 text-sm sm:text-base">
+                  Image {lightboxIndex + 1} of {filteredImages.length}
+                </p>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

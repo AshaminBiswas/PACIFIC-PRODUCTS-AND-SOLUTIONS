@@ -126,21 +126,22 @@ export default function AboutPage() {
   ];
 
   const values = [
-    { icon: Award, title: "Quality Excellence", desc: "Every product undergoes rigorous testing to meet international standards — no compromises." },
-    { icon: Target, title: "Customer Focus", desc: "We listen, understand, and deliver beyond expectations. Your satisfaction drives our innovation." },
-    { icon: Users, title: "Team Collaboration", desc: "Our skilled team works in perfect harmony to deliver projects on time and within budget." },
-    { icon: TrendingUp, title: "Continuous Innovation", desc: "We invest in R&D and technology to stay ahead of industry trends." },
-    { icon: Factory, title: "Engineering Precision", desc: "Traditional craftsmanship meets modern engineering precision in our manufacturing." },
-    { icon: Globe, title: "Sustainability", desc: "Committed to eco-friendly practices and sustainable materials for a better tomorrow." },
+    { icon: Award, title: "Quality Comes First", desc: "We never compromise on material quality, product performance, or finishing standards." },
+    { icon: Target, title: "Client Satisfaction Matters", desc: "Understanding client expectations and delivering as promised is crucial to our work process." },
+    { icon: TrendingUp, title: "Continuous Improvement", desc: "Market demands are always changing, and we continuously improve our products and solutions accordingly." },
+    { icon: Users, title: "Professional Commitment", desc: "Timely delivery, clear communication, and responsible execution are key parts of how we operate." },
+    { icon: Globe, title: "Sustainable Responsibility", desc: "Whenever possible, we focus on better material choices and efficient solutions that support responsible infrastructure development." },
   ];
 
   const materialFeatures = [
-    { icon: Droplets, label: "Water Resistant" },
-    { icon: Flame, label: "Fire Retardant" },
-    { icon: Shield, label: "Corrosion Proof" },
-    { icon: Zap, label: "Scratch Resistant" },
-    { icon: Eye, label: "Premium Aesthetics" },
-    { icon: Wrench, label: "Low Maintenance" },
+    { icon: Droplets, label: "Water-resistant performance" },
+    { icon: Shield, label: "Corrosion-resistant materials" },
+    { icon: Zap, label: "Scratch-resistant surfaces" },
+    { icon: Wrench, label: "Easy maintenance" },
+    { icon: Factory, label: "Strong structural durability" },
+    { icon: Eye, label: "Premium finish quality" },
+    { icon: Target, label: "Reliable long-term performance" },
+    { icon: Users, label: "Professional installation support" },
   ];
 
   return (
@@ -174,15 +175,23 @@ export default function AboutPage() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-4xl"
           >
-            {banner?.title || (<>Building Modern Infrastructure<br />Solutions for <span className="text-[#B5F823]">High-Performance Spaces</span></>)}
+            {banner?.title || (<>Building Better Commercial Spaces with <span className="text-[#B5F823]">Quality Solutions</span></>)}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="text-base sm:text-lg text-gray-200 max-w-2xl"
+            className="text-base sm:text-lg text-gray-200 max-w-2xl font-medium"
           >
-            {banner?.subtitle || "Premium architectural & infrastructure solutions for modern commercial, institutional, and public environments"}
+            {banner?.subtitle || "Premium Restroom Cubicles, Cladding, and Interior Infrastructure Solutions"}
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-sm sm:text-base text-gray-300 max-w-3xl mt-4"
+          >
+            At Pacific Products & Solutions, we offer practical and high-quality infrastructure solutions for commercial, institutional, and public spaces. We aim to create spaces that are durable, hygienic, visually appealing, and built to last for years. From restroom cubicles and shower partitions to exterior cladding, locker systems, and custom hardware, we collaborate with businesses seeking dependable and long-lasting solutions.
           </motion.p>
         </motion.div>
       </section>
@@ -210,11 +219,13 @@ export default function AboutPage() {
                 Who We Are
               </motion.span>
               <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-6">
-                Your Trusted Partner in <span className="text-[#7FB706]">Infrastructure Solutions</span>
+                A Trusted Name in <span className="text-[#7FB706]">Commercial Infrastructure Solutions</span>
               </h2>
               <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed text-[15px]">
-                <p>At Pacific Products & Solutions, we specialize in delivering premium architectural and infrastructure solutions designed for modern commercial, institutional, and public environments. With years of industry expertise, we have established ourselves as a trusted partner for businesses seeking durable, hygienic, aesthetically refined, and performance-driven systems.</p>
-                <p>From restroom cubicles and shower cubicles to exterior cladding, locker solutions, custom hardware, and interior architectural systems, we provide end-to-end solutions tailored to the evolving needs of contemporary infrastructure projects.</p>
+                <p>At Pacific Products & Solutions, we partner with businesses, architects, and contractors to deliver reliable solutions for modern commercial and institutional spaces.</p>
+                <p>Over the years, we have assisted clients from various industries who need quality products and proper execution. We know that every commercial project has unique challenges, such as high foot traffic, moisture exposure, maintenance issues, or design needs.</p>
+                <p>That's why our team concentrates on providing not just products but also complete practical solutions that meet the project requirements.</p>
+                <p>We work with architects, builders, contractors, consultants, facility teams, and business owners to deliver solutions that combine performance with modern design.</p>
               </div>
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -262,15 +273,19 @@ export default function AboutPage() {
       <section className="py-20 bg-transparent dark:bg-[#030213]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14">
-            <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">Our Approach</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-4">Engineering Meets Design</h2>
+            <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">Our Working Approach</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-4">Practical Thinking with Strong Execution</h2>
+            <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed mb-4">
+              For us, a good product is not just about how it looks. It should function well in daily use, require minimal maintenance, and last long.
+            </p>
+            <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed mb-4">
+              Our approach is straightforward: understand the client’s requirements, suggest the appropriate solution, use quality materials, and ensure professional execution.
+            </p>
             <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              Our approach combines engineering precision, modern design aesthetics, high-quality materials, and professional execution to create spaces that are functional, durable, and visually impactful. Every project is planned with attention to detail, ensuring long-term performance, safety, hygiene, and low maintenance.
+              Every project receives careful attention to detail so that the final outcome is functional, durable, and visually matches the overall space.
             </p>
           </motion.div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {materialFeatures.map((f, i) => <MaterialPill key={f.label} {...f} index={i} />)}
-          </div>
+
         </div>
       </section>
 
@@ -278,9 +293,9 @@ export default function AboutPage() {
       <section className="py-20 bg-gray-50/80 dark:bg-[#0a0a1a]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14">
-            <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">B2B Sectors</span>
+            <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">Industries We Serve</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-4">Industries We Proudly Serve</h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Trusted by leading organizations across 14+ sectors worldwide</p>
+            <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">Our products are used across various industries where durability, hygiene, and long-term performance are essential.</p>
           </motion.div>
           <SectorsGrid />
         </div>
@@ -300,23 +315,26 @@ export default function AboutPage() {
               </div>
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="order-1 lg:order-2">
-              <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">Built to Last</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-6">Engineered for High-Traffic Environments</h2>
+              <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">Built for Daily Commercial Use</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-6">Designed for Tough Environments</h2>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                Commercial spaces require products that can endure constant use without losing performance or appearance.
+              </p>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                Our products are engineered to withstand high-traffic environments while maintaining premium aesthetics and operational reliability. We use advanced materials and modern manufacturing standards to ensure our systems are resistant to water, fire, corrosion, scratches, and everyday wear — making them ideal for demanding commercial applications.
+                Our systems are developed with this in mind. We use materials and hardware suitable for demanding environments like offices, malls, hospitals, schools, airports, metro stations, gyms, and public facilities.
               </p>
               <div className="space-y-3">
-                {["Water, fire & corrosion resistant materials", "Premium aesthetics that endure", "Low-maintenance & operationally reliable", "ISO certified manufacturing processes", "5-year comprehensive product warranty"].map((point, i) => (
+                {materialFeatures.map((f, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -16 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.08 }}
+                    transition={{ delay: i * 0.05 }}
                     className="flex items-center gap-3"
                   >
                     <CheckCircle2 className="w-5 h-5 text-[#7FB706] flex-shrink-0" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{point}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{f.label}</span>
                   </motion.div>
                 ))}
               </div>
@@ -329,8 +347,8 @@ export default function AboutPage() {
       <section className="py-20 bg-gray-50/80 dark:bg-[#0a0a1a]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14">
-            <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">Our Values</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-4">The Principles That Guide Us</h2>
+            <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">What We Believe In</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-4">Values That Shape Our Work</h2>
             <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Every decision, every product, every project is driven by these core values</p>
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -427,11 +445,12 @@ export default function AboutPage() {
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: Layers, title: "Exterior Cladding Solutions", desc: "Modern exterior cladding systems designed to enhance architectural appearance, weather resistance, durability, and structural protection for commercial and institutional buildings." },
-              { icon: DoorOpen, title: "Restroom Cubicles & Toilet Partitions", desc: "Premium restroom cubicle systems engineered for hygiene, privacy, durability, and low maintenance in high-traffic public and commercial environments." },
-              { icon: ShowerHead, title: "Shower Cubicles", desc: "Modern shower partition systems designed for gyms, sports facilities, wellness centers, hostels, and institutional projects with superior moisture resistance and durability." },
-              { icon: Lock, title: "Locker Solutions", desc: "Custom locker systems for schools, offices, gyms, hospitals, and commercial facilities, offering secure storage with modern aesthetics and optimized space utilization." },
-              { icon: Cog, title: "Custom Hardware & Accessories", desc: "Precision-engineered hardware solutions designed to complement modern interiors and architectural infrastructure with durability and functionality." },
+              { icon: DoorOpen, title: "Restroom Cubicles & Toilet Partitions", desc: "Durable and modern restroom cubicle systems designed for hygiene, privacy, and easy maintenance in commercial environments." },
+              { icon: ShowerHead, title: "Shower Cubicles", desc: "Practical shower partition systems suitable for gyms, hostels, wellness centres, institutional spaces, and other moisture-prone environments." },
+              { icon: Layers, title: "Exterior Cladding", desc: "Cladding solutions that enhance building appearance while providing protection against weather exposure and external wear." },
+              { icon: Lock, title: "Locker Solutions", desc: "Custom locker systems for offices, schools, gyms, hospitals, and commercial facilities, focusing on security, usability, and clean design." },
+              { icon: Cog, title: "Custom Hardware & Accessories", desc: "Strong, precision-made hardware solutions designed for commercial use and long service life." },
+              { icon: Factory, title: "Interior Panel Solutions", desc: "Architectural panel systems that add functionality and visual appeal to commercial interiors." },
             ].map((svc, i) => (
               <motion.div
                 key={svc.title}
@@ -475,9 +494,12 @@ export default function AboutPage() {
               <Rocket className="w-16 h-16 text-[#7FB706]" />
             </motion.div>
             <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#7FB706] mb-3">Our Mission</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-6">Building Smarter Spaces for the Future</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#030213] dark:text-white mb-6">Creating Better Functional Spaces</h2>
+            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+              Our goal is to provide reliable infrastructure solutions that help businesses create safer, cleaner, smarter, and more efficient spaces.
+            </p>
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              At Pacific Products & Solutions, our mission is to continuously innovate and deliver high-quality architectural systems that combine performance, sustainability, and design excellence. We remain committed to helping businesses and institutions create <span className="text-[#7FB706] font-semibold">cleaner, smarter, safer, and more efficient spaces</span> for the future.
+              We believe good infrastructure should not only look modern but also perform consistently over time.
             </p>
           </motion.div>
         </div>

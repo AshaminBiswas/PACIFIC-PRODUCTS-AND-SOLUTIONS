@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { Link } from "react-router";
-import { Facebook, Youtube, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Youtube, Linkedin, Instagram, Mail, Phone, MapPin, Clock } from "lucide-react";
 import { useProducts, useSolutions } from "../../lib/hooks";
 // @ts-ignore
 import logo from "../../image/logo/logo.png";
 
 export function Footer() {
+  const [showUpdate, setShowUpdate] = useState(false);
   const { data: products } = useProducts();
   const { data: solutions } = useSolutions();
 
@@ -52,9 +54,9 @@ export function Footer() {
           <div className="lg:col-span-1">
             <div className="mb-6">
               <Link to="/" className="flex items-center gap-3">
-                <img 
-                  src={logo} 
-                  alt="Pacific Products & Solutions" 
+                <img
+                  src={logo}
+                  alt="Pacific Products & Solutions"
                   className="h-16 w-auto object-contain rounded-full bg-white/5 p-1"
                   style={{ transform: "rotate(-90deg)" }}
                 />
@@ -64,7 +66,7 @@ export function Footer() {
               </Link>
             </div>
             <p className="text-gray-400 mb-6">
-              Leading provider of premium interior contracting solutions, specializing in restroom cubicles, cladding, and paneling.
+              Leading B2B interior contracting provider in India, specializing in premium restroom cubicles, exterior cladding, wall paneling, locker solutions, and custom hardware for commercial spaces.
             </p>
             <div className="flex space-x-4">
               <a href="https://www.facebook.com/profile.php?id=100063648025932" target="_blank" rel="noopener noreferrer" className="hover:text-[#7FB706] transition-colors">
@@ -176,7 +178,15 @@ export function Footer() {
             <p className="text-gray-400 text-sm">
               © 2026 Pacific Products & Solutions. All rights reserved.
             </p>
-            <div className="flex space-x-6">
+            <div className="flex items-center space-x-6">
+              <button 
+                onClick={() => setShowUpdate(!showUpdate)}
+                className="flex items-center gap-1.5 text-gray-500 hover:text-[#7FB706] text-sm transition-colors"
+                title="Click to see last update time"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                {showUpdate && typeof __BUILD_DATE__ !== 'undefined' ? `Last Update: ${__BUILD_DATE__}` : "Version Info"}
+              </button>
               <Link to="/privacy" className="text-gray-400 hover:text-[#7FB706] text-sm">
                 Privacy Policy
               </Link>

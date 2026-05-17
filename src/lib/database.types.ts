@@ -133,6 +133,7 @@ export interface Product {
   description: string;
   category: string;
   image_url: string;
+  alt_text?: string | null;
   additional_images: string[];
   features: string[];
   specifications: { label: string; value: string }[];
@@ -151,6 +152,7 @@ export interface Blog {
   excerpt: string;
   content: string;
   cover_image_url: string;
+  alt_text?: string | null;
   author: string;
   category: string;
   tags: string[];
@@ -168,6 +170,7 @@ export interface Solution {
   description: string;
   icon_name: string;
   image_url: string;
+  alt_text?: string | null;
   additional_images: string[];
   features: string[];
   clients: string[];
@@ -184,6 +187,7 @@ export interface GalleryImage {
   location_slug: string | null;
   placement: 'general' | 'hero' | 'gallery';
   image_url: string;
+  alt_text?: string | null;
   sort_order: number;
   published: boolean;
   created_at: string;
@@ -192,6 +196,7 @@ export interface GalleryImage {
 export interface HeroImage {
   id: string;
   url: string;
+  alt_text?: string | null;
   description: string;
   sort_order: number;
   created_at: string;
@@ -202,6 +207,7 @@ export interface CoreService {
   title: string;
   description: string;
   image_url: string;
+  alt_text?: string | null;
   sort_order: number;
   created_at: string;
 }
@@ -210,6 +216,7 @@ export interface PageBanner {
   id: string;
   page_slug: string; // 'about' | 'services' | 'solutions' | 'gallery'
   image_url: string;
+  alt_text?: string | null;
   title: string;
   subtitle: string;
   created_at: string;
