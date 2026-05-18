@@ -148,7 +148,7 @@ export default function AboutPage() {
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
 
       {/* ═══ HERO ═══ */}
-      <section ref={heroRef} className="relative w-full h-[50vh] min-h-[340px] overflow-hidden">
+      <section ref={heroRef} className="relative w-full aspect-[16/5] min-h-[340px] max-h-[600px] overflow-hidden">
         <motion.div style={{ y: heroY }} className="absolute inset-0">
           <ImageWithFallback
             src={banner?.image_url || DEFAULT_BG}

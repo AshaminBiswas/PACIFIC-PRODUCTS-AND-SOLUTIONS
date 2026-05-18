@@ -19,7 +19,7 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       {/* Hero Banner */}
-      <section className="relative w-full h-[38vh] min-h-[260px] overflow-hidden">
+      <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
         <ImageWithFallback
           src={banner?.image_url || DEFAULT_BG}
           alt="Services banner"
