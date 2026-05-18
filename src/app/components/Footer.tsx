@@ -58,7 +58,6 @@ export function Footer() {
                   src={logo}
                   alt="Pacific Products & Solutions"
                   className="h-16 w-auto object-contain rounded-full bg-white/5 p-1"
-                  style={{ transform: "rotate(-90deg)" }}
                 />
                 <span className="text-lg font-bold text-[#7FB706] tracking-tight leading-tight">
                   Pacific Product<br />& Solutions

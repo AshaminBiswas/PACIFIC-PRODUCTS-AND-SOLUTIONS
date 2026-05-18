@@ -5,33 +5,6 @@
     <link rel="icon" id="dynamic-favicon" type="image/png" href="/src/image/logo/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pacific Products &amp; Solutions</title>
-    <script>
-      // Rotate logo -90deg (left) for the favicon
-      window.addEventListener('DOMContentLoaded', function () {
-        var img = new Image();
-        img.onload = function () {
-          var canvas = document.createElement("canvas");
-          canvas.width = img.height;
-          canvas.height = img.width;
-          var ctx = canvas.getContext("2d");
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate(-90 * Math.PI / 180);
-          ctx.drawImage(img, -img.width / 2, -img.height / 2);
-          
-          var oldLink = document.getElementById("dynamic-favicon");
-          var newLink = document.createElement("link");
-          newLink.id = "dynamic-favicon";
-          newLink.rel = "icon";
-          newLink.type = "image/png";
-          newLink.href = canvas.toDataURL("image/png");
-          document.head.appendChild(newLink);
-          if (oldLink) {
-            oldLink.parentNode.removeChild(oldLink);
-          }
-        };
-        img.src = "/src/image/logo/logo.png";
-      });
-    </script>
   </head>
 
   <body>

@@ -176,7 +176,6 @@ export default function AdminDashboard() {
               src={logo}
               alt="Pacific Products & Solutions"
               className="h-16 w-auto object-contain mb-1 rounded-full bg-white/5 p-2"
-              style={{ transform: "rotate(-90deg)" }}
             />
             <p className="text-[10px] tracking-wider text-gray-500">
               ADMIN PANEL
