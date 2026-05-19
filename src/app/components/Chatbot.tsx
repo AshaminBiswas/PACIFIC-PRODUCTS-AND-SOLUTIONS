@@ -3,36 +3,43 @@ import { motion, AnimatePresence } from "motion/react";
 import { MessageSquare, X, Send, Bot, RefreshCw } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { CoreServiceCard } from "./CoreServiceCard";
+import type { CoreService } from "../../lib/database.types";
 
 type Message = {
   id: string;
   sender: "bot" | "user";
   text: string;
   isProcessing?: boolean;
+  showServices?: boolean;
 };
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-const SYSTEM_PROMPT = `You are a friendly, professional sales assistant for Pacific Products & Solutions. 
-We are India's leading B2B interior contracting company.
-Our core services are: Restroom Cubicles, Toilet Partitions, Exterior Cladding, Interior Wall Paneling, Locker Systems, and Cubicle Hardware.
-Our industry solutions include: Corporate Offices, Education, Healthcare, Airports & Metro, Retail & Malls, and Sports & Leisure.
-Our USP: 12+ years experience, ISO-certified manufacturing, pan-India installation, highly durable and waterproof materials (like Compact Density Laminate), and premium aesthetics.
+const SYSTEM_PROMPT = `You are a highly professional, concise corporate sales representative for Pacific Products & Solutions (B2B interior contracting).
+Your tone MUST be professional, direct, and brief. DO NOT write paragraphs. Limit responses to 1-2 very short sentences.
 
-YOUR GOAL: 
-1. Answer the user's questions about our products and services accurately and concisely.
-2. Guide them towards requesting a quote or catalog.
-3. ALWAYS ask for their Name and Email (or Phone Number) so our sales team can contact them.
+Our services: Restroom Cubicles, Toilet Partitions, Exterior Cladding, Wall Paneling, Lockers, Cubicle Hardware.
 
-CRITICAL INSTRUCTION:
-Once the user provides their contact information (an email address or phone number) AND their name, thank them, and append exactly the string "[LEAD_CAPTURED]" at the very end of your response. This acts as a trigger for our system to save their lead. Do NOT use "[LEAD_CAPTURED]" until they have provided contact info.
+YOUR RULES:
+1. When a user asks about our "services" or "products" or "what we do", you MUST output exactly the string "[SHOW_SERVICES]" in your response. This will trigger our system to display visual service cards to the user.
+2. ALWAYS try to politely get the user's Name and Email/Phone number for a quote.
+3. Once they provide contact info, say thank you and append exactly "[LEAD_CAPTURED]" at the very end of your message.
 
-Keep your responses short, conversational, and helpful.`;
+Example 1:
+User: What services do you offer?
+You: We specialize in premium interior contracting solutions. Here are our core services. [SHOW_SERVICES]
+
+Example 2:
+User: I need a quote for restroom cubicles.
+You: I would be happy to provide a catalog and quote for our highly durable restroom cubicles. May I please have your name and email address to proceed?
+
+Keep it brief. Stay professional.`;
 
 const INITIAL_MESSAGE: Message = { 
   id: "msg-init", 
   sender: "bot", 
-  text: "Hi there! 👋 Welcome to Pacific Products & Solutions. I'm your AI assistant. How can I help you today?"
+  text: "Welcome to Pacific Products & Solutions. I am your automated sales assistant. How may I assist you with your project today?"
 };
 
 export function Chatbot() {
@@ -40,12 +47,24 @@ export function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [services, setServices] = useState<CoreService[]>([]);
   
   // Initialize Gemini
   const genAI = useRef(GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null);
   const chatSession = useRef<any>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch services on mount
+  useEffect(() => {
+    async function fetchServices() {
+      if (isSupabaseConfigured()) {
+        const { data } = await supabase.from('core_services').select('*').order('sort_order', { ascending: true });
+        if (data) setServices(data);
+      }
+    }
+    fetchServices();
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -56,7 +75,6 @@ export function Chatbot() {
   // Start new chat session
   const startChat = async () => {
     if (!genAI.current) return;
-    
     try {
       const model = genAI.current.getGenerativeModel({ 
         model: "gemini-flash-latest",
@@ -83,18 +101,16 @@ export function Chatbot() {
   // Extract email or phone from chat history to save lead
   const extractAndSaveLead = async (fullHistory: string) => {
     if (!isSupabaseConfigured()) return;
-    
-    // Simple regex to find emails in the user's recent messages
     const emailMatch = fullHistory.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/i);
     const email = emailMatch ? emailMatch[1] : "N/A";
     
     try {
       await supabase.from('contact_queries').insert([{
-        name: "AI Chatbot User", // AI could be prompted to return JSON, but for simplicity we use a generic name
+        name: "AI Chatbot Lead",
         email: email,
         phone: email === "N/A" ? "Provided in Chat" : "N/A",
-        requirement: "General Inquiry (AI Chat)",
-        message: "Full Chat History captured. User provided contact info.",
+        requirement: "AI Guided Inquiry",
+        message: "Contact captured via AI. Review chat logs if available.",
         company: null
       }]);
     } catch (e) {
@@ -116,7 +132,7 @@ export function Chatbot() {
       setMessages(prev => [...prev, { 
         id: `msg-err-${Date.now()}`, 
         sender: "bot", 
-        text: "I'm sorry, my AI connection is not configured correctly. Please contact us via the form or WhatsApp." 
+        text: "I am currently offline. Please use the contact form." 
       }]);
       return;
     }
@@ -127,12 +143,16 @@ export function Chatbot() {
       // Send message to Gemini
       const result = await chatSession.current.sendMessage(userText);
       let botResponse = result.response.text();
+      let showServices = false;
 
-      // Check if lead was captured
+      // Intercept and strip tags
+      if (botResponse.includes("[SHOW_SERVICES]")) {
+        showServices = true;
+        botResponse = botResponse.replace("[SHOW_SERVICES]", "").trim();
+      }
+
       if (botResponse.includes("[LEAD_CAPTURED]")) {
         botResponse = botResponse.replace("[LEAD_CAPTURED]", "").trim();
-        
-        // Compile history to find contact info
         const historyText = messages.map(m => m.text).join(" | ") + " | " + userText;
         await extractAndSaveLead(historyText);
       }
@@ -140,14 +160,15 @@ export function Chatbot() {
       setMessages(prev => [...prev, { 
         id: `msg-bot-${Date.now()}`, 
         sender: "bot", 
-        text: botResponse 
+        text: botResponse,
+        showServices
       }]);
     } catch (error) {
       console.error("AI Chat error:", error);
       setMessages(prev => [...prev, { 
         id: `msg-err-${Date.now()}`, 
         sender: "bot", 
-        text: "I'm having trouble connecting to my brain right now. Please try again in a moment." 
+        text: "I am experiencing network issues. Please try again." 
       }]);
     } finally {
       setIsTyping(false);
@@ -169,7 +190,7 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl w-[320px] sm:w-[380px] h-[500px] mb-4 flex flex-col overflow-hidden"
+            className="bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl w-[340px] sm:w-[420px] h-[550px] mb-4 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-[#030213] text-white p-4 flex justify-between items-center shrink-0">
@@ -186,11 +207,7 @@ export function Chatbot() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button 
-                  onClick={handleRestart} 
-                  title="Restart Chat"
-                  className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                >
+                <button onClick={handleRestart} title="Restart Chat" className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                   <RefreshCw className="w-4 h-4" />
                 </button>
                 <button onClick={() => setIsOpen(false)} className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
@@ -200,8 +217,8 @@ export function Chatbot() {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 p-4 overflow-y-auto bg-gray-50/50 dark:bg-[#030213]/50 space-y-4">
-              {messages.map((msg, index) => (
+            <div className="flex-1 p-4 overflow-y-auto bg-gray-50/50 dark:bg-[#030213]/50 space-y-5 custom-scrollbar">
+              {messages.map((msg) => (
                 <div key={msg.id} className="space-y-3">
                   <div className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                     {msg.sender === "bot" && (
@@ -209,15 +226,27 @@ export function Chatbot() {
                          <Bot className="w-3.5 h-3.5 text-[#B5F823]" />
                        </div>
                     )}
-                    <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed shadow-sm ${
-                      msg.sender === "user" 
-                        ? "bg-[#7FB706] text-white rounded-br-none" 
-                        : "bg-white dark:bg-white/10 border border-gray-100 dark:border-white/5 text-gray-800 dark:text-gray-200 rounded-bl-none"
-                    }`}>
-                      {/* Very basic markdown parsing for bold text the AI might output */}
-                      <span dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') }} />
-                    </div>
+                    {msg.text && (
+                      <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed shadow-sm ${
+                        msg.sender === "user" 
+                          ? "bg-[#7FB706] text-white rounded-br-none" 
+                          : "bg-white dark:bg-white/10 border border-gray-100 dark:border-white/5 text-gray-800 dark:text-gray-200 rounded-bl-none"
+                      }`}>
+                        <span dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') }} />
+                      </div>
+                    )}
                   </div>
+
+                  {/* Render Services Inline */}
+                  {msg.showServices && services.length > 0 && (
+                    <div className="w-full overflow-x-auto flex gap-3 pb-2 pt-1 pl-8 snap-x snap-mandatory scrollbar-hide">
+                      {services.map((service, idx) => (
+                        <div key={service.id} className="w-[200px] h-[220px] shrink-0 snap-center">
+                          <CoreServiceCard service={service} index={idx} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
               
@@ -245,7 +274,7 @@ export function Chatbot() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask me anything..."
+                  placeholder="Type a message..."
                   autoFocus
                   disabled={isTyping}
                   className="flex-1 bg-gray-100 dark:bg-white/5 border-transparent focus:bg-white focus:border-[#7FB706] focus:ring-1 focus:ring-[#7FB706] dark:text-white rounded-full px-4 py-2.5 text-sm outline-none transition-all disabled:opacity-50"
