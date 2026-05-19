@@ -16,7 +16,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/Button";
 import { SEO } from "../components/SEO";
-import { organizationSchema, webSiteSchema } from "../../lib/seo-data";
+import { organizationSchema, webSiteSchema, DEFAULT_KEYWORDS } from "../../lib/seo-data";
 import { ServiceCard } from "../components/ServiceCard";
 import { ProductCard } from "../components/ProductCard";
 import { TestimonialCarousel } from "../components/TestimonialCarousel";
@@ -277,6 +277,7 @@ export default function HomePage() {
       <SEO
         title="Premium Restroom Cubicles, Cladding & Interior Solutions"
         description="India's leading B2B interior contracting company. Premium restroom cubicles, exterior cladding, wall paneling, locker solutions for commercial spaces."
+        keywords={`${DEFAULT_KEYWORDS}, restroom cubicles manufacturer India, toilet partitions Delhi, exterior cladding contractors, HPL cubicle hardware, commercial washroom panels, locker systems suppliers, Pacific Products and Solutions`}
         canonical="/"
         jsonLd={[organizationSchema(), webSiteSchema()]}
       />

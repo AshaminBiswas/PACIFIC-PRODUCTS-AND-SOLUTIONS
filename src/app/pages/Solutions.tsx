@@ -4,6 +4,7 @@ import { DynamicIcon } from "../components/DynamicIcon";
 import { useSolutions, usePageBanner } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { SEO } from "../components/SEO";
+import { DEFAULT_KEYWORDS } from "../../lib/seo-data";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -22,6 +23,7 @@ export default function SolutionsPage() {
       <SEO
         title="Industry Solutions"
         description="Tailored interior solutions for corporates, malls, airports, metro stations, hospitals, schools, and commercial infrastructure projects."
+        keywords={`${DEFAULT_KEYWORDS}, corporate office interiors, hospital washroom cubicles, airport restroom partitions, mall cladding solutions, commercial interior contractors`}
         canonical="/solutions"
       />
       {/* Hero Banner */}
