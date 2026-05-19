@@ -4,6 +4,7 @@ import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useGallery, usePageBanner } from "../../lib/hooks";
 import { X, ZoomIn, ChevronLeft, ChevronRight, Image as ImageIcon, LayoutGrid } from "lucide-react";
 import type { GalleryImage } from "../../lib/database.types";
+import { SEO } from "../components/SEO";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -57,6 +58,11 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen pt-20 bg-[#f8f9fa] dark:bg-[#030213] transition-colors selection:bg-[#7FB706]/30">
+      <SEO
+        title="Project Gallery"
+        description="Browse our portfolio of completed commercial projects — restroom cubicles, exterior cladding, locker installations, and interior solutions across India."
+        canonical="/gallery"
+      />
       {/* Hero Banner */}
       <section className="relative w-full h-[45vh] min-h-[300px] overflow-hidden">
         <ImageWithFallback

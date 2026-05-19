@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { Shield, ChevronRight, Mail, Phone, ArrowUp } from "lucide-react";
 import { Link } from "react-router";
+import { SEO } from "../components/SEO";
 
 // ── Table of Contents data ────────────────────────────────────────────────────
 const sections = [
@@ -129,6 +130,12 @@ export default function PrivacyPolicyPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#030213] transition-colors">
+      <SEO
+        title="Privacy Policy"
+        description="Privacy policy for Pacific Products & Solutions — how we collect, use, and protect your personal information."
+        canonical="/privacy"
+        noindex={true}
+      />
       {/* ── Hero ── */}
       <section className="relative pt-32 pb-16 overflow-hidden">
         {/* Gradient blobs */}

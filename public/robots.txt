@@ -1,0 +1,6 @@
+# Pacific Products & Solutions - robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://pacificproduct.in/sitemap.xml

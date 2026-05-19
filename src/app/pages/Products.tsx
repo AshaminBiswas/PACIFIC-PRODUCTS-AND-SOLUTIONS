@@ -3,6 +3,7 @@ import { ProductCard } from "../components/ProductCard";
 import { useSearchParams } from "react-router";
 import { useProducts, usePageBanner } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { SEO } from "../components/SEO";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -18,6 +19,11 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
+      <SEO
+        title="Our Products & Services"
+        description="Explore our range of premium restroom cubicles, shower cubicles, exterior cladding, locker systems, wall paneling, and custom hardware solutions."
+        canonical="/products"
+      />
       {/* Hero Banner */}
       <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
         <ImageWithFallback

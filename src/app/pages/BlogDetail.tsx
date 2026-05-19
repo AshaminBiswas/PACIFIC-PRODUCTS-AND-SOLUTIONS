@@ -6,6 +6,8 @@ import { useBlog } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Button } from "../components/Button";
 import { ArrowLeft, Calendar, User, Tag } from "lucide-react";
+import { SEO } from "../components/SEO";
+import { blogPostSchema } from "../../lib/seo-data";
 
 export default function BlogDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -42,6 +44,14 @@ export default function BlogDetailPage() {
 
   return (
     <div className="min-h-screen pt-20">
+      <SEO
+        title={blog.title}
+        description={blog.excerpt?.slice(0, 155) || blog.title}
+        canonical={`/blog/${blog.slug}`}
+        ogType="article"
+        ogImage={blog.cover_image}
+        jsonLd={blogPostSchema(blog)}
+      />
       {/* Hero */}
       <section className="py-16 bg-gradient-to-br from-[#E9FDBF] to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">

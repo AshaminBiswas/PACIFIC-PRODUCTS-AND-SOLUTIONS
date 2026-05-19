@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/Button";
+import { SEO } from "../components/SEO";
+import { organizationSchema, webSiteSchema } from "../../lib/seo-data";
 import { ServiceCard } from "../components/ServiceCard";
 import { ProductCard } from "../components/ProductCard";
 import { TestimonialCarousel } from "../components/TestimonialCarousel";
@@ -272,6 +274,13 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Premium Restroom Cubicles, Cladding & Interior Solutions"
+        description="India's leading B2B interior contracting company. Premium restroom cubicles, exterior cladding, wall paneling, locker solutions for commercial spaces."
+        canonical="/"
+        jsonLd={[organizationSchema(), webSiteSchema()]}
+      />
+      <h1 className="sr-only">Pacific Products & Solutions — Premium Restroom Cubicles, Cladding & Interior Solutions</h1>
 
       {/* Hero */}
       <HeroSection />

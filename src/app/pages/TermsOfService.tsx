@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { FileText, ChevronRight, Mail, Phone, ArrowUp, AlertTriangle } from "lucide-react";
 import { Link } from "react-router";
+import { SEO } from "../components/SEO";
 
 // ── Table of Contents ─────────────────────────────────────────────────────────
 const sections = [
@@ -138,6 +139,12 @@ export default function TermsOfServicePage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#030213] transition-colors">
+      <SEO
+        title="Terms of Service"
+        description="Terms of service for Pacific Products & Solutions — terms and conditions governing the use of our website and services."
+        canonical="/terms"
+        noindex={true}
+      />
       {/* ── Hero ── */}
       <section className="relative pt-32 pb-16 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">

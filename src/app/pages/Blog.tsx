@@ -3,12 +3,18 @@ import { Link } from "react-router";
 import { useBlogs } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { ArrowRight, Calendar, User } from "lucide-react";
+import { SEO } from "../components/SEO";
 
 export default function BlogPage() {
   const { data: blogs, loading } = useBlogs();
 
   return (
     <div className="min-h-screen pt-20">
+      <SEO
+        title="Blog"
+        description="Industry insights, product guides, and expert tips on restroom cubicles, exterior cladding, interior solutions, and commercial infrastructure."
+        canonical="/blog"
+      />
       {/* Hero */}
       <section className="py-24 bg-gradient-to-br from-[#E9FDBF] to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

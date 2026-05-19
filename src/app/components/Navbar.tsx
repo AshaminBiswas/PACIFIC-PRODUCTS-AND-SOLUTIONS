@@ -106,9 +106,8 @@ export function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <a
-            href="/"
-            onClick={(e) => { e.preventDefault(); window.location.href = "/"; }}
+          <Link
+            to="/"
             className="flex items-center gap-3 flex-shrink-0"
           >
             <img
@@ -119,7 +118,7 @@ export function Navbar() {
             <span className="text-base sm:text-lg font-bold tracking-tight leading-tight text-[#7FB706]">
               Pacific Products<br className="hidden sm:block" /><span className="sm:hidden"> </span>& Solution
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">

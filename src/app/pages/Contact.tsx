@@ -4,6 +4,8 @@ import { ContactForm } from "../components/ContactForm";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { usePageBanner } from "../../lib/hooks";
 import { Link } from "react-router";
+import { SEO } from "../components/SEO";
+import { localBusinessSchema } from "../../lib/seo-data";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80";
 
@@ -43,6 +45,12 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
+      <SEO
+        title="Contact Us"
+        description="Get in touch with Pacific Products & Solutions for premium restroom cubicles, cladding, and interior solutions. Call +91 98185 92113 or visit our Mumbai office."
+        canonical="/contact"
+        jsonLd={localBusinessSchema()}
+      />
       {/* Hero Banner */}
       <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
         <ImageWithFallback

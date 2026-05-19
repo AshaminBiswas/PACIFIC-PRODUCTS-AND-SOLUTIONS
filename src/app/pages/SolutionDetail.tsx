@@ -6,6 +6,8 @@ import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useSolution } from "../../lib/hooks";
 import { DynamicIcon } from "../components/DynamicIcon";
+import { SEO } from "../components/SEO";
+import { breadcrumbSchema } from "../../lib/seo-data";
 
 export default function SolutionDetailPage() {
   const { industry } = useParams<{ industry: string }>();
@@ -54,6 +56,12 @@ export default function SolutionDetailPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#030213] transition-colors">
+      <SEO
+        title={solution.title}
+        description={solution.subtitle?.slice(0, 155) || solution.description?.slice(0, 155) || `${solution.title} solutions by Pacific Products`}
+        canonical={`/solutions/${solution.slug}`}
+        jsonLd={breadcrumbSchema([{name: 'Home', url: '/'}, {name: 'Solutions', url: '/solutions'}, {name: solution.title, url: `/solutions/${solution.slug}`}])}
+      />
 
       {/* ═══════════════════ CINEMATIC HERO BANNER ═══════════════════ */}
       <section className="relative min-h-[70vh] flex items-end overflow-hidden">

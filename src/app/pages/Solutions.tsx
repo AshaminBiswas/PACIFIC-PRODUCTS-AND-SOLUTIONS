@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router";
 import { DynamicIcon } from "../components/DynamicIcon";
 import { useSolutions, usePageBanner } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { SEO } from "../components/SEO";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -18,6 +19,11 @@ export default function SolutionsPage() {
 
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
+      <SEO
+        title="Industry Solutions"
+        description="Tailored interior solutions for corporates, malls, airports, metro stations, hospitals, schools, and commercial infrastructure projects."
+        canonical="/solutions"
+      />
       {/* Hero Banner */}
       <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
         <ImageWithFallback

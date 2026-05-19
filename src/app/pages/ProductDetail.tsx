@@ -10,6 +10,8 @@ import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useProduct, useCatalogs } from "../../lib/hooks";
 import { CatalogCard, CatalogViewerModal } from "../components/CatalogViewer";
 import { useState } from "react";
+import { SEO } from "../components/SEO";
+import { productSchema, breadcrumbSchema } from "../../lib/seo-data";
 
 interface ProductSpecification {
   label: string;
@@ -58,6 +60,14 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#030213] transition-colors">
+      <SEO
+        title={product.title}
+        description={product.description?.slice(0, 155) || `Premium ${product.title} solutions by Pacific Products & Solutions`}
+        canonical={`/products/${product.slug}`}
+        ogType="product"
+        ogImage={product.image_url}
+        jsonLd={[productSchema(product), breadcrumbSchema([{name: 'Home', url: '/'}, {name: 'Products', url: '/products'}, {name: product.title, url: `/products/${product.slug}`}])]}
+      />
 
       {/* ═══════════════════ HERO — DARK IMMERSIVE ═══════════════════ */}
       <section className="relative bg-[#030213] text-white overflow-hidden">

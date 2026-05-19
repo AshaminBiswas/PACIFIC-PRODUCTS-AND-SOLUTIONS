@@ -6,6 +6,8 @@ import { usePageBanner } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Button } from "../components/Button";
 import { Link } from "react-router";
+import { SEO } from "../components/SEO";
+import { faqSchema } from "../../lib/seo-data";
 
 const DEFAULT_BG =
   "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1920&q=80";
@@ -179,6 +181,12 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
+      <SEO
+        title="Frequently Asked Questions"
+        description="Find answers to common questions about Pacific Products restroom cubicles, cladding, locker systems, installation, warranty, and pricing."
+        canonical="/faq"
+        jsonLd={faqSchema(faqs)}
+      />
       {/* ── Hero Banner ── */}
       <section className="relative w-full h-[36vh] min-h-[240px] overflow-hidden">
         <ImageWithFallback

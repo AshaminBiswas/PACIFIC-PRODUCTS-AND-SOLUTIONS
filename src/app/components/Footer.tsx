@@ -84,7 +84,7 @@ export function Footer() {
           </div>
 
           {/* Services */}
-          <div>
+          <nav aria-label="Services">
             <h4 className="font-bold mb-4 text-[#B5F823]">Services</h4>
             <ul className="space-y-2">
               {productLinks.map((link) => (
@@ -98,10 +98,10 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Solutions */}
-          <div>
+          <nav aria-label="Solutions">
             <h4 className="font-bold mb-4 text-[#B5F823]">Solutions</h4>
             <ul className="space-y-2">
               {solutionLinks.map((link) => (
@@ -115,10 +115,10 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Company */}
-          <div>
+          <nav aria-label="Company">
             <h4 className="font-bold mb-4 text-[#B5F823]">Company</h4>
             <ul className="space-y-2">
               {companyLinks.map((link) => (
@@ -132,7 +132,7 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Contact & Locations */}
           <div>

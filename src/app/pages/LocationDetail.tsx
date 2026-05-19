@@ -1,6 +1,7 @@
-import { useEffect } from "react";
 import { motion } from "motion/react";
 import { Link, useNavigate, useParams } from "react-router";
+import { SEO } from "../components/SEO";
+import { localBusinessSchema } from "../../lib/seo-data";
 import {
   ArrowRight,
   Award,
@@ -67,19 +68,7 @@ function cleanText(value: string) {
     .replaceAll("Â", "");
 }
 
-function applySeo(data: LocationData) {
-  document.title = cleanText(data.meta.title);
-  const description = cleanText(data.meta.description);
-  let metaDescription = document.querySelector<HTMLMetaElement>('meta[name="description"]');
 
-  if (!metaDescription) {
-    metaDescription = document.createElement("meta");
-    metaDescription.name = "description";
-    document.head.appendChild(metaDescription);
-  }
-
-  metaDescription.content = description;
-}
 
 function scrollToInquiry() {
   document.getElementById("location-inquiry")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -692,10 +681,6 @@ export default function LocationPage() {
   const { data: locationImages } = useLocationGallery(slug);
   const pageData = data ? mergeBackendImages(data, locationImages) : null;
 
-  useEffect(() => {
-    if (pageData) applySeo(pageData);
-  }, [pageData]);
-
   if (!pageData || !slug) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white pt-20 dark:bg-[#030213]">
@@ -709,6 +694,12 @@ export default function LocationPage() {
 
   return (
     <main className="min-h-screen bg-white text-[#030213] dark:bg-[#030213] dark:text-white">
+      <SEO
+        title={cleanText(pageData.meta.title).replace(' | Pacific Products & Solutions', '')}
+        description={cleanText(pageData.meta.description)}
+        canonical={`/locations/${slug}`}
+        jsonLd={localBusinessSchema({city: cleanText(pageData.city), address: cleanText(pageData.address), phone: pageData.phone, email: pageData.email, region: cleanText(pageData.region)})}
+      />
       <HeroSection data={pageData} slug={slug} />
       {renderLocationFlow(pageData, slug)}
       <StickyCta data={pageData} />

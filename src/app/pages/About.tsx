@@ -12,6 +12,7 @@ import { SectorsGrid } from "../components/AboutSectors";
 import { usePageBanner } from "../../lib/hooks";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router";
+import { SEO } from "../components/SEO";
 import aboutImg from "../../image/about.png";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
@@ -146,6 +147,11 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
+      <SEO
+        title="About Us"
+        description="Learn about Pacific Products & Solutions — 12+ years of excellence in B2B interior contracting, ISO-certified manufacturing, and pan-India installation."
+        canonical="/about"
+      />
 
       {/* ═══ HERO ═══ */}
       <section ref={heroRef} className="relative w-full aspect-[16/5] min-h-[340px] max-h-[600px] overflow-hidden">

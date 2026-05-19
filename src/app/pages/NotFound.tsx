@@ -1,8 +1,10 @@
 import { motion } from "motion/react";
+import { SEO } from "../components/SEO";
 
 export default function NotFoundPage() {
   return (
     <div className="min-h-screen pt-20 flex items-center justify-center bg-gradient-to-br from-[#E9FDBF] to-white">
+      <SEO title="Page Not Found" description="The page you're looking for doesn't exist." noindex={true} />
       <div className="container mx-auto px-4 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
