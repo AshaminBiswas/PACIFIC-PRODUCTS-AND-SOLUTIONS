@@ -59,7 +59,7 @@ export function Chatbot() {
     
     try {
       const model = genAI.current.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
+        model: "gemini-flash-latest",
         systemInstruction: SYSTEM_PROMPT 
       });
       chatSession.current = model.startChat({
