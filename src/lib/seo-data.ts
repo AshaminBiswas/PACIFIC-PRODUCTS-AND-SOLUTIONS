@@ -6,7 +6,7 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const DEFAULT_DESCRIPTION =
   "India's leading B2B interior contracting company specializing in premium restroom cubicles, exterior cladding, wall paneling, locker solutions, and custom hardware for commercial spaces.";
 export const DEFAULT_KEYWORDS = 
-  "restroom cubicles manufacturer India, toilet partitions Mumbai, exterior cladding contractors, HPL cubicle hardware, commercial washroom panels, locker system suppliers, Pacific Products and Solutions, toilet cubicles, locker system, shower cubicles";
+  "restroom cubicles manufacturer India, toilet partitions Delhi, exterior cladding contractors, HPL cubicle hardware, commercial washroom panels, locker system suppliers, Pacific Products and Solutions, toilet cubicles, locker system, shower cubicles";
 
 // ── Organization Schema ───────────────────────────────────────────────────
 
@@ -22,8 +22,8 @@ export function organizationSchema() {
     telephone: "+919818592113",
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Mumbai",
-      addressRegion: "Maharashtra",
+      addressLocality: "New Delhi",
+      addressRegion: "Delhi",
       addressCountry: "IN",
     },
     sameAs: [
@@ -62,9 +62,9 @@ export function localBusinessSchema(location?: {
     email: location?.email || "info@pacificproduct.in",
     address: {
       "@type": "PostalAddress",
-      streetAddress: location?.address || "MIDC Industrial Area, Andheri East",
-      addressLocality: location?.city || "Mumbai",
-      addressRegion: location?.region || "Maharashtra",
+      streetAddress: location?.address || "Okhla Industrial Estate",
+      addressLocality: location?.city || "New Delhi",
+      addressRegion: location?.region || "Delhi",
       addressCountry: "IN",
     },
     priceRange: "$$",

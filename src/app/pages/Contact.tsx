@@ -14,17 +14,17 @@ export default function ContactPage() {
 
   const locations = [
     {
-      city: "Mumbai (Head Office)",
-      slug: "mumbai",
-      address: "Plot No. 123, MIDC Industrial Area, Andheri East, Mumbai - 400093, Maharashtra, India",
-      phone: "+91 22 1234 5678",
+      city: "Delhi (Head Office)",
+      slug: "delhi",
+      address: "Okhla Industrial Estate, New Delhi - 110020, Delhi, India",
+      phone: "+91 98185 92113",
       email: "info@pacificproduct.in",
     },
     {
-      city: "Delhi",
-      slug: "delhi",
-      address: "Sector 18, Udyog Vihar, Gurugram - 122015, Haryana, India",
-      phone: "+91 11 9876 5432",
+      city: "Mumbai",
+      slug: "mumbai",
+      address: "Plot No. 123, MIDC Industrial Area, Andheri East, Mumbai - 400093, Maharashtra, India",
+      phone: "+91 22 1234 5678",
       email: "info@pacificproduct.in",
     },
     {
@@ -47,7 +47,7 @@ export default function ContactPage() {
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       <SEO
         title="Contact Us"
-        description="Get in touch with Pacific Products & Solutions for premium restroom cubicles, cladding, and interior solutions. Call +91 98185 92113 or visit our Mumbai office."
+        description="Get in touch with Pacific Products & Solutions for premium restroom cubicles, cladding, and interior solutions. Call +91 98185 92113 or visit our Delhi office."
         canonical="/contact"
         jsonLd={localBusinessSchema()}
       />
@@ -120,7 +120,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-white text-lg mb-2">Phone</h4>
-                    <p className="text-gray-400 hover:text-white transition-colors cursor-pointer">+91 22 1234 5678</p>
+                    <p className="text-gray-400 hover:text-white transition-colors cursor-pointer">+91 98185 92113</p>
                     <p className="text-gray-400 hover:text-white transition-colors cursor-pointer">+91 98765 43210 (Sales)</p>
                   </div>
                 </div>
@@ -142,10 +142,9 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-white text-lg mb-2">Head Office</h4>
-                    <p className="text-gray-400 leading-relaxed">
-                      Plot No. 123, MIDC Industrial Area<br />
-                      Andheri East, Mumbai - 400093<br />
-                      Maharashtra, India
+                    <p className="text-gray-400 leading-relaxed text-sm">
+                      Okhla Industrial Estate, New Delhi - 110020<br />
+                      Delhi, India
                     </p>
                   </div>
                 </div>

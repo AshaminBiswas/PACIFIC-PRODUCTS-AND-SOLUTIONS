@@ -315,7 +315,7 @@ export default function TermsOfServicePage() {
             {/* Governing Law */}
             <SectionHeading id="governing-law">Governing Law &amp; Dispute Resolution</SectionHeading>
             <Para>
-              These Terms shall be governed by and construed in accordance with the laws of India. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts in Mumbai, Maharashtra, India.
+              These Terms shall be governed by and construed in accordance with the laws of India. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts in New Delhi, Delhi, India.
             </Para>
             <Para>
               We encourage you to contact us first to resolve any dispute amicably before resorting to formal legal proceedings.

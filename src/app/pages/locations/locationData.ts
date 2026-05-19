@@ -121,9 +121,9 @@ export const locations: Record<string, LocationData> = {
   delhi: {
     slug: "delhi",
     city: "Delhi NCR",
-    region: "North India",
+    region: "North India · Head Office",
     tagline: "Premium Infrastructure Solutions for India's Capital Region",
-    description: "Serving the National Capital Region with world-class restroom cubicles, exterior cladding, and commercial interior solutions. Our Delhi NCR operations cover Gurugram, Noida, Faridabad, and Greater Delhi — delivering precision-engineered products to India's most prestigious commercial addresses.",
+    description: "Our head office and primary manufacturing facility in Delhi drives all pan-India operations. Serving the National Capital Region with world-class restroom cubicles, exterior cladding, and commercial interior solutions.",
     address: "Sector 18, Udyog Vihar, Gurugram - 122015, Haryana",
     phone: "+91 98185 92113",
     email: "info@pacificproduct.in",
@@ -157,9 +157,9 @@ export const locations: Record<string, LocationData> = {
   mumbai: {
     slug: "mumbai",
     city: "Mumbai",
-    region: "West India · Head Office",
+    region: "West India",
     tagline: "India's Commercial Capital Trusts Pacific Products",
-    description: "Our head office and primary manufacturing facility in Mumbai drives all pan-India operations and international exports. Backed by an ISO-certified production line, we deliver world-class restroom cubicles, cladding, and interior solutions to Mumbai's most iconic commercial landmarks.",
+    description: "Our advanced manufacturing facility and regional office in Mumbai serves western India and international exports. Backed by an ISO-certified production line, we deliver world-class restroom cubicles, cladding, and interior solutions to iconic commercial landmarks.",
     address: "Plot No. 123, MIDC Industrial Area, Andheri East, Mumbai - 400093",
     phone: "+91 98185 92113",
     email: "info@pacificproduct.in",
@@ -168,7 +168,7 @@ export const locations: Record<string, LocationData> = {
     mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60340.42!2d72.847!3d19.113!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c84c4ad0a22d%3A0x5c3a0a4c1a7a1b7e!2sAndheri%20East%2C%20Mumbai!5e0!3m2!1sen!2sin!4v1713550212891!5m2!1sen!2sin",
     meta: {
       title: "Restroom Cubicles & Commercial Interiors in Mumbai | Pacific Products",
-      description: "Mumbai's leading manufacturer of restroom cubicles, shower partitions, exterior cladding & locker systems. 300+ projects, 15+ years experience. ISO-certified facility.",
+      description: "Mumbai's leading manufacturer of restroom cubicles, shower partitions, exterior cladding & locker systems. 300+ projects, 15+ years experience.",
     },
     stats: [
       { label: "Projects Completed", value: "300+", numericValue: 300, suffix: "+" },
@@ -181,7 +181,7 @@ export const locations: Record<string, LocationData> = {
     projects: ["Mumbai International Airport", "BKC Corporate Towers", "Phoenix Market City", "Palladium Mall", "NESCO Complex", "Bandra-Kurla Complex"],
     whyChoose: COMMON_WHY_CHOOSE,
     faqs: [
-      { question: "Where is Pacific Products headquartered in Mumbai?", answer: "Our head office and primary manufacturing facility is located in MIDC Industrial Area, Andheri East, Mumbai — strategically positioned for pan-India distribution." },
+      { question: "Where is Pacific Products located in Mumbai?", answer: "Our regional office and manufacturing facility is located in MIDC Industrial Area, Andheri East, Mumbai." },
       { question: "Do you manufacture restroom cubicles in-house?", answer: "Yes, all our products are manufactured in our ISO-certified Mumbai facility, ensuring quality control at every stage." },
       { question: "Can you supply cubicles for high-rise buildings in Mumbai?", answer: "Absolutely. We've installed cubicle systems in BKC corporate towers, luxury hotels, and high-rise residential complexes across Mumbai." },
       { question: "Do you handle international exports from Mumbai?", answer: "Yes, our Mumbai facility serves as the export hub for international orders across the Middle East, Southeast Asia, and Africa." },

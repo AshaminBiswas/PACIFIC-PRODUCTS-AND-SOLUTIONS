@@ -152,7 +152,7 @@ export function Footer() {
               </li>
               <li className="flex items-start space-x-2">
                 <MapPin className="w-4 h-4 mt-1 text-[#7FB706]" />
-                <span className="text-gray-400 text-sm">Mumbai, India</span>
+                <span className="text-gray-400 text-sm">Okhla Industrial Estate, New Delhi - 110020<br/>Delhi, India</span>
               </li>
             </ul>
             <h5 className="font-semibold mb-2 text-sm">Our Locations</h5>
