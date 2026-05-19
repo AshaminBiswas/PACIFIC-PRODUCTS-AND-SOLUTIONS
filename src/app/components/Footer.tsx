@@ -60,7 +60,7 @@ export function Footer() {
                   className="h-16 w-auto object-contain rounded-full bg-white/5 p-1"
                 />
                 <span className="text-lg font-bold text-[#7FB706] tracking-tight leading-tight">
-                  Pacific Product<br />& Solutions
+                  Pacific Products<br />& Solutions
                 </span>
               </Link>
             </div>
