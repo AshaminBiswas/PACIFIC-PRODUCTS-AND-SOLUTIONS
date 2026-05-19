@@ -14,7 +14,7 @@ import { Button } from "../components/Button";
 import { useNavigate } from "react-router";
 import { SEO } from "../components/SEO";
 import { DEFAULT_KEYWORDS } from "../../lib/seo-data";
-import aboutImg from "../../image/about.png";
+import aboutImg from "../../image/about.webp";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 

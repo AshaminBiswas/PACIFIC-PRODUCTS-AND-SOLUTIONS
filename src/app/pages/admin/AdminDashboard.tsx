@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router";
 import { supabase, isSupabaseConfigured } from "../../../lib/supabase";
 // @ts-ignore
-import logo from "../../../image/logo/logo.png";
+import logo from "../../../image/logo/logo.webp";
 import {
   LayoutDashboard,
   Package,

@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { Facebook, Youtube, Linkedin, Instagram, Mail, Phone, MapPin, Clock } from "lucide-react";
 import { useProducts, useSolutions } from "../../lib/hooks";
 // @ts-ignore
-import logo from "../../image/logo/logo.png";
+import logo from "../../image/logo/logo.webp";
 
 export function Footer() {
   const [showUpdate, setShowUpdate] = useState(false);

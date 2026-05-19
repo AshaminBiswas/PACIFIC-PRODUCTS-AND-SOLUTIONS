@@ -16,7 +16,7 @@ export function organizationSchema() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: `${SITE_URL}/src/image/logo/logo.png`,
+    logo: `${SITE_URL}/src/image/logo/logo.webp`,
     description: DEFAULT_DESCRIPTION,
     email: "info@pacificproduct.in",
     telephone: "+919818592113",
@@ -56,7 +56,7 @@ export function localBusinessSchema(location?: {
     "@type": "LocalBusiness",
     "@id": `${SITE_URL}/#business`,
     name: SITE_NAME,
-    image: `${SITE_URL}/src/image/logo/logo.png`,
+    image: `${SITE_URL}/src/image/logo/logo.webp`,
     url: SITE_URL,
     telephone: location?.phone || "+919818592113",
     email: location?.email || "info@pacificproduct.in",
@@ -149,7 +149,7 @@ export function blogPostSchema(post: {
       name: SITE_NAME,
       logo: {
         "@type": "ImageObject",
-        url: `${SITE_URL}/src/image/logo/logo.png`,
+        url: `${SITE_URL}/src/image/logo/logo.webp`,
       },
     },
   };
