@@ -5,6 +5,8 @@ export const SITE_URL = "https://pacificproduct.in";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const DEFAULT_DESCRIPTION =
   "India's leading B2B interior contracting company specializing in premium restroom cubicles, exterior cladding, wall paneling, locker solutions, and custom hardware for commercial spaces.";
+export const DEFAULT_KEYWORDS = 
+  "restroom cubicles manufacturer India, toilet partitions Mumbai, exterior cladding contractors, HPL cubicle hardware, commercial washroom panels, locker system suppliers, Pacific Products and Solutions, toilet cubicles, locker system, shower cubicles";
 
 // ── Organization Schema ───────────────────────────────────────────────────
 

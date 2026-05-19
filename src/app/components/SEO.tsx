@@ -1,11 +1,13 @@
 import { Helmet } from "react-helmet-async";
-import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE, DEFAULT_DESCRIPTION } from "../../lib/seo-data";
+import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE, DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS } from "../../lib/seo-data";
 
 interface SEOProps {
   /** Page title — will be appended with " | Pacific Products & Solutions" */
   title: string;
   /** Meta description (recommended max ~155 characters) */
   description?: string;
+  /** Meta keywords (comma separated) */
+  keywords?: string;
   /** Canonical URL path, e.g. "/products" (will be prefixed with SITE_URL) */
   canonical?: string;
   /** Open Graph image URL (defaults to site OG image) */
@@ -21,6 +23,7 @@ interface SEOProps {
 export function SEO({
   title,
   description = DEFAULT_DESCRIPTION,
+  keywords = DEFAULT_KEYWORDS,
   canonical,
   ogImage = DEFAULT_OG_IMAGE,
   ogType = "website",
@@ -42,6 +45,7 @@ export function SEO({
       {/* Primary Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
       {canonical && <link rel="canonical" href={canonicalUrl} />}
       {noindex && <meta name="robots" content="noindex, nofollow" />}
 
