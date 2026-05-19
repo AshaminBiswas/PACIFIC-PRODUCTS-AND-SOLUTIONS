@@ -13,40 +13,39 @@ type Message = {
   isProcessing?: boolean;
   showServices?: boolean;
   showSolutions?: boolean;
+  showProducts?: boolean;
 };
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-const SYSTEM_PROMPT = `You are a highly professional, concise corporate sales representative for Pacific Products & Solutions (B2B interior contracting).
-Your tone MUST be professional, direct, and brief. DO NOT write paragraphs. Limit responses to 1-2 very short sentences.
+const SYSTEM_PROMPT = `You are an AI personal assistant acting as a highly professional Sales Manager for Pacific Products & Solutions (B2B interior contracting).
+Your tone MUST be warm, human-like, and professional. DO NOT write long paragraphs. Limit responses to 1-3 short sentences. You represent the company with pride.
 
-Our services: Restroom Cubicles, Toilet Partitions, Exterior Cladding, Wall Paneling, Lockers, Cubicle Hardware.
-Our industry solutions: Corporate Offices, Education, Healthcare, Airports & Metro, Retail & Malls, Sports & Leisure.
+Our core services: Restroom Cubicles, Exterior Cladding, Locker Systems, Wall Paneling.
+Our industry solutions: Corporate Offices, Education, Healthcare, Airports, Retail.
+Our products: Standard and customized cubicles, cladding panels, hardware, etc.
 
 YOUR RULES:
-1. When a user asks about our "services" or "products" or "what we do", you MUST output exactly the string "[SHOW_SERVICES]" in your response.
-2. When a user asks about our "industries", "sectors", or "solutions", you MUST output exactly the string "[SHOW_SOLUTIONS]" in your response.
-3. ALWAYS try to politely get the user's Name and Email/Phone number for a quote.
-4. Once they provide contact info, say thank you and append exactly "[LEAD_CAPTURED]" at the very end of your message.
+1. If asked about "services" or "what you do", output EXACTLY: "[SHOW_SERVICES]" in your response.
+2. If asked about "industries", "sectors", or "solutions", output EXACTLY: "[SHOW_SOLUTIONS]" in your response.
+3. If asked about "products", "materials", or "items", output EXACTLY: "[SHOW_PRODUCTS]" in your response.
+4. ALWAYS try to gently ask for the user's Name and Email/Phone number so you can prepare a custom quote or share a catalog.
+5. Once they provide contact info, say thank you and append exactly "[LEAD_CAPTURED]" at the very end.
 
 Example 1:
-User: What services do you offer?
-You: We specialize in premium interior contracting solutions. Here are our core services. [SHOW_SERVICES]
+User: Do you have any products I can see?
+You: Absolutely! As your personal sales manager, I'd love to show you our premium range. Here are our top products. [SHOW_PRODUCTS]
 
 Example 2:
-User: What industries do you serve?
-You: We provide tailored interior solutions across multiple sectors. Here are our industry solutions. [SHOW_SOLUTIONS]
-
-Example 3:
 User: I need a quote.
-You: I would be happy to provide a quote. May I please have your name and email address to proceed?
+You: I would be delighted to arrange a quote for you. Could you please share your name and email address so I can send the details?
 
-Keep it brief. Stay professional.`;
+Keep it human, polite, and brief.`;
 
 const INITIAL_MESSAGE: Message = { 
   id: "msg-init", 
   sender: "bot", 
-  text: "Welcome to Pacific Products & Solutions. I am your automated sales assistant. How may I assist you with your project today?"
+  text: "Hello! I am your AI personal assistant and Sales Manager here at Pacific Products & Solutions. How can I help you today?"
 };
 
 export function Chatbot() {
@@ -54,8 +53,10 @@ export function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  
   const [services, setServices] = useState<CoreService[]>([]);
   const [solutions, setSolutions] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   
   // Initialize Gemini
   const genAI = useRef(GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null);
@@ -63,17 +64,19 @@ export function Chatbot() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Fetch services and solutions on mount
+  // Fetch data on mount
   useEffect(() => {
     async function fetchData() {
       if (isSupabaseConfigured()) {
-        const [servicesRes, solutionsRes] = await Promise.all([
+        const [servicesRes, solutionsRes, productsRes] = await Promise.all([
           supabase.from('core_services').select('*').order('sort_order', { ascending: true }),
-          supabase.from('solutions').select('*').order('sort_order', { ascending: true })
+          supabase.from('solutions').select('*').order('sort_order', { ascending: true }),
+          supabase.from('products').select('*').order('sort_order', { ascending: true })
         ]);
         
         if (servicesRes.data) setServices(servicesRes.data);
         if (solutionsRes.data) setSolutions(solutionsRes.data);
+        if (productsRes.data) setProducts(productsRes.data);
       }
     }
     fetchData();
@@ -158,6 +161,7 @@ export function Chatbot() {
       let botResponse = result.response.text();
       let showServices = false;
       let showSolutions = false;
+      let showProducts = false;
 
       // Intercept and strip tags
       if (botResponse.includes("[SHOW_SERVICES]")) {
@@ -168,6 +172,11 @@ export function Chatbot() {
       if (botResponse.includes("[SHOW_SOLUTIONS]")) {
         showSolutions = true;
         botResponse = botResponse.replace("[SHOW_SOLUTIONS]", "").trim();
+      }
+
+      if (botResponse.includes("[SHOW_PRODUCTS]")) {
+        showProducts = true;
+        botResponse = botResponse.replace("[SHOW_PRODUCTS]", "").trim();
       }
 
       if (botResponse.includes("[LEAD_CAPTURED]")) {
@@ -181,7 +190,8 @@ export function Chatbot() {
         sender: "bot", 
         text: botResponse,
         showServices,
-        showSolutions
+        showSolutions,
+        showProducts
       }]);
     } catch (error) {
       console.error("AI Chat error:", error);
@@ -281,6 +291,25 @@ export function Chatbot() {
                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                            <div className="absolute bottom-3 left-4 right-4 text-white text-[13px] font-bold leading-tight group-hover:text-[#B5F823] transition-colors">
                              {solution.title}
+                           </div>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Render Products Inline */}
+                  {msg.showProducts && products.length > 0 && (
+                    <div className="w-full overflow-x-auto flex gap-3 pb-2 pt-1 pl-8 snap-x snap-mandatory scrollbar-hide">
+                      {products.map((product) => (
+                        <a 
+                          key={product.id} 
+                          href={`/products/${product.slug}`}
+                          className="relative w-[180px] h-[140px] shrink-0 snap-center rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm group block bg-white dark:bg-[#030213]"
+                        >
+                           <img src={product.image_url} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                           <div className="absolute bottom-3 left-4 right-4 text-white text-[13px] font-bold leading-tight drop-shadow-md">
+                             {product.title}
                            </div>
                         </a>
                       ))}
