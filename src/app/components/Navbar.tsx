@@ -116,7 +116,7 @@ export function Navbar() {
               className="h-12 sm:h-16 w-auto object-contain rounded-full"
             />
             <span className="text-base sm:text-lg font-bold tracking-tight leading-tight text-[#7FB706]">
-              Pacific Products<br className="hidden sm:block" /><span className="sm:hidden"> </span>& Solution
+              Pacific Products<br className="hidden sm:block" /><span className="sm:hidden"> </span>& Solutions
             </span>
           </Link>
 
