@@ -12,6 +12,7 @@ type Message = {
   text: string;
   isProcessing?: boolean;
   showServices?: boolean;
+  showSolutions?: boolean;
 };
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
@@ -20,19 +21,25 @@ const SYSTEM_PROMPT = `You are a highly professional, concise corporate sales re
 Your tone MUST be professional, direct, and brief. DO NOT write paragraphs. Limit responses to 1-2 very short sentences.
 
 Our services: Restroom Cubicles, Toilet Partitions, Exterior Cladding, Wall Paneling, Lockers, Cubicle Hardware.
+Our industry solutions: Corporate Offices, Education, Healthcare, Airports & Metro, Retail & Malls, Sports & Leisure.
 
 YOUR RULES:
-1. When a user asks about our "services" or "products" or "what we do", you MUST output exactly the string "[SHOW_SERVICES]" in your response. This will trigger our system to display visual service cards to the user.
-2. ALWAYS try to politely get the user's Name and Email/Phone number for a quote.
-3. Once they provide contact info, say thank you and append exactly "[LEAD_CAPTURED]" at the very end of your message.
+1. When a user asks about our "services" or "products" or "what we do", you MUST output exactly the string "[SHOW_SERVICES]" in your response.
+2. When a user asks about our "industries", "sectors", or "solutions", you MUST output exactly the string "[SHOW_SOLUTIONS]" in your response.
+3. ALWAYS try to politely get the user's Name and Email/Phone number for a quote.
+4. Once they provide contact info, say thank you and append exactly "[LEAD_CAPTURED]" at the very end of your message.
 
 Example 1:
 User: What services do you offer?
 You: We specialize in premium interior contracting solutions. Here are our core services. [SHOW_SERVICES]
 
 Example 2:
-User: I need a quote for restroom cubicles.
-You: I would be happy to provide a catalog and quote for our highly durable restroom cubicles. May I please have your name and email address to proceed?
+User: What industries do you serve?
+You: We provide tailored interior solutions across multiple sectors. Here are our industry solutions. [SHOW_SOLUTIONS]
+
+Example 3:
+User: I need a quote.
+You: I would be happy to provide a quote. May I please have your name and email address to proceed?
 
 Keep it brief. Stay professional.`;
 
@@ -48,6 +55,7 @@ export function Chatbot() {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [services, setServices] = useState<CoreService[]>([]);
+  const [solutions, setSolutions] = useState<any[]>([]);
   
   // Initialize Gemini
   const genAI = useRef(GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null);
@@ -55,15 +63,20 @@ export function Chatbot() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Fetch services on mount
+  // Fetch services and solutions on mount
   useEffect(() => {
-    async function fetchServices() {
+    async function fetchData() {
       if (isSupabaseConfigured()) {
-        const { data } = await supabase.from('core_services').select('*').order('sort_order', { ascending: true });
-        if (data) setServices(data);
+        const [servicesRes, solutionsRes] = await Promise.all([
+          supabase.from('core_services').select('*').order('sort_order', { ascending: true }),
+          supabase.from('solutions').select('*').order('sort_order', { ascending: true })
+        ]);
+        
+        if (servicesRes.data) setServices(servicesRes.data);
+        if (solutionsRes.data) setSolutions(solutionsRes.data);
       }
     }
-    fetchServices();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -144,11 +157,17 @@ export function Chatbot() {
       const result = await chatSession.current.sendMessage(userText);
       let botResponse = result.response.text();
       let showServices = false;
+      let showSolutions = false;
 
       // Intercept and strip tags
       if (botResponse.includes("[SHOW_SERVICES]")) {
         showServices = true;
         botResponse = botResponse.replace("[SHOW_SERVICES]", "").trim();
+      }
+      
+      if (botResponse.includes("[SHOW_SOLUTIONS]")) {
+        showSolutions = true;
+        botResponse = botResponse.replace("[SHOW_SOLUTIONS]", "").trim();
       }
 
       if (botResponse.includes("[LEAD_CAPTURED]")) {
@@ -161,7 +180,8 @@ export function Chatbot() {
         id: `msg-bot-${Date.now()}`, 
         sender: "bot", 
         text: botResponse,
-        showServices
+        showServices,
+        showSolutions
       }]);
     } catch (error) {
       console.error("AI Chat error:", error);
@@ -244,6 +264,25 @@ export function Chatbot() {
                         <div key={service.id} className="w-[200px] h-[220px] shrink-0 snap-center">
                           <CoreServiceCard service={service} index={idx} />
                         </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Render Solutions Inline */}
+                  {msg.showSolutions && solutions.length > 0 && (
+                    <div className="w-full overflow-x-auto flex gap-3 pb-2 pt-1 pl-8 snap-x snap-mandatory scrollbar-hide">
+                      {solutions.map((solution) => (
+                        <a 
+                          key={solution.id} 
+                          href={`/solutions/${solution.slug}`}
+                          className="relative w-[180px] h-[140px] shrink-0 snap-center rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm group block bg-[#030213]"
+                        >
+                           <img src={solution.image_url} alt={solution.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                           <div className="absolute bottom-3 left-4 right-4 text-white text-[13px] font-bold leading-tight group-hover:text-[#B5F823] transition-colors">
+                             {solution.title}
+                           </div>
+                        </a>
                       ))}
                     </div>
                   )}
