@@ -238,7 +238,7 @@ function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug })
 
   if (isMumbai) {
     return (
-      <section className="relative overflow-hidden bg-[#030213] pt-28 text-white">
+      <section className="relative overflow-hidden bg-[#030213] pt-20 text-white">
         <div className="absolute inset-y-0 right-0 w-full opacity-55 lg:w-[58%]">
           <img src={data.heroImage} alt={`${cleanText(data.city)} commercial infrastructure solutions`} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#030213] via-[#030213]/75 to-[#030213]/20" />
@@ -264,7 +264,7 @@ function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug })
       <section className="relative min-h-[760px] overflow-hidden bg-[#030213] text-white">
         <img src={data.heroImage} alt={`${cleanText(data.city)} luxury commercial interiors`} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#030213]/50 via-[#030213]/60 to-[#030213]" />
-        <div className="container relative z-10 mx-auto flex min-h-[760px] flex-col justify-end px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+        <div className="container relative z-10 mx-auto flex min-h-[760px] flex-col justify-end px-4 pb-16 pt-16 sm:px-6 lg:px-8">
           <Link to="/contact" className="mb-auto inline-flex w-fit items-center gap-2 text-sm font-semibold text-white/75 transition hover:text-[#B5F823]">
             <ChevronLeft className="h-4 w-4" />
             All Locations
@@ -285,7 +285,7 @@ function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug })
   }
 
   return (
-    <section className={`relative overflow-hidden pt-28 ${isDelhi ? "bg-[#f7f8f3]" : "bg-white"} dark:bg-[#030213]`}>
+    <section className={`relative overflow-hidden pt-20 ${isDelhi ? "bg-[#f7f8f3]" : "bg-white"} dark:bg-[#030213]`}>
       <div className="container mx-auto px-4 pb-20 pt-8 sm:px-6 lg:px-8 lg:pb-28 lg:pt-12">
         <Link to="/contact" className="mb-10 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-[#7FB706] dark:text-gray-400">
           <ChevronLeft className="h-4 w-4" />
