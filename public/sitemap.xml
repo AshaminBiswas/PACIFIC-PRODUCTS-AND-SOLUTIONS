@@ -71,6 +71,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://pacificproduct.in/locations/kolkata</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://pacificproduct.in/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -79,5 +84,60 @@
     <loc>https://pacificproduct.in/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/products/restroom-cubicles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/products/toilet-cubicles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/products/toilet-partitions</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/products/cubicle-hardware</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/products/exterior-cladding</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/products/interior-paneling</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/products/acrylic-solid-surface</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/solutions/airports</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/solutions/malls</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/solutions/offices</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pacificproduct.in/solutions/residential</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

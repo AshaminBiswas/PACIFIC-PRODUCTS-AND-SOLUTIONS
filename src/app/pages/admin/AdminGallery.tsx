@@ -11,6 +11,7 @@ const LOCATIONS = [
   { slug: "mumbai", label: "Mumbai" },
   { slug: "bangalore", label: "Bangalore" },
   { slug: "ahmedabad", label: "Ahmedabad" },
+  { slug: "kolkata", label: "Kolkata" },
   { slug: "uae", label: "UAE" },
 ];
 const PLACEMENTS = [
@@ -32,7 +33,7 @@ export default function AdminGallery() {
   const [category, setCategory] = useState("other");
   const [locationSlug, setLocationSlug] = useState("");
   const [placement, setPlacement] = useState<Placement>("general");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const sortedImages = useMemo(() => {
@@ -50,19 +51,25 @@ export default function AdminGallery() {
     setCategory("other");
     setLocationSlug("");
     setPlacement("general");
-    setImageUrl("");
+    setImageUrls([]);
     setErr("");
   };
 
   const handleImg = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
     setUploading(true);
     setErr("");
     const folder = locationSlug ? `locations/${locationSlug}/${placement}` : "gallery";
-    const url = await uploadImage(f, folder);
-    if (url) {
-      setImageUrl(url);
+    
+    const urls: string[] = [];
+    for (const f of files) {
+      const url = await uploadImage(f, folder);
+      if (url) urls.push(url);
+    }
+    
+    if (urls.length > 0) {
+      setImageUrls((prev) => [...prev, ...urls]);
     } else {
       setErr("Upload failed. Check Supabase Storage bucket and policies.");
     }
@@ -74,16 +81,26 @@ export default function AdminGallery() {
     setErr("");
     try {
       const normalizedPlacement = locationSlug ? placement : "general";
-      const { error } = await supabase.from("gallery_images").insert({
-        title,
+
+      if (normalizedPlacement === "hero" && locationSlug) {
+        const existingHeroCount = images.filter(img => img.location_slug === locationSlug && img.placement === "hero").length;
+        if (existingHeroCount + imageUrls.length > 8) {
+          throw new Error("Maximum of 8 hero images allowed for this location. Please delete existing ones first.");
+        }
+      }
+
+      const rows = imageUrls.map((url, idx) => ({
+        title: imageUrls.length > 1 ? `${title} ${idx + 1}` : title,
         alt_text: altText || null,
         category,
         location_slug: locationSlug || null,
         placement: normalizedPlacement,
-        image_url: imageUrl,
-        sort_order: images.length + 1,
+        image_url: url,
+        sort_order: images.length + idx + 1,
         published: true,
-      });
+      }));
+
+      const { error } = await supabase.from("gallery_images").insert(rows);
       if (error) throw error;
       setShow(false);
       resetForm();
@@ -219,21 +236,43 @@ export default function AdminGallery() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-300 mb-1">Image *</label>
+                <label className="block text-sm text-gray-300 mb-1">Image(s) *</label>
                 <div className="flex items-center gap-3">
-                  <input ref={fileRef} type="file" accept="image/*" onChange={handleImg} className="hidden" />
-                  <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 text-sm disabled:opacity-50">
-                    <Upload className="w-4 h-4" />{uploading ? "Uploading..." : "Upload"}
+                  <input ref={fileRef} type="file" multiple accept="image/*" onChange={handleImg} className="hidden" />
+                  <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 text-sm disabled:opacity-50 shrink-0">
+                    <Upload className="w-4 h-4" />{uploading ? "Uploading..." : "Upload Multiple"}
                   </button>
-                  <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="or paste URL" className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]" />
+                  <input 
+                    placeholder="or paste URL and press Enter" 
+                    className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.currentTarget.value) {
+                        setImageUrls(prev => [...prev, e.currentTarget.value]);
+                        e.currentTarget.value = "";
+                      }
+                    }}
+                  />
                 </div>
-                <p className="text-xs text-gray-500 mt-1 font-medium">For location hero, upload a wide 1920x900 image. For showcase gallery, upload 6+ images when possible.</p>
-                {imageUrl && <img src={imageUrl} alt="" className="mt-2 h-28 w-full rounded-lg object-cover" />}
+                <p className="text-xs text-gray-500 mt-1 font-medium">
+                  {placement === "hero" 
+                    ? "For location hero, upload up to 8 images with a 16:9 ratio (e.g. 1920x1080). Images are automatically optimized." 
+                    : "For showcase gallery, upload 6+ images when possible. Images are automatically optimized."}
+                </p>
+                {imageUrls.length > 0 && (
+                  <div className="mt-3 grid grid-cols-4 gap-2">
+                    {imageUrls.map((url, i) => (
+                      <div key={i} className="relative group">
+                        <img src={url} alt="" className="h-16 w-full rounded-lg object-cover" />
+                        <button onClick={() => setImageUrls(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-black/70 p-1 rounded-md text-white opacity-0 group-hover:opacity-100 transition"><X className="w-3 h-3" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 p-6 border-t border-white/10">
               <button onClick={() => setShow(false)} className="px-4 py-2 text-gray-400 hover:text-white text-sm">Cancel</button>
-              <button onClick={save} disabled={saving || uploading || !title || !imageUrl} className="px-6 py-2 bg-[#7FB706] text-white rounded-xl hover:bg-[#6fa005] disabled:opacity-50 text-sm font-medium">{saving ? "Saving..." : "Add Image"}</button>
+              <button onClick={save} disabled={saving || uploading || !title || imageUrls.length === 0} className="px-6 py-2 bg-[#7FB706] text-white rounded-xl hover:bg-[#6fa005] disabled:opacity-50 text-sm font-medium">{saving ? "Saving..." : `Add ${imageUrls.length} Image(s)`}</button>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
-import { motion } from "motion/react";
+import { useState, useEffect, useRef } from "react";
+import { motion, animate, useInView } from "motion/react";
 import { Link, useNavigate, useParams } from "react-router";
 import { SEO } from "../components/SEO";
 import { localBusinessSchema } from "../../lib/seo-data";
@@ -35,6 +36,7 @@ import { Button } from "../components/Button";
 import { ContactForm } from "../components/ContactForm";
 import { useLocationGallery } from "../../lib/hooks";
 import { locations, type LocationData } from "./locations/locationData";
+import { FeaturedServices } from "../components/FeaturedServices";
 
 type LocationSlug = keyof typeof locations;
 
@@ -57,6 +59,7 @@ const adjacentLocations: Record<LocationSlug, string[]> = {
   mumbai: ["delhi", "uae", "ahmedabad"],
   bangalore: ["mumbai", "delhi", "uae"],
   ahmedabad: ["delhi", "mumbai", "bangalore"],
+  kolkata: ["delhi", "mumbai", "bangalore"],
   uae: ["mumbai", "delhi", "bangalore"],
 };
 
@@ -80,7 +83,10 @@ function openWhatsapp(data: LocationData) {
 }
 
 function mergeBackendImages(data: LocationData, locationImages: ReturnType<typeof useLocationGallery>["data"]): LocationData {
-  const heroImage = locationImages.find((image) => image.placement === "hero")?.image_url || data.heroImage;
+  const backendHeroImages = locationImages.filter((image) => image.placement === "hero").map(i => i.image_url);
+  const heroImage = backendHeroImages.length > 0 ? backendHeroImages[0] : data.heroImage;
+  const heroImages = backendHeroImages.length > 0 ? backendHeroImages : [data.heroImage];
+
   const galleryImages = locationImages
     .filter((image) => image.placement !== "hero")
     .map((image) => image.image_url);
@@ -91,6 +97,7 @@ function mergeBackendImages(data: LocationData, locationImages: ReturnType<typeo
   return {
     ...data,
     heroImage,
+    heroImages,
     galleryImages: repeatedGalleryImages,
   };
 }
@@ -124,15 +131,101 @@ function SectionHeading({
   );
 }
 
+function AnimatedCounter({ numericValue, suffix }: { numericValue: number; suffix: string }) {
+  const [display, setDisplay] = useState("0" + suffix);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+
+  useEffect(() => {
+    if (inView) {
+      const controls = animate(0, numericValue, {
+        duration: 2.5,
+        ease: "easeOut",
+        onUpdate(latest) {
+          if (Number.isInteger(numericValue)) {
+            setDisplay(Math.floor(latest) + suffix);
+          } else {
+            setDisplay(latest.toFixed(1) + suffix);
+          }
+        },
+      });
+      return controls.stop;
+    }
+  }, [inView, numericValue, suffix]);
+
+  return <span ref={ref}>{display}</span>;
+}
+
 function StatStrip({ data, compact = false }: { data: LocationData; compact?: boolean }) {
   return (
-    <div className={`grid ${compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4"} border border-black/10 bg-white/90 shadow-xl shadow-black/5 backdrop-blur dark:border-white/10 dark:bg-white/5`}>
+    <motion.div 
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-50px" }}
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.15
+          }
+        }
+      }}
+      className={`grid ${compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4"} border border-black/10 bg-white/90 shadow-xl shadow-black/5 backdrop-blur dark:border-white/10 dark:bg-white/5`}
+    >
       {data.stats.map((stat) => (
-        <div key={stat.label} className="border-r border-black/10 p-5 last:border-r-0 dark:border-white/10 sm:p-7">
-          <div className="text-3xl font-bold text-[#7FB706] dark:text-[#B5F823]">{stat.value}</div>
+        <motion.div 
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
+          }}
+          key={stat.label} 
+          className="border-r border-black/10 p-5 last:border-r-0 dark:border-white/10 sm:p-7"
+        >
+          <div className="text-3xl font-bold text-[#7FB706] dark:text-[#B5F823]">
+            <AnimatedCounter numericValue={stat.numericValue} suffix={stat.suffix} />
+          </div>
           <div className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">{stat.label}</div>
-        </div>
+        </motion.div>
       ))}
+    </motion.div>
+  );
+}
+
+function LocationHeroSlider({ images, altText }: { images: string[], altText: string }) {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrent((c) => (c + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  return (
+    <div className="relative w-full h-full overflow-hidden bg-gray-100 dark:bg-gray-900">
+      {images.map((img, i) => (
+        <img
+          key={img}
+          src={img}
+          alt={`${altText} ${i + 1}`}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+          style={{ opacity: i === current ? 1 : 0 }}
+        />
+      ))}
+      {images.length > 1 && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? "bg-white w-6" : "bg-white/40 hover:bg-white/70 w-2"}`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -150,7 +243,7 @@ function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug })
           <img src={data.heroImage} alt={`${cleanText(data.city)} commercial infrastructure solutions`} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#030213] via-[#030213]/75 to-[#030213]/20" />
         </div>
-        <div className="container relative z-10 mx-auto px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+        <div className="container relative z-10 mx-auto px-4 pb-24 pt-8 sm:px-6 lg:px-8 lg:pb-32 lg:pt-12">
           <Link to="/contact" className="mb-10 inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition hover:text-[#B5F823]">
             <ChevronLeft className="h-4 w-4" />
             All Locations
@@ -160,9 +253,6 @@ function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug })
             <h1 className="mt-6 text-5xl font-bold leading-[1.02] sm:text-6xl lg:text-7xl">{cleanText(data.tagline)}</h1>
             <p className="mt-7 text-lg leading-8 text-white/75">{cleanText(data.description)}</p>
             <HeroActions data={data} light />
-          </div>
-          <div className="mt-16 max-w-4xl">
-            <StatStrip data={data} />
           </div>
         </div>
       </section>
@@ -174,7 +264,7 @@ function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug })
       <section className="relative min-h-[760px] overflow-hidden bg-[#030213] text-white">
         <img src={data.heroImage} alt={`${cleanText(data.city)} luxury commercial interiors`} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#030213]/50 via-[#030213]/60 to-[#030213]" />
-        <div className="container relative z-10 mx-auto flex min-h-[760px] flex-col justify-end px-4 pb-16 pt-32 sm:px-6 lg:px-8">
+        <div className="container relative z-10 mx-auto flex min-h-[760px] flex-col justify-end px-4 pb-16 pt-24 sm:px-6 lg:px-8">
           <Link to="/contact" className="mb-auto inline-flex w-fit items-center gap-2 text-sm font-semibold text-white/75 transition hover:text-[#B5F823]">
             <ChevronLeft className="h-4 w-4" />
             All Locations
@@ -196,7 +286,7 @@ function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug })
 
   return (
     <section className={`relative overflow-hidden pt-28 ${isDelhi ? "bg-[#f7f8f3]" : "bg-white"} dark:bg-[#030213]`}>
-      <div className="container mx-auto px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <div className="container mx-auto px-4 pb-20 pt-8 sm:px-6 lg:px-8 lg:pb-28 lg:pt-12">
         <Link to="/contact" className="mb-10 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-[#7FB706] dark:text-gray-400">
           <ChevronLeft className="h-4 w-4" />
           All Locations
@@ -210,10 +300,13 @@ function HeroSection({ data, slug }: { data: LocationData; slug: LocationSlug })
           </motion.div>
           <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1 }} className={`relative ${isBangalore ? "lg:order-1" : ""}`}>
             <div className={`overflow-hidden ${isDelhi ? "rounded-t-[4rem]" : "rounded-none"} border border-black/10 bg-white p-3 shadow-2xl shadow-black/10 dark:border-white/10 dark:bg-white/5`}>
-              <img src={data.heroImage} alt={`${cleanText(data.city)} restroom cubicles and cladding projects`} className="h-[520px] w-full object-cover" />
-            </div>
-            <div className={`absolute ${isBangalore ? "-bottom-8 left-8" : "-bottom-8 right-8"} w-[min(86%,420px)]`}>
-              <StatStrip data={data} compact />
+              <div className="h-[520px] w-full relative">
+                {data.heroImages && data.heroImages.length > 1 ? (
+                  <LocationHeroSlider images={data.heroImages} altText={`${cleanText(data.city)} restroom cubicles and cladding projects`} />
+                ) : (
+                  <img src={data.heroImage} alt={`${cleanText(data.city)} restroom cubicles and cladding projects`} className="h-full w-full object-cover" />
+                )}
+              </div>
             </div>
           </motion.div>
         </div>
@@ -668,6 +761,19 @@ function renderLocationFlow(data: LocationData, slug: LocationSlug) {
           <MapSection data={data} />
         </>
       );
+    case "kolkata":
+      return (
+        <>
+          <ServicesSection data={data} layout="split" />
+          <ShowcaseSection data={data} variant="mosaic" />
+          <IndustrySection data={data} />
+          <ProjectsCredibility data={data} />
+          <WhyChooseSection data={data} compact />
+          <FaqSection data={data} />
+          <InquirySection data={data} slug={slug} />
+          <MapSection data={data} />
+        </>
+      );
     default:
       return null;
   }
@@ -697,10 +803,17 @@ export default function LocationPage() {
       <SEO
         title={cleanText(pageData.meta.title).replace(' | Pacific Products & Solutions', '')}
         description={cleanText(pageData.meta.description)}
+        keywords={pageData.meta.keywords ? cleanText(pageData.meta.keywords) : undefined}
         canonical={`/locations/${slug}`}
         jsonLd={localBusinessSchema({city: cleanText(pageData.city), address: cleanText(pageData.address), phone: pageData.phone, email: pageData.email, region: cleanText(pageData.region)})}
       />
       <HeroSection data={pageData} slug={slug} />
+      
+      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <StatStrip data={pageData} />
+      </div>
+
+      <FeaturedServices />
       {renderLocationFlow(pageData, slug)}
       <StickyCta data={pageData} />
     </main>

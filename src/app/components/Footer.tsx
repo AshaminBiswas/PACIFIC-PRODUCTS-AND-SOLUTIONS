@@ -43,6 +43,7 @@ export function Footer() {
     { name: "Mumbai", path: "/locations/mumbai" },
     { name: "Bangalore", path: "/locations/bangalore" },
     { name: "Ahmedabad", path: "/locations/ahmedabad" },
+    { name: "Kolkata", path: "/locations/kolkata" },
     { name: "UAE", path: "/locations/uae" },
   ];
 

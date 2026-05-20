@@ -17,7 +17,7 @@ export interface LocationData {
   hours: string;
   whatsapp: string;
   mapSrc: string;
-  meta: { title: string; description: string };
+  meta: { title: string; description: string; keywords?: string };
   stats: { label: string; value: string; numericValue: number; suffix: string }[];
   services: { title: string; desc: string }[];
   industries: { name: string; icon: string }[];
@@ -25,6 +25,7 @@ export interface LocationData {
   whyChoose: { title: string; desc: string }[];
   faqs: LocationFAQ[];
   heroImage: string;
+  heroImages?: string[];
   galleryImages: string[];
 }
 
@@ -85,6 +86,17 @@ const IMAGES = {
       "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&q=80",
     ],
   },
+  kolkata: {
+    hero: "https://images.unsplash.com/photo-1558431382-27e303142255?w=1600&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1600585153490-76fb20a32601?w=800&q=80",
+      "https://images.unsplash.com/photo-1600573472556-e636c2acda9e?w=800&q=80",
+      "https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=800&q=80",
+      "https://images.unsplash.com/photo-1600585154363-67eb9e2e2099?w=800&q=80",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
+    ],
+  },
 };
 
 const COMMON_SERVICES = [
@@ -133,6 +145,7 @@ export const locations: Record<string, LocationData> = {
     meta: {
       title: "Restroom Cubicles & Interior Solutions in Delhi NCR | Pacific Products",
       description: "Leading manufacturer & installer of restroom cubicles, shower partitions, exterior cladding & commercial interiors in Delhi NCR. 120+ projects completed. Get a free quote today.",
+      keywords: "restroom cubicles delhi, shower partitions ncr, exterior cladding delhi ncr, commercial interiors gurgaon, toilet cubicles noida, HPL panels delhi, locker solutions ncr, restroom cubicles, toilet cubicles, custom hardware",
     },
     stats: [
       { label: "Projects Completed", value: "120+", numericValue: 120, suffix: "+" },
@@ -169,6 +182,7 @@ export const locations: Record<string, LocationData> = {
     meta: {
       title: "Restroom Cubicles & Commercial Interiors in Mumbai | Pacific Products",
       description: "Mumbai's leading manufacturer of restroom cubicles, shower partitions, exterior cladding & locker systems. 300+ projects, 15+ years experience.",
+      keywords: "restroom cubicles mumbai, toilet partitions maharashtra, commercial interiors mumbai, shower cubicles pune, exterior cladding mumbai, HPL toilet partitions, locker systems mumbai, restroom cubicles, toilet cubicles, custom hardware",
     },
     stats: [
       { label: "Projects Completed", value: "300+", numericValue: 300, suffix: "+" },
@@ -205,6 +219,7 @@ export const locations: Record<string, LocationData> = {
     meta: {
       title: "Restroom Cubicles & IT Park Interiors in Bangalore | Pacific Products",
       description: "Bangalore's trusted partner for restroom cubicles, corporate interiors, locker systems & exterior cladding. 150+ tech campus projects completed. Get a free consultation.",
+      keywords: "restroom cubicles bangalore, IT park interiors bengaluru, shower cubicles karnataka, exterior cladding bangalore, toilet partitions bengaluru, commercial locker systems, restroom cubicles, toilet cubicles, custom hardware",
     },
     stats: [
       { label: "Projects Completed", value: "150+", numericValue: 150, suffix: "+" },
@@ -241,6 +256,7 @@ export const locations: Record<string, LocationData> = {
     meta: {
       title: "Restroom Cubicles & Interior Solutions in Ahmedabad | Pacific Products",
       description: "Ahmedabad's preferred manufacturer of restroom cubicles, shower partitions, exterior cladding & locker solutions. 90+ commercial projects across Gujarat. Free site visit.",
+      keywords: "restroom cubicles ahmedabad, toilet partitions gujarat, shower cubicles surat, exterior cladding ahmedabad, commercial interiors vadodara, HPL cubicles gujarat, restroom cubicles, toilet cubicles, custom hardware",
     },
     stats: [
       { label: "Projects Completed", value: "90+", numericValue: 90, suffix: "+" },
@@ -277,6 +293,7 @@ export const locations: Record<string, LocationData> = {
     meta: {
       title: "Luxury Restroom Cubicles & Commercial Interiors in Dubai UAE | Pacific Products",
       description: "Dubai's trusted supplier of luxury restroom cubicles, shower partitions, exterior cladding & commercial interiors. Serving UAE & GCC. 70+ premium projects completed.",
+      keywords: "restroom cubicles dubai, toilet partitions uae, luxury shower cubicles abu dhabi, exterior cladding uae, commercial interiors dubai, HPL panels middle east, locker systems uae, restroom cubicles, toilet cubicles, custom hardware",
     },
     stats: [
       { label: "Projects Completed", value: "70+", numericValue: 70, suffix: "+" },
@@ -297,5 +314,42 @@ export const locations: Record<string, LocationData> = {
     ],
     heroImage: IMAGES.uae.hero,
     galleryImages: IMAGES.uae.gallery,
+  },
+  kolkata: {
+    slug: "kolkata",
+    city: "Kolkata",
+    region: "East India",
+    tagline: "Infrastructure Solutions for the City of Joy",
+    description: "Serving East India from our Kolkata office, we provide world-class restroom cubicles, cladding, and commercial interior solutions. Blending modern infrastructure with Kolkata's rich architectural heritage.",
+    address: "Salt Lake Sector V, Kolkata - 700091, West Bengal",
+    phone: "+91 98185 92113",
+    email: "info@pacificproduct.in",
+    hours: "Mon–Sat: 9:00 AM – 6:00 PM",
+    whatsapp: "919818592113",
+    mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117925.33!2d88.264!3d22.535!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f882db4908f667%3A0x43e330e68f6c2cbc!2sKolkata%2C%20West%20Bengal!5e0!3m2!1sen!2sin!4v1713550212891!5m2!1sen!2sin",
+    meta: {
+      title: "Restroom Cubicles & Commercial Interiors in Kolkata | Pacific Products",
+      description: "Kolkata's preferred manufacturer of restroom cubicles, shower partitions, exterior cladding & locker solutions. Free site visit in West Bengal.",
+      keywords: "restroom cubicles kolkata, toilet partitions west bengal, shower cubicles east india, exterior cladding kolkata, commercial interiors bengal, HPL panels kolkata, restroom cubicles, toilet cubicles, custom hardware",
+    },
+    stats: [
+      { label: "Projects Completed", value: "80+", numericValue: 80, suffix: "+" },
+      { label: "Years in Bengal", value: "5+", numericValue: 5, suffix: "+" },
+      { label: "Sq. Ft. Installed", value: "1M+", numericValue: 1, suffix: "M+" },
+      { label: "Local Clients", value: "50+", numericValue: 50, suffix: "+" },
+    ],
+    services: COMMON_SERVICES,
+    industries: COMMON_INDUSTRIES,
+    projects: ["Eco Park New Town", "Quest Mall", "Kolkata Metro", "Sector V IT Parks", "ITC Sonar", "Science City"],
+    whyChoose: COMMON_WHY_CHOOSE,
+    faqs: [
+      { question: "Do you provide cubicle solutions across West Bengal?", answer: "Yes, we serve all major areas in West Bengal including Kolkata, Howrah, Siliguri, Asansol, and Durgapur." },
+      { question: "Can you handle installations in old heritage buildings?", answer: "Absolutely. We have experience installing modern cubicle systems while respecting the structural integrity of heritage properties." },
+      { question: "What materials are best suited for Kolkata's humid climate?", answer: "Our compact laminate and HPL cubicles are highly moisture-resistant, making them ideal for Kolkata's high humidity levels." },
+      { question: "Do you offer site visits in Kolkata?", answer: "Yes, our team provides free site visits, measurements, and consultations across Kolkata and neighboring areas." },
+      { question: "Are your installations suitable for large IT parks?", answer: "Yes, we specialize in high-traffic installations for IT parks and corporate spaces, like those in Salt Lake Sector V and Rajarhat." },
+    ],
+    heroImage: IMAGES.kolkata.hero,
+    galleryImages: IMAGES.kolkata.gallery,
   },
 };

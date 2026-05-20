@@ -35,6 +35,13 @@ export default function ContactPage() {
       email: "info@pacificproduct.in",
     },
     {
+      city: "Kolkata",
+      slug: "kolkata",
+      address: "Salt Lake Sector V, Kolkata - 700091, West Bengal, India",
+      phone: "+91 98185 92113",
+      email: "info@pacificproduct.in",
+    },
+    {
       city: "Dubai, UAE",
       slug: "uae",
       address: "Al Quoz Industrial Area 3, Dubai, United Arab Emirates",

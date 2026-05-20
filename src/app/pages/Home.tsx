@@ -259,15 +259,14 @@ function HeroSection() {
 
 // ── Page ──────────────────────────────────────────────────────
 
-import { useProducts, useSolutions, useHeroImages, useCoreServices } from "../../lib/hooks";
+import { useSolutions, useHeroImages, useCoreServices } from "../../lib/hooks";
 import { DynamicIcon } from "../components/DynamicIcon";
 import { ImageWithFallback as SolutionImage } from "../components/figma/ImageWithFallback";
 import { CoreServiceCard } from "../components/CoreServiceCard";
+import { FeaturedServices } from "../components/FeaturedServices";
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { data: allProducts, loading } = useProducts();
-  const featuredProducts = allProducts?.filter(p => p.is_featured).slice(0, 3) || [];
 
   const { data: solutions, loading: loadingSolutions } = useSolutions();
   const { data: coreServices, loading: loadingCoreServices } = useCoreServices();
@@ -287,55 +286,7 @@ export default function HomePage() {
       <HeroSection />
 
       {/* Featured Products */}
-
-
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-transparent dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-10 sm:mb-14 lg:mb-16"
-          >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-[#7FB706]">
-              Featured Services
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
-              Explore our range of premium interior solutions
-            </p>
-          </motion.div>
-
-          {loading ? (
-            <div className="text-center text-gray-500 py-10">Loading featured services...</div>
-          ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {featuredProducts.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  title={product.title}
-                  description={product.description || product.subtitle}
-                  image={product.image_url}
-                  path={`/products/${product.slug}`}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500 py-10">No featured services yet. Add some in the Admin panel!</div>
-          )}
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mt-8 sm:mt-12"
-          >
-            <Button size="lg" variant="outline" onClick={() => navigate("/products")}>
-              View All Services
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </motion.div>
-        </div>
-      </section>
+      <FeaturedServices />
 
       {/* Our Solutions */}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white/40 dark:bg-[#0a0a1a] transition-colors">
