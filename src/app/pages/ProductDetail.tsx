@@ -142,7 +142,7 @@ export default function ProductDetailPage() {
                 {product.title}
               </h1>
               <p className="text-xl text-[#B5F823] font-medium mb-4">{product.subtitle}</p>
-              <p className="text-base sm:text-lg text-gray-400 mb-8 leading-relaxed max-w-xl">
+              <p className="text-sm sm:text-base text-gray-400 mb-8 leading-relaxed max-w-xl">
                 {product.description}
               </p>
 
