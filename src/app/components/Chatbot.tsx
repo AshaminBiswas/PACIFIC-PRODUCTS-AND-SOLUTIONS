@@ -142,7 +142,7 @@ export function Chatbot() {
     if (!genAI.current) return;
     try {
       const model = genAI.current.getGenerativeModel({ 
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash-preview-05-20",
         systemInstruction: SYSTEM_PROMPT 
       });
       chatSession.current = model.startChat({
