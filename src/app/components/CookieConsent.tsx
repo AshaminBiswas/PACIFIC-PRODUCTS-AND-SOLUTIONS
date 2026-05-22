@@ -136,56 +136,45 @@ export default function CookieConsent() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 24, opacity: 0 }}
           transition={{ type: "spring", stiffness: 340, damping: 30 }}
-          className="fixed bottom-6 left-4 z-[9998] w-[calc(100%-2rem)] max-w-sm"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9998] w-[calc(100%-2rem)] max-w-lg"
+          style={{ maxHeight: "150px" }}
         >
 
           {/* ── Step 1: Cookie Consent ── */}
           {step === "consent" && (
-            <div className="rounded-2xl bg-white dark:bg-[#0d0d1f] border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/20 dark:shadow-black/50 overflow-hidden">
+            <div className="rounded-2xl bg-white dark:bg-[#0d0d1f] border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/20 dark:shadow-black/50 overflow-hidden" style={{ maxHeight: "150px", overflowY: "auto" }}>
               {/* Accent bar */}
               <div className="h-[3px] bg-gradient-to-r from-[#7FB706] to-[#B5F823]" />
 
-              <div className="p-5">
+              <div className="px-4 py-2.5">
                 {/* Top row */}
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <Cookie className="w-5 h-5 text-[#7FB706] flex-shrink-0" />
-                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                <div className="flex items-center justify-between gap-3 mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <Cookie className="w-4 h-4 text-[#7FB706] flex-shrink-0" />
+                    <h3 className="text-xs font-bold text-gray-900 dark:text-white">
                       Cookie Preferences
                     </h3>
                   </div>
                   <button
                     onClick={handleDecline}
-                    className="w-6 h-6 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors flex-shrink-0"
+                    className="w-5 h-5 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors flex-shrink-0"
                     aria-label="Dismiss"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
 
-                <p className="text-gray-600 dark:text-gray-400 text-xs leading-relaxed mb-4">
-                  We use cookies and similar technologies to improve your browsing experience, analyse site traffic, and personalise content. By clicking{" "}
-                  <strong className="text-gray-800 dark:text-gray-200 font-semibold">"Accept All"</strong>, you consent to our use of cookies as described in our{" "}
-                  <Link
-                    to="/privacy"
-                    className="text-[#7FB706] hover:underline font-medium"
-                  >
-                    Privacy Policy
-                  </Link>{" "}
+                <p className="text-gray-600 dark:text-gray-400 text-[11px] leading-relaxed mb-2.5">
+                  We use cookies to improve your experience. By clicking <strong className="text-gray-800 dark:text-gray-200 font-semibold">"Accept All"</strong>, you consent to our{" "}
+                  <Link to="/privacy" className="text-[#7FB706] hover:underline font-medium">Privacy Policy</Link>{" "}
                   and{" "}
-                  <Link
-                    to="/terms"
-                    className="text-[#7FB706] hover:underline font-medium"
-                  >
-                    Terms of Service
-                  </Link>
-                  .
+                  <Link to="/terms" className="text-[#7FB706] hover:underline font-medium">Terms of Service</Link>.
                 </p>
 
                 <div className="flex gap-2">
                   <button
                     onClick={handleDecline}
-                    className="flex-1 py-2 rounded-lg border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/20 text-xs font-medium transition-all"
+                    className="flex-1 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/20 text-[11px] font-medium transition-all"
                   >
                     Decline
                   </button>
@@ -193,7 +182,7 @@ export default function CookieConsent() {
                     onClick={handleAccept}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex-[1.8] py-2 rounded-lg bg-[#7FB706] hover:bg-[#6fa005] text-white text-xs font-semibold transition-colors shadow-md shadow-[#7FB706]/20"
+                    className="flex-[1.8] py-1.5 rounded-lg bg-[#7FB706] hover:bg-[#6fa005] text-white text-[11px] font-semibold transition-colors shadow-md shadow-[#7FB706]/20"
                   >
                     Accept All
                   </motion.button>
@@ -204,26 +193,26 @@ export default function CookieConsent() {
 
           {/* ── Step 2: Newsletter Signup ── */}
           {step === "newsletter" && (
-            <div className="rounded-2xl bg-white dark:bg-[#0d0d1f] border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/20 dark:shadow-black/50 overflow-hidden">
+            <div className="rounded-2xl bg-white dark:bg-[#0d0d1f] border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/20 dark:shadow-black/50 overflow-hidden" style={{ maxHeight: "150px", overflowY: "auto" }}>
               <div className="h-[3px] bg-gradient-to-r from-[#7FB706] to-[#B5F823]" />
 
-              <div className="p-5">
+              <div className="px-4 py-2.5">
                 {/* Header */}
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-snug">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <h3 className="text-xs font-bold text-gray-900 dark:text-white leading-snug">
                     Stay ahead of the curve 🚀
                   </h3>
                   <button
                     onClick={() => handleSubscribe(true)}
-                    className="w-6 h-6 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors flex-shrink-0"
+                    className="w-5 h-5 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors flex-shrink-0"
                     aria-label="Skip"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
 
-                <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed mb-4">
-                  Get our latest product launches, project showcases, and industry insights delivered to your inbox. No spam — unsubscribe anytime.
+                <p className="text-gray-500 dark:text-gray-400 text-[11px] leading-relaxed mb-2">
+                  Get our latest product launches and insights delivered to your inbox. No spam — unsubscribe anytime.
                 </p>
 
                 {/* Email input */}
@@ -237,26 +226,22 @@ export default function CookieConsent() {
                     }}
                     onKeyDown={(e) => e.key === "Enter" && handleSubscribe(false)}
                     placeholder="Enter your email address"
-                    className={`w-full px-3 py-2.5 rounded-xl text-sm bg-gray-50 dark:bg-white/5 border ${
+                    className={`w-full px-3 py-1.5 rounded-xl text-[11px] bg-gray-50 dark:bg-white/5 border ${
                       emailError
                         ? "border-red-400"
                         : "border-gray-200 dark:border-white/10 focus:border-[#7FB706]"
                     } text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#7FB706]/30 transition-all`}
                   />
                   {emailError && (
-                    <p className="text-red-400 text-xs mt-1">{emailError}</p>
+                    <p className="text-red-400 text-[10px] mt-0.5">{emailError}</p>
                   )}
                 </div>
 
-                <p className="text-[10px] text-gray-400 dark:text-gray-600 mb-3">
-                  By subscribing you agree to receive marketing emails from Pacific Products &amp; Solutions.
-                </p>
-
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => handleSubscribe(true)}
                     disabled={saving}
-                    className="flex-1 py-2 rounded-lg border border-gray-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs font-medium transition-all disabled:opacity-50"
+                    className="flex-1 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-[11px] font-medium transition-all disabled:opacity-50"
                   >
                     Maybe later
                   </button>
@@ -265,14 +250,14 @@ export default function CookieConsent() {
                     disabled={saving}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex-[1.8] flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#7FB706] hover:bg-[#6fa005] disabled:opacity-60 text-white text-xs font-semibold transition-colors shadow-md shadow-[#7FB706]/20"
+                    className="flex-[1.8] flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-[#7FB706] hover:bg-[#6fa005] disabled:opacity-60 text-white text-[11px] font-semibold transition-colors shadow-md shadow-[#7FB706]/20"
                   >
                     {saving ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <Loader2 className="w-3 h-3 animate-spin" />
                     ) : (
                       <>
                         Subscribe
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        <ChevronRight className="w-3 h-3" />
                       </>
                     )}
                   </motion.button>
