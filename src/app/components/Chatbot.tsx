@@ -16,7 +16,7 @@ type Message = {
   showProducts?: boolean;
 };
 
-const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY;
+const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY as string;
 
 const SYSTEM_PROMPT = `You are Aria — an elite, senior B2B Sales Consultant representing Pacific Products & Solutions, a premier interior infrastructure company specialising in commercial restroom cubicles, exterior cladding, locker systems, and wall panelling across India and the UAE.
 
