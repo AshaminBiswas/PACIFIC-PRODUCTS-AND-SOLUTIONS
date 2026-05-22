@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { MessageSquare, X, Send, Bot, RefreshCw } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { CoreServiceCard } from "./CoreServiceCard";
 import type { CoreService } from "../../lib/database.types";
 
@@ -108,7 +108,7 @@ export function Chatbot() {
   const [products, setProducts] = useState<any[]>([]);
   
   // Initialize Gemini
-  const genAI = useRef(GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null);
+  const genAI = useRef(GEMINI_API_KEY ? new GoogleGenAI({ apiKey: GEMINI_API_KEY }) : null);
   const chatSession = useRef<any>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -141,12 +141,11 @@ export function Chatbot() {
   const startChat = async () => {
     if (!genAI.current) return;
     try {
-      const model = genAI.current.getGenerativeModel({ 
-        model: "gemini-2.5-flash-preview-05-20",
-        systemInstruction: SYSTEM_PROMPT 
-      });
-      chatSession.current = model.startChat({
-        history: [],
+      chatSession.current = genAI.current.chats.create({
+        model: "gemini-2.5-flash",
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+        },
       });
     } catch (err) {
       console.error("Failed to start Gemini chat:", err);
@@ -206,8 +205,8 @@ export function Chatbot() {
 
     try {
       // Send message to Gemini
-      const result = await chatSession.current.sendMessage(userText);
-      let botResponse = result.response.text();
+      const result = await chatSession.current.sendMessage({ message: userText });
+      let botResponse = result.text;
       let showServices = false;
       let showSolutions = false;
       let showProducts = false;
