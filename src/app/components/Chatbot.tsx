@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { MessageSquare, X, Send, Bot, RefreshCw } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
-import { GoogleGenAI } from "@google/genai";
 import { CoreServiceCard } from "./CoreServiceCard";
 import type { CoreService } from "../../lib/database.types";
 
@@ -97,6 +96,8 @@ const INITIAL_MESSAGE: Message = {
   text: "Good day. I'm Aria, your dedicated Sales Consultant at Pacific Products & Solutions. Whether you're specifying cubicle systems, cladding, or locker solutions for a commercial project — I'm here to help. What can I assist you with today?"
 };
 
+// We will use standard fetch to communicate with Gemini REST API directly
+
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
@@ -107,10 +108,6 @@ export function Chatbot() {
   const [solutions, setSolutions] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   
-  // Initialize Gemini
-  const genAI = useRef(GEMINI_API_KEY ? new GoogleGenAI({ apiKey: GEMINI_API_KEY }) : null);
-  const chatSession = useRef<any>(null);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch data on mount
@@ -137,20 +134,8 @@ export function Chatbot() {
     }
   }, [messages, isOpen, isTyping]);
 
-  // Start new chat session
   const startChat = async () => {
-    if (!genAI.current) return;
-    try {
-      chatSession.current = genAI.current.chats.create({
-        model: "gemini-2.5-flash",
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      });
-    } catch (err) {
-      console.error("Failed to start Gemini chat:", err);
-    }
+    // No-op - REST API doesn't need start chat initialization
   };
 
   useEffect(() => {
@@ -160,7 +145,6 @@ export function Chatbot() {
   const handleRestart = () => {
     setMessages([INITIAL_MESSAGE]);
     setInputValue("");
-    startChat();
   };
 
   // Extract email or phone from chat history to save lead
@@ -183,6 +167,60 @@ export function Chatbot() {
     }
   };
 
+  const callGeminiAPI = async (chatHistory: Message[], newText: string) => {
+    if (!GEMINI_API_KEY) throw new Error("API Key not found");
+
+    // Format chat history for Gemini REST API
+    const contents: any[] = [];
+    
+    chatHistory.forEach(m => {
+      if (m.id === "msg-init") return; // Skip initial greetings to start with a user role
+      if (!m.text) return;
+      contents.push({
+        role: m.sender === "bot" ? "model" : "user",
+        parts: [{ text: m.text }]
+      });
+    });
+
+    // Add current user message
+    contents.push({
+      role: "user",
+      parts: [{ text: newText }]
+    });
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents,
+          systemInstruction: {
+            parts: [{ text: SYSTEM_PROMPT }]
+          },
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1000
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`API call failed: ${errText}`);
+    }
+
+    const data = await response.json();
+    const botText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!botText) {
+      throw new Error("No response text returned from Gemini API");
+    }
+    return botText;
+  };
+
   const handleSendText = async () => {
     if (!inputValue.trim()) return;
 
@@ -193,7 +231,7 @@ export function Chatbot() {
     const newUserMsg: Message = { id: `msg-${Date.now()}`, sender: "user", text: userText };
     setMessages(prev => [...prev, newUserMsg]);
 
-    if (!chatSession.current) {
+    if (!GEMINI_API_KEY) {
       setMessages(prev => [...prev, { 
         id: `msg-err-${Date.now()}`, 
         sender: "bot", 
@@ -205,31 +243,31 @@ export function Chatbot() {
     setIsTyping(true);
 
     try {
-      // Send message to Gemini
-      const result = await chatSession.current.sendMessage({ message: userText });
-      let botResponse = result.text;
+      // Send message to Gemini via Direct REST API
+      const botResponse = await callGeminiAPI(messages, userText);
+      let cleanResponse = botResponse;
       let showServices = false;
       let showSolutions = false;
       let showProducts = false;
 
       // Intercept and strip tags
-      if (botResponse.includes("[SHOW_SERVICES]")) {
+      if (cleanResponse.includes("[SHOW_SERVICES]")) {
         showServices = true;
-        botResponse = botResponse.replace("[SHOW_SERVICES]", "").trim();
+        cleanResponse = cleanResponse.replace("[SHOW_SERVICES]", "").trim();
       }
       
-      if (botResponse.includes("[SHOW_SOLUTIONS]")) {
+      if (cleanResponse.includes("[SHOW_SOLUTIONS]")) {
         showSolutions = true;
-        botResponse = botResponse.replace("[SHOW_SOLUTIONS]", "").trim();
+        cleanResponse = cleanResponse.replace("[SHOW_SOLUTIONS]", "").trim();
       }
 
-      if (botResponse.includes("[SHOW_PRODUCTS]")) {
+      if (cleanResponse.includes("[SHOW_PRODUCTS]")) {
         showProducts = true;
-        botResponse = botResponse.replace("[SHOW_PRODUCTS]", "").trim();
+        cleanResponse = cleanResponse.replace("[SHOW_PRODUCTS]", "").trim();
       }
 
-      if (botResponse.includes("[LEAD_CAPTURED]")) {
-        botResponse = botResponse.replace("[LEAD_CAPTURED]", "").trim();
+      if (cleanResponse.includes("[LEAD_CAPTURED]")) {
+        cleanResponse = cleanResponse.replace("[LEAD_CAPTURED]", "").trim();
         const historyText = messages.map(m => m.text).join(" | ") + " | " + userText;
         await extractAndSaveLead(historyText);
       }
@@ -237,7 +275,7 @@ export function Chatbot() {
       setMessages(prev => [...prev, { 
         id: `msg-bot-${Date.now()}`, 
         sender: "bot", 
-        text: botResponse,
+        text: cleanResponse,
         showServices,
         showSolutions,
         showProducts
