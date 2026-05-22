@@ -9,7 +9,7 @@ import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useProduct, useCatalogs } from "../../lib/hooks";
 import { CatalogCard, CatalogViewerModal } from "../components/CatalogViewer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SEO } from "../components/SEO";
 import { productSchema, breadcrumbSchema } from "../../lib/seo-data";
 
@@ -18,17 +18,45 @@ interface ProductSpecification {
   value: string;
 }
 
+// Helper: convert a category name to URL slug
+function toCategorySlug(category: string | undefined) {
+  if (!category) return "";
+  return category
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export default function ProductDetailPage() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, productSlug, categorySlug } = useParams<{ slug: string; productSlug: string; categorySlug: string }>();
   const navigate = useNavigate();
-  const { data: product, loading } = useProduct(slug);
+  // Support both route patterns: /products/:slug and /products/:categorySlug/:productSlug
+  const lookupSlug = productSlug || slug;
+  const { data: product, loading } = useProduct(lookupSlug);
   const { data: catalogs } = useCatalogs(product?.id || undefined);
   const [showCatalogViewer, setShowCatalogViewer] = useState(false);
   const [currentMain, setCurrentMain] = useState<string | null>(null);
   const [currentThumbs, setCurrentThumbs] = useState<string[] | null>(null);
 
+  // Redirect old /products/:slug URLs to /products/:categorySlug/:productSlug
+  useEffect(() => {
+    if (product && slug && !productSlug) {
+      const catSlug = toCategorySlug(product.category);
+      if (catSlug) {
+        navigate(`/products/${catSlug}/${product.slug}`, { replace: true });
+      }
+    }
+  }, [product, slug, productSlug, navigate]);
+
   const mainImage = currentMain || product?.image_url || "";
   const thumbnailImages = currentThumbs || product?.additional_images?.filter(Boolean).slice(0, 4) || [];
+
+  // Build the canonical URL path with category
+  const productUrl = product
+    ? product.category
+      ? `/products/${toCategorySlug(product.category)}/${product.slug}`
+      : `/products/${product.slug}`
+    : "";
 
   const handleSwap = (idx: number) => {
     const clickedImg = thumbnailImages[idx];
@@ -63,10 +91,15 @@ export default function ProductDetailPage() {
       <SEO
         title={product.title}
         description={product.description?.slice(0, 155) || `Premium ${product.title} solutions by Pacific Products & Solutions`}
-        canonical={`/products/${product.slug}`}
+        canonical={productUrl}
         ogType="product"
         ogImage={product.image_url}
-        jsonLd={[productSchema(product), breadcrumbSchema([{name: 'Home', url: '/'}, {name: 'Products', url: '/products'}, {name: product.title, url: `/products/${product.slug}`}])]}
+        jsonLd={[productSchema({ ...product, slug: productUrl.replace('/products/', '') }), breadcrumbSchema([
+          {name: 'Home', url: '/'},
+          {name: 'Products', url: '/products'},
+          ...(product.category ? [{name: product.category, url: `/products?category=${encodeURIComponent(product.category)}`}] : []),
+          {name: product.title, url: productUrl}
+        ])]}
       />
 
       {/* ═══════════════════ HERO — DARK IMMERSIVE ═══════════════════ */}
@@ -80,6 +113,17 @@ export default function ProductDetailPage() {
             <button onClick={() => navigate("/")} className="hover:text-[#B5F823] transition-colors">Home</button>
             <ChevronRight className="w-3.5 h-3.5" />
             <button onClick={() => navigate("/products")} className="hover:text-[#B5F823] transition-colors">Services</button>
+            {product.category && (
+              <>
+                <ChevronRight className="w-3.5 h-3.5" />
+                <button
+                  onClick={() => navigate(`/products?category=${encodeURIComponent(product.category)}`)}
+                  className="hover:text-[#B5F823] transition-colors"
+                >
+                  {product.category}
+                </button>
+              </>
+            )}
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-white">{product.title}</span>
           </motion.div>

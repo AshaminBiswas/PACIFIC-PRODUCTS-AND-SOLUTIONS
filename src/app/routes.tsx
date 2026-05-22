@@ -112,6 +112,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "products/:categorySlug/:productSlug",
+        element: (
+          <Suspense fallback={<ProductDetailSkeleton />}>
+            <ProductDetail />
+          </Suspense>
+        ),
+      },
+      {
         path: "solutions",
         element: (
           <Suspense fallback={<SolutionsSkeleton />}>

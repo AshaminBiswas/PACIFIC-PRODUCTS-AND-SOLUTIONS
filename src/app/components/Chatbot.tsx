@@ -352,7 +352,12 @@ export function Chatbot() {
                       {products.map((product) => (
                         <a 
                           key={product.id} 
-                          href={`/products/${product.slug}`}
+                          href={(() => {
+                            const catSlug = product.category
+                              ? product.category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+                              : "";
+                            return catSlug ? `/products/${catSlug}/${product.slug}` : `/products/${product.slug}`;
+                          })()}
                           className="relative w-[180px] h-[140px] shrink-0 snap-center rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm group block bg-white dark:bg-[#030213]"
                         >
                            <img src={product.image_url} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />

@@ -240,7 +240,11 @@ export default function AdminProducts() {
                         )}
                         <div>
                           <p className="text-white font-medium">{product.title}</p>
-                          <p className="text-gray-500 text-xs">{product.slug}</p>
+                          <p className="text-gray-500 text-xs font-mono">
+                            {product.category
+                              ? `/products/${toSlug(product.category)}/${product.slug}`
+                              : `/products/${product.slug}`}
+                          </p>
                         </div>
                       </div>
                     </td>

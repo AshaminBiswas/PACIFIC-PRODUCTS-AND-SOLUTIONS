@@ -8,6 +8,11 @@ import { DEFAULT_KEYWORDS } from "../../lib/seo-data";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
+function toCategorySlug(category: string | undefined) {
+  if (!category) return "";
+  return category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export default function ProductsPage() {
   const { data: products, loading } = useProducts();
   const { data: banner } = usePageBanner("services");
@@ -68,22 +73,28 @@ export default function ProductsPage() {
             <div className="text-center text-gray-500 dark:text-gray-400">Loading services...</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <ProductCard
-                    title={product.title}
-                    description={product.description || product.subtitle}
-                    image={product.image_url}
-                    path={`/products/${product.slug}`}
-                  />
-                </motion.div>
-              ))}
+              {filteredProducts.map((product, index) => {
+                const catSlug = toCategorySlug(product.category);
+                const productPath = catSlug
+                  ? `/products/${catSlug}/${product.slug}`
+                  : `/products/${product.slug}`;
+                return (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <ProductCard
+                      title={product.title}
+                      description={product.description || product.subtitle}
+                      image={product.image_url}
+                      path={productPath}
+                    />
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>

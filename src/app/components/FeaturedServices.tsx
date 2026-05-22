@@ -31,15 +31,23 @@ export function FeaturedServices() {
           <div className="text-center text-gray-500 py-10">Loading featured services...</div>
         ) : featuredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                title={product.title}
-                description={product.description || product.subtitle}
-                image={product.image_url}
-                path={`/products/${product.slug}`}
-              />
-            ))}
+            {featuredProducts.map((product) => {
+              const catSlug = product.category
+                ? product.category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+                : "";
+              const productPath = catSlug
+                ? `/products/${catSlug}/${product.slug}`
+                : `/products/${product.slug}`;
+              return (
+                <ProductCard
+                  key={product.id}
+                  title={product.title}
+                  description={product.description || product.subtitle}
+                  image={product.image_url}
+                  path={productPath}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center text-gray-500 py-10">No featured services yet. Add some in the Admin panel!</div>
