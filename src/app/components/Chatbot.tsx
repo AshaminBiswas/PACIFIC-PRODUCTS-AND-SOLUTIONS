@@ -16,7 +16,7 @@ type Message = {
   showProducts?: boolean;
 };
 
-const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY || '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';
+const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY;
 
 const SYSTEM_PROMPT = `You are Aria — an elite, senior B2B Sales Consultant representing Pacific Products & Solutions, a premier interior infrastructure company specialising in commercial restroom cubicles, exterior cladding, locker systems, and wall panelling across India and the UAE.
 
@@ -136,7 +136,7 @@ function ThinkingBlock({ reasoning }: { reasoning: string }) {
   );
 }
 
-// We will use standard fetch to communicate with Gemini REST API directly
+// We will use standard fetch to communicate with NVIDIA REST API directly
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
