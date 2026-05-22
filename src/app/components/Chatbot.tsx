@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { MessageSquare, X, Send, Bot, RefreshCw } from "lucide-react";
+import { MessageSquare, X, Send, Bot, RefreshCw, Brain, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { CoreServiceCard } from "./CoreServiceCard";
 import type { CoreService } from "../../lib/database.types";
@@ -9,13 +9,14 @@ type Message = {
   id: string;
   sender: "bot" | "user";
   text: string;
+  reasoning?: string;
   isProcessing?: boolean;
   showServices?: boolean;
   showSolutions?: boolean;
   showProducts?: boolean;
 };
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY || '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';
 
 const SYSTEM_PROMPT = `You are Aria — an elite, senior B2B Sales Consultant representing Pacific Products & Solutions, a premier interior infrastructure company specialising in commercial restroom cubicles, exterior cladding, locker systems, and wall panelling across India and the UAE.
 
@@ -96,6 +97,45 @@ const INITIAL_MESSAGE: Message = {
   text: "Good day. I'm Aria, your dedicated Sales Consultant at Pacific Products & Solutions. Whether you're specifying cubicle systems, cladding, or locker solutions for a commercial project — I'm here to help. What can I assist you with today?"
 };
 
+function ThinkingBlock({ reasoning }: { reasoning: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  return (
+    <div className="w-full pl-8 pr-2 mb-2">
+      <div className="border border-gray-200/50 dark:border-white/5 rounded-xl bg-gray-50/50 dark:bg-[#030213]/20 overflow-hidden">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full flex items-center justify-between px-3 py-2 text-[11px] font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus:outline-none"
+        >
+          <div className="flex items-center gap-1.5">
+            <Brain className="w-3.5 h-3.5 text-purple-400 dark:text-purple-300 animate-pulse" />
+            <span>Aria's Thought Process</span>
+          </div>
+          {isExpanded ? (
+            <ChevronUp className="w-3.5 h-3.5" />
+          ) : (
+            <ChevronDown className="w-3.5 h-3.5" />
+          )}
+        </button>
+        <AnimatePresence initial={false}>
+          {isExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="px-3 pb-3 pt-1 text-[11px] leading-relaxed text-gray-400 dark:text-gray-500 whitespace-pre-line border-t border-gray-200/30 dark:border-white/5 font-mono max-h-[150px] overflow-y-auto custom-scrollbar italic">
+                {reasoning}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
 // We will use standard fetch to communicate with Gemini REST API directly
 
 export function Chatbot() {
@@ -167,43 +207,45 @@ export function Chatbot() {
     }
   };
 
-  const callGeminiAPI = async (chatHistory: Message[], newText: string) => {
-    if (!GEMINI_API_KEY) throw new Error("API Key not found");
+  const callNvidiaAPI = async (chatHistory: Message[], newText: string) => {
+    if (!NVIDIA_API_KEY) throw new Error("API Key not found");
 
-    // Format chat history for Gemini REST API
-    const contents: any[] = [];
+    // Format chat history for NVIDIA REST API (OpenAI-compatible)
+    const messagesPayload: any[] = [
+      { role: "system", content: SYSTEM_PROMPT }
+    ];
     
     chatHistory.forEach(m => {
       if (m.id === "msg-init") return; // Skip initial greetings to start with a user role
       if (!m.text) return;
-      contents.push({
-        role: m.sender === "bot" ? "model" : "user",
-        parts: [{ text: m.text }]
+      messagesPayload.push({
+        role: m.sender === "bot" ? "assistant" : "user",
+        content: m.text
       });
     });
 
     // Add current user message
-    contents.push({
+    messagesPayload.push({
       role: "user",
-      parts: [{ text: newText }]
+      content: newText
     });
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      "/api/nvidia/v1/chat/completions",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${NVIDIA_API_KEY}`
         },
         body: JSON.stringify({
-          contents,
-          systemInstruction: {
-            parts: [{ text: SYSTEM_PROMPT }]
-          },
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1000
-          }
+          model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+          messages: messagesPayload,
+          temperature: 0.6,
+          top_p: 0.95,
+          max_tokens: 65536,
+          reasoning_budget: 16384,
+          chat_template_kwargs: { enable_thinking: true }
         })
       }
     );
@@ -214,11 +256,12 @@ export function Chatbot() {
     }
 
     const data = await response.json();
-    const botText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const botText = data.choices?.[0]?.message?.content;
+    const botReasoning = data.choices?.[0]?.message?.reasoning_content;
     if (!botText) {
-      throw new Error("No response text returned from Gemini API");
+      throw new Error("No response content returned from NVIDIA API");
     }
-    return botText;
+    return { text: botText, reasoning: botReasoning };
   };
 
   const handleSendText = async () => {
@@ -231,7 +274,7 @@ export function Chatbot() {
     const newUserMsg: Message = { id: `msg-${Date.now()}`, sender: "user", text: userText };
     setMessages(prev => [...prev, newUserMsg]);
 
-    if (!GEMINI_API_KEY) {
+    if (!NVIDIA_API_KEY) {
       setMessages(prev => [...prev, { 
         id: `msg-err-${Date.now()}`, 
         sender: "bot", 
@@ -243,8 +286,8 @@ export function Chatbot() {
     setIsTyping(true);
 
     try {
-      // Send message to Gemini via Direct REST API
-      const botResponse = await callGeminiAPI(messages, userText);
+      // Send message to NVIDIA API via Local/Vercel proxy
+      const { text: botResponse, reasoning: botReasoning } = await callNvidiaAPI(messages, userText);
       let cleanResponse = botResponse;
       let showServices = false;
       let showSolutions = false;
@@ -276,6 +319,7 @@ export function Chatbot() {
         id: `msg-bot-${Date.now()}`, 
         sender: "bot", 
         text: cleanResponse,
+        reasoning: botReasoning,
         showServices,
         showSolutions,
         showProducts
@@ -337,6 +381,9 @@ export function Chatbot() {
             <div className="flex-1 p-4 overflow-y-auto bg-gray-50/50 dark:bg-[#030213]/50 space-y-5 custom-scrollbar">
               {messages.map((msg) => (
                 <div key={msg.id} className="space-y-3">
+                  {msg.sender === "bot" && msg.reasoning && (
+                    <ThinkingBlock reasoning={msg.reasoning} />
+                  )}
                   <div className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                     {msg.sender === "bot" && (
                        <div className="w-6 h-6 rounded-full bg-[#030213] flex-shrink-0 flex items-center justify-center mr-2 self-end mb-1">
