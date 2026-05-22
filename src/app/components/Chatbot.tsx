@@ -145,6 +145,7 @@ export function Chatbot() {
         model: "gemini-2.5-flash",
         config: {
           systemInstruction: SYSTEM_PROMPT,
+          thinkingConfig: { thinkingBudget: 0 },
         },
       });
     } catch (err) {
