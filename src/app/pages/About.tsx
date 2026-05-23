@@ -156,53 +156,20 @@ export default function AboutPage() {
       />
 
       {/* ═══ HERO ═══ */}
-      <section ref={heroRef} className="relative w-full aspect-[16/5] min-h-[340px] max-h-[600px] overflow-hidden">
-        <motion.div style={{ y: heroY }} className="absolute inset-0">
-          <ImageWithFallback
-            src={banner?.image_url || DEFAULT_BG}
-            alt="About banner"
-            className="absolute inset-0 w-full h-full object-cover scale-105"
-            priority
-          />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
-        <HeroParticles />
-        <motion.div style={{ opacity: heroOpacity }} className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-          {/* <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full mb-5"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Since 2011 — Engineering Excellence
-          </motion.div> */}
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-4xl"
-          >
-            {banner?.title || (<>Building Better Commercial Spaces with <span className="text-[#B5F823]">Quality Solutions</span></>)}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            className="text-base sm:text-lg text-gray-200 max-w-2xl font-medium"
-          >
-            {banner?.subtitle || "Premium Restroom Cubicles, Cladding, and Interior Infrastructure Solutions"}
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-sm sm:text-base text-gray-300 max-w-3xl mt-4"
-          >
-            At Pacific Products & Solutions, we offer practical and high-quality infrastructure solutions for commercial, institutional, and public spaces. We aim to create spaces that are durable, hygienic, visually appealing, and built to last for years. From restroom cubicles and shower partitions to exterior cladding, locker systems, and custom hardware, we collaborate with businesses seeking dependable and long-lasting solutions.
-          </motion.p>
-        </motion.div>
-      </section>
+      {banner?.image_url && (
+        <section ref={heroRef} className="relative w-full aspect-[16/5] min-h-[340px] max-h-[600px] overflow-hidden">
+          <motion.div style={{ y: heroY }} className="absolute inset-0">
+            <ImageWithFallback
+              src={banner.image_url}
+              alt="About banner"
+              className="absolute inset-0 w-full h-full object-cover scale-105"
+              priority
+            />
+          </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+          <HeroParticles />
+        </section>
+      )}
 
       {/* ═══ STATS ═══ */}
       <section className="py-16 bg-transparent dark:bg-[#030213]">

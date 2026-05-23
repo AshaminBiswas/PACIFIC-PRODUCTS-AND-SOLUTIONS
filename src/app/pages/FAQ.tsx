@@ -188,48 +188,17 @@ export default function FAQPage() {
         jsonLd={faqSchema(faqs)}
       />
       {/* ── Hero Banner ── */}
-      <section className="relative w-full h-[36vh] min-h-[240px] overflow-hidden">
-        <ImageWithFallback
-          src={banner?.image_url || DEFAULT_BG}
-          alt="FAQ banner"
-          className="absolute inset-0 w-full h-full object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/70" />
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-[#7FB706]/20 border border-[#7FB706]/40 text-[#B5F823] text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full mb-4 backdrop-blur-sm"
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            Help Center
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-3"
-          >
-            {banner?.title || (
-              <>
-                Frequently Asked{" "}
-                <span className="text-[#B5F823]">Questions</span>
-              </>
-            )}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg text-gray-200 max-w-xl"
-          >
-            {banner?.subtitle ||
-              "Everything you need to know about our products, installation, and support."}
-          </motion.p>
-        </div>
-      </section>
+      {banner?.image_url && (
+        <section className="relative w-full h-[36vh] min-h-[240px] overflow-hidden">
+          <ImageWithFallback
+            src={banner.image_url}
+            alt="FAQ banner"
+            className="absolute inset-0 w-full h-full object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/70" />
+        </section>
+      )}
 
       {/* ── Search & Filter ── */}
       <section className="py-10 sm:py-14 bg-white dark:bg-[#030213] transition-colors">

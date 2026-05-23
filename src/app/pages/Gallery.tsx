@@ -64,49 +64,18 @@ export default function GalleryPage() {
         canonical="/gallery"
       />
       {/* Hero Banner */}
-      <section className="relative w-full h-[45vh] min-h-[300px] overflow-hidden">
-        <ImageWithFallback
-          src={banner?.image_url || DEFAULT_BG}
-          alt="Gallery banner"
-          className="absolute inset-0 w-full h-full object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-[#f8f9fa] dark:to-[#030213] transition-colors" />
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay" />
-        
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="w-16 h-16 bg-[#7FB706]/20 border border-[#7FB706]/40 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md shadow-lg shadow-[#7FB706]/20"
-          >
-            <ImageIcon className="w-8 h-8 text-[#B5F823]" />
-          </motion.div>
-          
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight"
-            style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}
-          >
-            {banner?.title ? (
-              banner.title
-            ) : (
-              <>Our <span className="text-[#B5F823]">Portfolio</span></>
-            )}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg sm:text-xl text-gray-200 max-w-2xl font-medium"
-          >
-            {banner?.subtitle || "Explore our detailed gallery of precision-engineered installations across commercial, industrial, and institutional sectors."}
-          </motion.p>
-        </div>
-      </section>
+      {banner?.image_url && (
+        <section className="relative w-full h-[45vh] min-h-[300px] overflow-hidden">
+          <ImageWithFallback
+            src={banner.image_url}
+            alt="Gallery banner"
+            className="absolute inset-0 w-full h-full object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-[#f8f9fa] dark:to-[#030213] transition-colors" />
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay" />
+        </section>
+      )}
 
       {/* Filter Section */}
       <section className="sticky top-20 z-30 py-6 bg-white/80 dark:bg-[#0a0a1a]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-colors shadow-sm">

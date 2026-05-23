@@ -32,39 +32,17 @@ export default function ProductsPage() {
         canonical="/products"
       />
       {/* Hero Banner */}
-      <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
-        <ImageWithFallback
-          src={banner?.image_url || DEFAULT_BG}
-          alt="Services banner"
-          className="absolute inset-0 w-full h-full object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4"
-          >
-            {categoryFilter ? (
-              <span className="text-[#B5F823]">{categoryFilter}</span>
-            ) : banner?.title ? (
-              banner.title
-            ) : (
-              <>Our <span className="text-[#B5F823]">Services</span></>
-            )}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="text-lg sm:text-xl text-gray-200 max-w-2xl"
-          >
-            {banner?.subtitle || "Explore our comprehensive range of premium interior solutions engineered for excellence and designed for modern spaces"}
-          </motion.p>
-        </div>
-      </section>
+      {banner?.image_url && (
+        <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
+          <ImageWithFallback
+            src={banner.image_url}
+            alt="Services banner"
+            className="absolute inset-0 w-full h-full object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+        </section>
+      )}
 
       {/* Products Grid */}
       <section className="py-16 sm:py-24 bg-transparent dark:bg-[#030213] transition-colors">
