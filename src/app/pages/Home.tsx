@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
 import {
   ArrowRight,
   Shield,
@@ -12,6 +12,12 @@ import {
   ShoppingBag,
   Plane,
   Home,
+  Search,
+  Sparkles,
+  X,
+  Loader2,
+  Package,
+  Layers,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/Button";
@@ -22,7 +28,9 @@ import { ProductCard } from "../components/ProductCard";
 import { TestimonialCarousel } from "../components/TestimonialCarousel";
 
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import type { Product, Solution } from "../../lib/database.types";
 
 // ─────────────────────────────────────────────────────────────
 
@@ -94,6 +102,23 @@ function HeroSlideshow({ images, onSlideChange }: HeroSlideshowProps) {
 }
 
 
+// ── AI Search types ───────────────────────────────────────────
+type SearchResultItem = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  image_url?: string;
+  type: "product" | "solution";
+  url: string;
+};
+
+type AIRecommendation = {
+  title: string;
+  reason: string;
+  url: string;
+};
+
+const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY as string;
 
 // ── Hero Section (extracted as its own component) ─────────────
 
@@ -105,10 +130,23 @@ function HeroSection() {
   const { data: heroImages } = useHeroImages();
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allSolutions, setAllSolutions] = useState<Solution[]>([]);
+  const [filteredResults, setFilteredResults] = useState<SearchResultItem[]>([]);
+  const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation[]>([]);
+  const [isAISearching, setIsAISearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const aiDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const activeDescription =
     heroImages.length > 0 && heroImages[currentSlide]?.description
       ? heroImages[currentSlide].description
-      : "Premium restroom cubicles, cladding, and paneling solutions for architects, builders, and corporate clients worldwide";
+      : "";
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -118,12 +156,150 @@ function HeroSection() {
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
+  // ── Fetch products & solutions once ──
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    Promise.all([
+      supabase.from("products").select("id,title,subtitle,image_url,slug,category").eq("published", true).order("sort_order"),
+      supabase.from("solutions").select("id,title,subtitle,image_url,slug").eq("published", true).order("sort_order"),
+    ]).then(([p, s]) => {
+      if (p.data) setAllProducts(p.data as Product[]);
+      if (s.data) setAllSolutions(s.data as Solution[]);
+    });
+  }, []);
+
+  // ── Click-outside to close dropdown ──
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ── AI recommendations ──
+  const fetchAIRecommendations = useCallback(async (query: string) => {
+    if (!NVIDIA_API_KEY) return;
+    setIsAISearching(true);
+    try {
+      const productList = allProducts.map((p) => {
+        const catSlug = p.category
+          ? p.category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+          : "";
+        return `- ${p.title} (${p.category ?? "General"}) | URL: ${catSlug ? `/products/${catSlug}/${p.slug}` : `/products/${p.slug}`}`;
+      }).join("\n");
+      const solutionList = allSolutions.map((s) => `- ${s.title} | URL: /solutions/${s.slug}`).join("\n");
+
+      const prompt = `You are a product search assistant for Pacific Products & Solutions, a B2B company selling restroom cubicles, cladding, locker systems, and interior solutions.\n\nUser searched for: "${query}"\n\nAvailable Products:\n${productList || "(none)"}\n\nAvailable Solutions:\n${solutionList || "(none)"}\n\nReturn 1-3 most relevant recommendations as a JSON array (raw JSON only, no markdown):\n[{"title": "Name", "reason": "Brief reason max 8 words", "url": "/exact/url"}]\n\nReturn [] if nothing matches. Only use URLs from the lists above.`;
+
+      const res = await fetch("/api/nvidia/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${NVIDIA_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.3,
+          max_tokens: 256,
+          chat_template_kwargs: { enable_thinking: false },
+        }),
+      });
+
+      if (!res.ok) return;
+      const data = await res.json();
+      const text: string = data.choices?.[0]?.message?.content ?? "[]";
+      const jsonMatch = text.match(/\[.*\]/s);
+      if (jsonMatch) {
+        const recs: AIRecommendation[] = JSON.parse(jsonMatch[0]);
+        setAiRecommendations(recs.slice(0, 3));
+      }
+    } catch {
+      // silent fail
+    } finally {
+      setIsAISearching(false);
+    }
+  }, [allProducts, allSolutions]);
+
+  // ── Local filter on every keystroke ──
+  useEffect(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      setFilteredResults([]);
+      setAiRecommendations([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const productResults: SearchResultItem[] = allProducts
+      .filter((p) =>
+        p.title.toLowerCase().includes(q) ||
+        (p.subtitle ?? "").toLowerCase().includes(q) ||
+        (p.category ?? "").toLowerCase().includes(q)
+      )
+      .slice(0, 5)
+      .map((p) => {
+        const catSlug = p.category
+          ? p.category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+          : "";
+        return {
+          id: p.id,
+          title: p.title,
+          subtitle: p.subtitle ?? p.category,
+          image_url: p.image_url,
+          type: "product" as const,
+          url: catSlug ? `/products/${catSlug}/${p.slug}` : `/products/${p.slug}`,
+        };
+      });
+
+    const solutionResults: SearchResultItem[] = allSolutions
+      .filter((s) =>
+        s.title.toLowerCase().includes(q) ||
+        (s.subtitle ?? "").toLowerCase().includes(q)
+      )
+      .slice(0, 3)
+      .map((s) => ({
+        id: s.id,
+        title: s.title,
+        subtitle: s.subtitle,
+        image_url: s.image_url,
+        type: "solution" as const,
+        url: `/solutions/${s.slug}`,
+      }));
+
+    setFilteredResults([...productResults, ...solutionResults]);
+    setShowDropdown(true);
+
+    // Debounce AI request
+    if (aiDebounceRef.current) clearTimeout(aiDebounceRef.current);
+    if (q.length >= 3) {
+      aiDebounceRef.current = setTimeout(() => fetchAIRecommendations(q), 700);
+    }
+  }, [searchQuery, allProducts, allSolutions, fetchAIRecommendations]);
+
+  const handleResultClick = (url: string) => {
+    setShowDropdown(false);
+    setSearchQuery("");
+    navigate(url);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowDropdown(false);
+    }
+  };
+
   return (
     <section
       ref={heroRef}
       className="relative min-h-screen flex items-end justify-center overflow-hidden pt-0 sm:pt-16 lg:pt-20"
     >
-      {/* Hero Background: slideshow if images exist, else animated gradient */}
+      {/* Hero Background */}
       {heroImages.length > 0 ? (
         <HeroSlideshow
           images={heroImages.map((img) => ({ url: img.url, description: img.description }))}
@@ -166,25 +342,12 @@ function HeroSection() {
       {/* Main content */}
       <motion.div
         style={{ opacity }}
-        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center pb-[20vh]"
+        className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 text-center pb-[18vh]"
       >
-        {/* Badge
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-          className="inline-flex items-center gap-2 bg-[#7FB706]/10 border border-[#7FB706]/25 text-[#4a7002] text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full mb-6 backdrop-blur-sm"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#7FB706] animate-pulse" />
-          Trusted by 250+ clients worldwide
-        </motion.div> */}
-
-
-
-        {/* Sub-headline — shows current slide description or static fallback */}
+        {/* Description */}
         <motion.p
           key={currentSlide}
-          className="text-lg sm:text-xl md:text-2xl text-white/95 mb-10 sm:mb-12 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed font-medium"
+          className="text-lg sm:text-xl md:text-2xl text-white/95 mb-8 sm:mb-10 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed font-medium"
           style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9), 0 2px 20px rgba(0,0,0,0.7)" }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -192,6 +355,230 @@ function HeroSection() {
         >
           {activeDescription}
         </motion.p>
+
+        {/* ── AI Search Bar ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="mb-8 sm:mb-10 max-w-2xl mx-auto"
+          ref={searchRef}
+        >
+          <form onSubmit={handleSearchSubmit} className="relative">
+            {/* Input wrapper */}
+            <div
+              className="relative flex items-center rounded-2xl transition-all duration-300"
+              style={{
+                boxShadow: searchFocused
+                  ? "0 0 0 2px #7FB706, 0 8px 40px rgba(127,183,6,0.28)"
+                  : "0 4px 32px rgba(0,0,0,0.45)",
+              }}
+            >
+              {/* Glass backdrop */}
+              <div className="absolute inset-0 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 pointer-events-none" />
+
+              {/* Search icon */}
+              <div className="relative z-10 pl-4 sm:pl-5 text-white/60 flex-shrink-0">
+                <Search className="w-5 h-5" />
+              </div>
+
+              {/* Input */}
+              <input
+                ref={inputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => { setSearchFocused(true); if (searchQuery.trim()) setShowDropdown(true); }}
+                onBlur={() => setSearchFocused(false)}
+                placeholder="Search products, solutions, materials..."
+                className="relative z-10 flex-1 bg-transparent text-white placeholder-white/45 text-sm sm:text-base px-3 sm:px-4 py-4 outline-none"
+              />
+
+              {/* Clear */}
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => { setSearchQuery(""); setShowDropdown(false); inputRef.current?.focus(); }}
+                  className="relative z-10 p-1.5 mr-1 text-white/40 hover:text-white/80 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+
+              {/* AI badge */}
+              <div className="relative z-10 flex items-center gap-1.5 mr-2 px-2.5 py-1.5 rounded-lg bg-[#7FB706]/20 border border-[#7FB706]/30 flex-shrink-0">
+                {isAISearching
+                  ? <Loader2 className="w-3.5 h-3.5 text-[#B5F823] animate-spin" />
+                  : <Sparkles className="w-3.5 h-3.5 text-[#B5F823]" />}
+                <span className="text-[11px] font-semibold text-[#B5F823] hidden sm:block">
+                  {isAISearching ? "Thinking…" : "AI"}
+                </span>
+              </div>
+
+              {/* Search button */}
+              <button
+                type="submit"
+                className="relative z-10 mr-2 px-4 py-2 rounded-xl bg-[#7FB706] hover:bg-[#6fa005] text-white text-sm font-semibold transition-all duration-200 active:scale-95 whitespace-nowrap hidden sm:block"
+              >
+                Search
+              </button>
+            </div>
+
+            {/* ── Results Dropdown ── */}
+            <AnimatePresence>
+              {showDropdown && (filteredResults.length > 0 || aiRecommendations.length > 0 || isAISearching) && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                  className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden z-50"
+                  style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07)" }}
+                >
+                  <div className="absolute inset-0 bg-[#0d0d1f]/96 backdrop-blur-2xl rounded-2xl" />
+
+                  <div className="relative z-10 max-h-[420px] overflow-y-auto">
+
+                    {/* Instant results */}
+                    {filteredResults.length > 0 && (
+                      <div className="px-3 pt-3 pb-1">
+                        <p className="text-[10px] font-bold text-white/35 uppercase tracking-widest px-2 mb-2">Results</p>
+                        {filteredResults.map((item) => (
+                          <motion.button
+                            key={`${item.type}-${item.id}`}
+                            onClick={() => handleResultClick(item.url)}
+                            whileHover={{ x: 3 }}
+                            className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-colors text-left group"
+                          >
+                            {/* Thumbnail */}
+                            <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-white/5 border border-white/8">
+                              {item.image_url ? (
+                                <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  {item.type === "product"
+                                    ? <Package className="w-4 h-4 text-white/20" />
+                                    : <Layers className="w-4 h-4 text-white/20" />}
+                                </div>
+                              )}
+                            </div>
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-white/90 truncate group-hover:text-[#B5F823] transition-colors">{item.title}</p>
+                              {item.subtitle && (
+                                <p className="text-[11px] text-white/38 truncate mt-0.5">{item.subtitle}</p>
+                              )}
+                            </div>
+                            {/* Badge */}
+                            <span className={`text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full flex-shrink-0 ${
+                              item.type === "product"
+                                ? "bg-[#7FB706]/15 text-[#B5F823]"
+                                : "bg-blue-500/15 text-blue-400"
+                            }`}>
+                              {item.type}
+                            </span>
+                          </motion.button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Divider */}
+                    {filteredResults.length > 0 && (aiRecommendations.length > 0 || isAISearching) && (
+                      <div className="mx-4 border-t border-white/8 my-1" />
+                    )}
+
+                    {/* AI Recommendations */}
+                    {(aiRecommendations.length > 0 || isAISearching) && (
+                      <div className="px-3 pt-2 pb-3">
+                        <div className="flex items-center gap-1.5 px-2 mb-2">
+                          <Sparkles className="w-3 h-3 text-[#B5F823]" />
+                          <p className="text-[10px] font-bold text-[#B5F823] uppercase tracking-widest">AI Picks</p>
+                          {isAISearching && <Loader2 className="w-3 h-3 text-[#B5F823] animate-spin ml-1" />}
+                        </div>
+
+                        {isAISearching && aiRecommendations.length === 0 ? (
+                          <div className="flex items-center gap-2 px-2 py-3">
+                            <div className="flex gap-1">
+                              {[0, 0.15, 0.3].map((d, i) => (
+                                <motion.div
+                                  key={i}
+                                  className="w-1.5 h-1.5 rounded-full bg-[#7FB706]/60"
+                                  animate={{ opacity: [0.4, 1, 0.4] }}
+                                  transition={{ duration: 0.9, repeat: Infinity, delay: d }}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-[11px] text-white/35">Generating AI suggestions…</span>
+                          </div>
+                        ) : (
+                          aiRecommendations.map((rec, i) => (
+                            <motion.button
+                              key={i}
+                              onClick={() => handleResultClick(rec.url)}
+                              whileHover={{ x: 3 }}
+                              className="w-full flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-white/5 transition-colors text-left group"
+                            >
+                              <div className="w-7 h-7 rounded-lg bg-[#7FB706]/15 border border-[#7FB706]/25 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <Sparkles className="w-3.5 h-3.5 text-[#B5F823]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-white/90 group-hover:text-[#B5F823] transition-colors truncate">{rec.title}</p>
+                                <p className="text-[11px] text-white/38 mt-0.5">{rec.reason}</p>
+                              </div>
+                              <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-[#7FB706] transition-colors flex-shrink-0 mt-1" />
+                            </motion.button>
+                          ))
+                        )}
+                      </div>
+                    )}
+
+                    {/* Empty state */}
+                    {filteredResults.length === 0 && !isAISearching && aiRecommendations.length === 0 && (
+                      <div className="px-5 py-6 text-center">
+                        <Search className="w-8 h-8 text-white/12 mx-auto mb-2" />
+                        <p className="text-sm text-white/38">No results for <span className="text-white/55 font-medium">"{searchQuery}"</span></p>
+                        <button
+                          onClick={() => navigate("/products")}
+                          className="mt-3 text-[12px] text-[#7FB706] hover:text-[#B5F823] transition-colors font-medium"
+                        >
+                          Browse all products →
+                        </button>
+                      </div>
+                    )}
+
+                    {/* View all */}
+                    {filteredResults.length > 0 && (
+                      <button
+                        onClick={() => { navigate(`/products?q=${encodeURIComponent(searchQuery)}`); setShowDropdown(false); }}
+                        className="w-full text-center py-3 text-[11px] font-semibold text-[#7FB706] hover:text-[#B5F823] border-t border-white/8 transition-colors"
+                      >
+                        See all results for "{searchQuery}" →
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </form>
+
+          {/* Quick suggestion pills */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="flex flex-wrap justify-center gap-2 mt-3"
+          >
+            {["Restroom Cubicles", "Exterior Cladding", "Locker Systems", "Shower Cubicles"].map((tag) => (
+              <button
+                key={tag}
+                onClick={() => { setSearchQuery(tag); inputRef.current?.focus(); }}
+                className="text-[11px] text-white/50 hover:text-white/85 border border-white/15 hover:border-white/35 px-3 py-1 rounded-full transition-all duration-200 backdrop-blur-sm hover:bg-white/5"
+              >
+                {tag}
+              </button>
+            ))}
+          </motion.div>
+        </motion.div>
 
         {/* CTA buttons */}
         <motion.div
@@ -248,16 +635,15 @@ function HeroSection() {
           </motion.div>
         </motion.div>
 
-
-
       </motion.div>
-
 
     </section>
   );
 }
 
+
 // ── Page ──────────────────────────────────────────────────────
+
 
 import { useSolutions, useHeroImages, useCoreServices } from "../../lib/hooks";
 import { DynamicIcon } from "../components/DynamicIcon";
