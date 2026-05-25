@@ -362,6 +362,7 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
           className="mb-8 sm:mb-10 max-w-2xl mx-auto"
+          style={{ marginTop: "-300px" }}
           ref={searchRef}
         >
           <form onSubmit={handleSearchSubmit} className="relative">
@@ -583,6 +584,7 @@ function HeroSection() {
         {/* CTA buttons */}
         <motion.div
           className="flex flex-row gap-1.5 sm:gap-4 justify-center items-center mb-6 sm:mb-16 lg:mb-2 w-full px-2 sm:px-0"
+          style={{ marginTop: "100px" }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.5 }}

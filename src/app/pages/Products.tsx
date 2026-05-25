@@ -5,6 +5,7 @@ import { useProducts, usePageBanner } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { SEO } from "../components/SEO";
 import { DEFAULT_KEYWORDS } from "../../lib/seo-data";
+import { PageHero } from "../components/PageHero";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -32,17 +33,13 @@ export default function ProductsPage() {
         canonical="/products"
       />
       {/* Hero Banner */}
-      {banner?.image_url && (
-        <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
-          <ImageWithFallback
-            src={banner.image_url}
-            alt="Services banner"
-            className="absolute inset-0 w-full h-full object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
-        </section>
-      )}
+      <PageHero
+        title="Our Services"
+        accentWord="Services"
+        subtitle="Explore our premium range of restroom cubicles, exterior cladding, locker systems, wall paneling, and custom hardware solutions for commercial spaces."
+        breadcrumb="Services"
+        backgroundImage={banner?.image_url}
+      />
 
       {/* Products Grid */}
       <section className="py-16 sm:py-24 bg-transparent dark:bg-[#030213] transition-colors">

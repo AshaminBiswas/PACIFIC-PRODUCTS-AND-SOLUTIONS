@@ -9,6 +9,7 @@ import {
 import { AnimatedCounter } from "../components/AnimatedCounter";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { SectorsGrid } from "../components/AboutSectors";
+import { PageHero } from "../components/PageHero";
 import { usePageBanner } from "../../lib/hooks";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router";
@@ -156,20 +157,13 @@ export default function AboutPage() {
       />
 
       {/* ═══ HERO ═══ */}
-      {banner?.image_url && (
-        <section ref={heroRef} className="relative w-full aspect-[16/5] min-h-[340px] max-h-[600px] overflow-hidden">
-          <motion.div style={{ y: heroY }} className="absolute inset-0">
-            <ImageWithFallback
-              src={banner.image_url}
-              alt="About banner"
-              className="absolute inset-0 w-full h-full object-cover scale-105"
-              priority
-            />
-          </motion.div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
-          <HeroParticles />
-        </section>
-      )}
+      <PageHero
+        title="About Us"
+        accentWord="Us"
+        subtitle="12+ years of excellence in B2B interior contracting — delivering premium restroom cubicles, cladding, locker systems, and interior solutions across India."
+        breadcrumb="About Us"
+        backgroundImage={banner?.image_url}
+      />
 
       {/* ═══ STATS ═══ */}
       <section className="py-16 bg-transparent dark:bg-[#030213]">

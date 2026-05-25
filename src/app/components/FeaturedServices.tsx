@@ -11,7 +11,7 @@ export function FeaturedServices() {
   const featuredProducts = allProducts?.filter(p => p.is_featured).slice(0, 3) || [];
 
   return (
-    <section className="pt-0 pb-12 sm:pb-16 md:pb-20 lg:pb-24 bg-transparent dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
+    <section className="pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-12 sm:pb-16 md:pb-20 lg:pb-24 bg-transparent dark:bg-[#030213] text-gray-900 dark:text-white transition-colors">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

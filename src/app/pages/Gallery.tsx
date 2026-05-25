@@ -5,6 +5,7 @@ import { useGallery, usePageBanner } from "../../lib/hooks";
 import { X, ZoomIn, ChevronLeft, ChevronRight, Image as ImageIcon, LayoutGrid } from "lucide-react";
 import type { GalleryImage } from "../../lib/database.types";
 import { SEO } from "../components/SEO";
+import { PageHero } from "../components/PageHero";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -64,18 +65,13 @@ export default function GalleryPage() {
         canonical="/gallery"
       />
       {/* Hero Banner */}
-      {banner?.image_url && (
-        <section className="relative w-full h-[45vh] min-h-[300px] overflow-hidden">
-          <ImageWithFallback
-            src={banner.image_url}
-            alt="Gallery banner"
-            className="absolute inset-0 w-full h-full object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-[#f8f9fa] dark:to-[#030213] transition-colors" />
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay" />
-        </section>
-      )}
+      <PageHero
+        title="Project Gallery"
+        accentWord="Gallery"
+        subtitle="Browse our portfolio of completed commercial projects — restroom cubicles, exterior cladding, locker installations, and interior solutions across India."
+        breadcrumb="Gallery"
+        backgroundImage={banner?.image_url}
+      />
 
       {/* Filter Section */}
       <section className="sticky top-20 z-30 py-6 bg-white/80 dark:bg-[#0a0a1a]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-colors shadow-sm">

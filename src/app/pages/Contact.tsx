@@ -6,6 +6,7 @@ import { usePageBanner } from "../../lib/hooks";
 import { Link } from "react-router";
 import { SEO } from "../components/SEO";
 import { localBusinessSchema } from "../../lib/seo-data";
+import { PageHero } from "../components/PageHero";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80";
 
@@ -59,17 +60,13 @@ export default function ContactPage() {
         jsonLd={localBusinessSchema()}
       />
       {/* Hero Banner */}
-      {banner?.image_url && (
-        <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
-          <ImageWithFallback
-            src={banner.image_url}
-            alt="Contact banner"
-            className="absolute inset-0 w-full h-full object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
-        </section>
-      )}
+      <PageHero
+        title="Contact Us"
+        accentWord="Us"
+        subtitle="Get in touch with our team for quotes, project consultations, or any inquiries. We're ready to help you create better commercial spaces."
+        breadcrumb="Contact Us"
+        backgroundImage={banner?.image_url}
+      />
 
       {/* Contact Form & Info */}
       <section className="py-20 sm:py-28 bg-[#030213] transition-colors">

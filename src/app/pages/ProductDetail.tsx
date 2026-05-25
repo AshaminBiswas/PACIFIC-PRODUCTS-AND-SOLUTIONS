@@ -12,6 +12,7 @@ import { CatalogCard, CatalogViewerModal } from "../components/CatalogViewer";
 import { useState, useEffect } from "react";
 import { SEO } from "../components/SEO";
 import { productSchema, breadcrumbSchema } from "../../lib/seo-data";
+import { RelatedProducts } from "../components/RelatedProducts";
 
 interface ProductSpecification {
   label: string;
@@ -336,6 +337,12 @@ export default function ProductDetailPage() {
       {showCatalogViewer && catalogs.length > 0 && (
         <CatalogViewerModal catalog={catalogs[0]} onClose={() => setShowCatalogViewer(false)} />
       )}
+
+      {/* ═══════════════════ RELATED PRODUCTS ═══════════════════ */}
+      <RelatedProducts
+        currentProductId={product.id}
+        currentCategory={product.category}
+      />
 
       {/* ═══════════════════ CTA ═══════════════════ */}
       <section className="relative py-16 sm:py-20 lg:py-24 bg-[#030213] text-white overflow-hidden">

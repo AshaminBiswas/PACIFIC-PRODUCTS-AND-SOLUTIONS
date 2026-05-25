@@ -5,6 +5,7 @@ import { useSolutions, usePageBanner } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { SEO } from "../components/SEO";
 import { DEFAULT_KEYWORDS } from "../../lib/seo-data";
+import { PageHero } from "../components/PageHero";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
 
@@ -27,17 +28,13 @@ export default function SolutionsPage() {
         canonical="/solutions"
       />
       {/* Hero Banner */}
-      {banner?.image_url && (
-        <section className="relative w-full aspect-[16/5] min-h-[260px] max-h-[600px] overflow-hidden">
-          <ImageWithFallback
-            src={banner.image_url}
-            alt="Solutions banner"
-            className="absolute inset-0 w-full h-full object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
-        </section>
-      )}
+      <PageHero
+        title="Industry Solutions"
+        accentWord="Solutions"
+        subtitle="Tailored interior solutions for corporates, malls, airports, hospitals, schools, and commercial infrastructure projects across India."
+        breadcrumb="Solutions"
+        backgroundImage={banner?.image_url}
+      />
 
       {/* Solutions Grid */}
       <section className="py-16 sm:py-24 bg-[#030213] text-white">
