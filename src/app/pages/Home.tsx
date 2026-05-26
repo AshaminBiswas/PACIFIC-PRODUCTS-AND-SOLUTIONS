@@ -30,6 +30,7 @@ import { TestimonialCarousel } from "../components/TestimonialCarousel";
 
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useRef, useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import type { Product, Solution } from "../../lib/database.types";
 
@@ -141,9 +142,31 @@ function HeroSection() {
   const [isAISearching, setIsAISearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
   const searchRef = useRef<HTMLDivElement>(null);
   const aiDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Update dropdown position relative to form (for portal rendering)
+  const updateDropdownPos = useCallback(() => {
+    if (formRef.current) {
+      const rect = formRef.current.getBoundingClientRect();
+      setDropdownPos({ top: rect.bottom + 8, left: rect.left, width: rect.width });
+    }
+  }, []);
+
+  // Keep dropdown position in sync with scroll and resize
+  useEffect(() => {
+    if (!showDropdown) return;
+    updateDropdownPos();
+    window.addEventListener("scroll", updateDropdownPos, true);
+    window.addEventListener("resize", updateDropdownPos);
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPos, true);
+      window.removeEventListener("resize", updateDropdownPos);
+    };
+  }, [showDropdown, updateDropdownPos]);
 
   const activeDescription =
     heroImages.length > 0 && heroImages[currentSlide]?.description
@@ -368,7 +391,7 @@ function HeroSection() {
           style={{ marginTop: "-300px" }}
           ref={searchRef}
         >
-          <form onSubmit={handleSearchSubmit} className="relative">
+          <form ref={formRef} onSubmit={handleSearchSubmit} className="relative">
             {/* Input wrapper */}
             <div
               className="relative flex items-center rounded-2xl transition-all duration-300"
@@ -428,20 +451,34 @@ function HeroSection() {
               </button>
             </div>
 
-            {/* ── Results Dropdown ── */}
+          </form>
+
+          {/* ── Results Dropdown — rendered via portal into document.body ──
+               This escapes the section's overflow:hidden and the parent
+               motion.div's animated opacity stacking context. */}
+          {createPortal(
             <AnimatePresence>
               {showDropdown && (filteredResults.length > 0 || aiRecommendations.length > 0 || isAISearching) && (
                 <motion.div
+                  key="search-results-dropdown"
                   initial={{ opacity: 0, y: -8, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.98 }}
                   transition={{ duration: 0.18, ease: "easeOut" }}
-                  className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden z-[9999]"
-                  style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07)" }}
+                  style={{
+                    position: "fixed",
+                    top: dropdownPos.top,
+                    left: dropdownPos.left,
+                    width: dropdownPos.width,
+                    zIndex: 99999,
+                    borderRadius: "1rem",
+                    overflow: "hidden",
+                    boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07)",
+                  }}
                 >
-                  <div className="absolute inset-0 bg-[#0d0d1f]/96 backdrop-blur-2xl rounded-2xl" />
+                  <div style={{ position: "absolute", inset: 0, background: "rgba(13,13,31,0.96)", backdropFilter: "blur(24px)", borderRadius: "1rem" }} />
 
-                  <div className="relative z-10 max-h-[420px] overflow-y-auto">
+                  <div style={{ position: "relative", zIndex: 10, maxHeight: "420px", overflowY: "auto" }}>
 
                     {/* Instant results */}
                     {filteredResults.length > 0 && (
@@ -574,8 +611,9 @@ function HeroSection() {
                   </div>
                 </motion.div>
               )}
-            </AnimatePresence>
-          </form>
+            </AnimatePresence>,
+            document.body
+          )}
 
           {/* Quick suggestion pills */}
           <motion.div
