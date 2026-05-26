@@ -388,7 +388,7 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
           className="mb-8 sm:mb-10 max-w-2xl mx-auto"
-          style={{ marginTop: "-300px" }}
+          style={{ marginTop: "-400px" }}
           ref={searchRef}
         >
           <form ref={formRef} onSubmit={handleSearchSubmit} className="relative">

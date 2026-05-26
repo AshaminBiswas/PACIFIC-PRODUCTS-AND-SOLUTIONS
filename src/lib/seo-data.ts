@@ -1,7 +1,7 @@
 // ── SEO Constants & Structured Data Factories ─────────────────────────────
 
 export const SITE_NAME = "Pacific Products & Solutions";
-export const SITE_URL = "https://pacificproduct.in";
+export const SITE_URL = "https://pacific-products-and-solutions-nu.vercel.app";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const DEFAULT_DESCRIPTION =
   "India's leading B2B interior contracting company specializing in premium restroom cubicles, exterior cladding, wall paneling, locker solutions, and custom hardware for commercial spaces.";
