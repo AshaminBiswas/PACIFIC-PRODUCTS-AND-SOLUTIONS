@@ -87,11 +87,16 @@ export default function ProductDetailPage() {
     );
   }
 
+  const isPremiumShowerCubicles = lookupSlug === "premium-shower-cubicles-supplier-in-india";
+  const seoDescription = isPremiumShowerCubicles
+    ? "Premium shower cubicles manufacturer in India offering luxury modular shower cubicle solutions for hotels, gyms, offices, hospitals, and commercial spaces. Waterproof, durable, hygienic, and modern shower partition systems by Pacific Product and Solution."
+    : (product.description?.slice(0, 155) || `Premium ${product.title} solutions by Pacific Products & Solutions`);
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#030213] transition-colors">
       <SEO
         title={product.title}
-        description={product.description?.slice(0, 155) || `Premium ${product.title} solutions by Pacific Products & Solutions`}
+        description={seoDescription}
         canonical={productUrl}
         ogType="product"
         ogImage={product.image_url}

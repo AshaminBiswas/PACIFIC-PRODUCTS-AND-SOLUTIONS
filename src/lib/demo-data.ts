@@ -223,6 +223,38 @@ export const demoProducts: Product[] = [
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
+  {
+    id: "demo-8",
+    slug: "premium-shower-cubicles-supplier-in-india",
+    title: "Premium Shower Cubicles Supplier in India",
+    subtitle: "Luxury Modular Shower Cubicle Solutions",
+    description:
+      "Premium shower cubicles manufacturer in India offering luxury modular shower cubicle solutions for hotels, gyms, offices, hospitals, and commercial spaces. Waterproof, durable, hygienic, and modern shower partition systems by Pacific Product and Solution.",
+    category: "Shower Cubicles",
+    image_url:
+      "https://images.unsplash.com/photo-1635493637999-ed6a733d2334?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    additional_images: [],
+    features: [
+      "Waterproof Compact Laminate Panels",
+      "Hygienic Modular Systems",
+      "Modern Shower Partition Designs",
+      "Corrosion-Resistant Marine-Grade Hardware",
+      "Anti-Bacterial Surface Finish",
+      "Easy Maintenance and Fast Installation",
+    ],
+    specifications: [
+      { label: "Material", value: "Premium Waterproof HPL / Compact Laminate / Toughened Glass" },
+      { label: "Panel Thickness", value: "12mm - 18mm" },
+      { label: "Standard Height", value: "2000mm - 2100mm" },
+      { label: "Warranty", value: "5 Years" },
+    ],
+    applications: ["Hotels", "Gyms", "Corporate Offices", "Hospitals", "Commercial Spaces", "Wellness Centres"],
+    is_featured: true,
+    sort_order: 8,
+    published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
 ];
 
 // ── Solutions ────────────────────────────────────────────────

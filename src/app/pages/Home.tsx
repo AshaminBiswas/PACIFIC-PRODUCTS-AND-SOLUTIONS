@@ -18,6 +18,7 @@ import {
   Loader2,
   Package,
   Layers,
+  ChevronDown,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/Button";
@@ -139,6 +140,7 @@ function HeroSection() {
   const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation[]>([]);
   const [isAISearching, setIsAISearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const aiDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -226,6 +228,7 @@ function HeroSection() {
 
   // ── Local filter on every keystroke ──
   useEffect(() => {
+    setIsExpanded(false); // Reset expansion on new query
     const q = searchQuery.trim().toLowerCase();
     if (!q) {
       setFilteredResults([]);
@@ -240,7 +243,7 @@ function HeroSection() {
         (p.subtitle ?? "").toLowerCase().includes(q) ||
         (p.category ?? "").toLowerCase().includes(q)
       )
-      .slice(0, 5)
+      .slice(0, 15)
       .map((p) => {
         const catSlug = p.category
           ? p.category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
@@ -260,7 +263,7 @@ function HeroSection() {
         s.title.toLowerCase().includes(q) ||
         (s.subtitle ?? "").toLowerCase().includes(q)
       )
-      .slice(0, 3)
+      .slice(0, 10)
       .map((s) => ({
         id: s.id,
         title: s.title,
@@ -433,7 +436,7 @@ function HeroSection() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.98 }}
                   transition={{ duration: 0.18, ease: "easeOut" }}
-                  className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden z-50"
+                  className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden z-[9999]"
                   style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07)" }}
                 >
                   <div className="absolute inset-0 bg-[#0d0d1f]/96 backdrop-blur-2xl rounded-2xl" />
@@ -444,7 +447,7 @@ function HeroSection() {
                     {filteredResults.length > 0 && (
                       <div className="px-3 pt-3 pb-1">
                         <p className="text-[10px] font-bold text-white/35 uppercase tracking-widest px-2 mb-2">Results</p>
-                        {filteredResults.map((item) => (
+                        {(isExpanded ? filteredResults : filteredResults.slice(0, 5)).map((item) => (
                           <motion.button
                             key={`${item.type}-${item.id}`}
                             onClick={() => handleResultClick(item.url)}
@@ -480,6 +483,18 @@ function HeroSection() {
                             </span>
                           </motion.button>
                         ))}
+
+                        {/* Expand Button */}
+                        {filteredResults.length > 5 && !isExpanded && (
+                          <button
+                            type="button"
+                            onClick={() => setIsExpanded(true)}
+                            className="w-[calc(100%-8px)] mx-1 flex items-center justify-center gap-1.5 py-2.5 mt-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-[#7FB706] hover:text-[#B5F823] transition-all duration-200 border border-white/5 hover:border-white/10 active:scale-[0.98]"
+                          >
+                            <ChevronDown className="w-3.5 h-3.5" />
+                            Show More Results ({filteredResults.length - 5} hidden)
+                          </button>
+                        )}
                       </div>
                     )}
 
