@@ -11,8 +11,8 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen pt-20 bg-white dark:bg-[#030213] transition-colors">
       <SEO
-        title="Blog"
-        description="Industry insights, product guides, and expert tips on restroom cubicles, exterior cladding, interior solutions, and commercial infrastructure."
+        title="Blog & Industry Insights | Restroom Cubicles & Commercial Interiors"
+        description="Industry insights, product guides, and expert tips on restroom cubicles, exterior cladding, interior solutions, and commercial infrastructure across India."
         canonical="/blog"
       />
       {/* Hero */}

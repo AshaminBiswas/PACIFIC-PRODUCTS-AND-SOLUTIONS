@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import type { Catalog } from "../../lib/database.types";
 import { FileText, Image as ImageIcon, Download, ExternalLink, X, Search } from "lucide-react";
-import { Helmet } from "react-helmet-async";
+import { SEO } from "../components/SEO";
 
 const DOCUMENT_TYPES = [
   "Brochure",
@@ -73,15 +73,17 @@ export default function Downloads() {
 
   return (
     <div className="bg-white dark:bg-[#05050f] min-h-screen pt-24 pb-20">
-      <Helmet>
-        <title>Downloads | Pacific Products & Solutions</title>
-        <meta name="description" content="Download brochures, catalogs, technical specifications, and installation manuals for our products." />
-      </Helmet>
+      <SEO
+        title="Technical Downloads & Product Catalogs"
+        description="Download product brochures, CAD drawings, technical specifications, and installation manuals for our restroom cubicle, cladding, and locker systems."
+        keywords="restroom cubicle brochure download, HPL cladding technical specification, locker system catalog PDF, cubicle installation manual, Pacific Products downloads"
+        canonical="/download"
+      />
 
       {/* Hero Banner */}
       <div className="bg-gray-50 dark:bg-[#0a0a1a] border-y border-gray-200 dark:border-white/5 py-16 mb-12">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Resource Center</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Technical Downloads &amp; Product Catalogs</h1>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
             Access our complete library of product brochures, technical specifications, CAD drawings, and installation manuals.
           </p>

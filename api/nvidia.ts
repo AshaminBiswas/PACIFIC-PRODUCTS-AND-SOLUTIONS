@@ -1,12 +1,12 @@
 /**
  * Vercel Edge Function — NVIDIA NIM API proxy.
  *
- * Uses the Edge Runtime (standard Web APIs) so no external type packages
- * are required. Vercel auto-detects this via `export const config`.
+ * Uses the Edge Runtime (standard Web APIs). `process.env` is available in
+ * Vercel's Edge Runtime but TypeScript's DOM lib doesn't declare it.
+ * We access it via `globalThis` to avoid requiring @types/node.
  *
  * Why this exists:
- *   VITE_* env vars are bundled into client JS and visible to anyone who
- *   inspects the bundle. This proxy keeps NVIDIA_API_KEY server-side only.
+ *   Keeps NVIDIA_API_KEY server-side only — never bundled into the client JS.
  *
  * Route: /api/nvidia  (catches all sub-paths via vercel.json rewrite)
  */
@@ -21,7 +21,10 @@ export default async function handler(req: Request): Promise<Response> {
     });
   }
 
-  const apiKey = process.env.NVIDIA_API_KEY;
+  // `process.env` exists on Vercel Edge Runtime but is not in TypeScript's
+  // DOM lib — access via globalThis to avoid requiring @types/node.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const apiKey = (globalThis as any).process?.env?.NVIDIA_API_KEY as string | undefined;
   if (!apiKey) {
     return new Response(
       JSON.stringify({ error: "NVIDIA_API_KEY is not configured on the server." }),

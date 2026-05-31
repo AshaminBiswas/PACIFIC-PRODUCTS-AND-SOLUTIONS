@@ -21,7 +21,8 @@ type Message = {
   showServices?: boolean;
   showSolutions?: boolean;
   showProducts?: boolean;
-  filterCategory?: string; // filter products by this category when showProducts
+  filterCategory?: string;
+  featuredOnly?: boolean;      // show only is_featured products
   quickReplies?: string[];
 };
 
@@ -40,16 +41,39 @@ function getGreeting(): string {
   return "Hello! I'm Aria, your assistant at Pacific Products & Solutions. How can I help you tonight?";
 }
 
-// Map user text → product category slug for Supabase filtering
+// Map user text → exact Supabase product category string
 function detectCategory(text: string): string | undefined {
-  const t = text.toLowerCase();
-  if (t.includes("restroom") || t.includes("washroom cubicle")) return "Restroom Cubicles";
-  if (t.includes("toilet partition"))                           return "Toilet Partition";
-  if (t.includes("shower") || t.includes("wet area"))           return "Shower Cubicle";
-  if (t.includes("locker"))                                     return "Locker Solution";
-  if (t.includes("changing room"))                              return "Changing Room";
-  if (t.includes("hardware"))                                   return "Custom Hardware";
+  const t = text.toLowerCase().trim();
+  // Exact label matches first (from category buttons)
+  if (t === "restroom cubicles" || t.includes("restroom cubicle") || t.includes("washroom cubicle")) return "Restroom Cubicles";
+  if (t === "toilet partition"   || t.includes("toilet partition"))  return "Toilet Partition";
+  if (t === "shower cubicle"     || t.includes("shower cubicle") || (t.includes("shower") && !t.includes("restroom"))) return "Shower Cubicle";
+  if (t === "locker solution"    || t.includes("locker"))           return "Locker Solution";
+  if (t === "changing room"      || t.includes("changing room"))    return "Changing Room";
+  if (t === "custom hardware"    || t.includes("hardware"))         return "Custom Hardware";
+  if (t.includes("cladding") || t.includes("exterior") || t.includes("facade")) return "Exterior Cladding";
+  if (t.includes("wall panel") || t.includes("panelling") || t.includes("paneling")) return "Interior Panelling";
+  if (t.includes("solid surface") || t.includes("acrylic") || t.includes("countertop") || t.includes("vanity")) return "Acrylic Solid Surface";
   return undefined;
+}
+
+// Detect if user is asking to see products/a category — client-side, no AI needed
+function detectProductIntent(text: string): { show: boolean; featuredOnly: boolean } {
+  const t = text.toLowerCase().trim();
+  const CATEGORY_LABELS = [
+    "restroom cubicles", "toilet partition", "shower cubicle", "locker solution",
+    "changing room", "custom hardware", "exterior cladding", "interior panelling",
+    "acrylic solid surface",
+  ];
+  const PRODUCT_KEYWORDS = [
+    "product", "catalogue", "catalog", "range", "what do you make", "what do you sell",
+    "show me", "show your", "see your", "cubicle", "cladding", "locker", "partition",
+    "hardware", "panelling", "paneling", "solid surface",
+  ];
+  const isCategoryClick  = CATEGORY_LABELS.some((c) => t === c || t.includes(c));
+  const isProductKeyword = PRODUCT_KEYWORDS.some((k) => t.includes(k));
+  const isFeatured       = t.includes("featured") || t.includes("popular") || t.includes("best seller");
+  return { show: isCategoryClick || isProductKeyword || isFeatured, featuredOnly: isFeatured && !isCategoryClick };
 }
 
 // Context-aware quick replies
@@ -81,101 +105,163 @@ const CATEGORY_QUICK_REPLIES = [
 // System Prompt
 // ─────────────────────────────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are Aria — a senior B2B Sales Consultant for Pacific Products & Solutions, a premier infrastructure company specialising in commercial restroom cubicles, shower cubicles, exterior cladding, locker systems, toilet partitions, and wall panelling across India and the UAE.
+const SYSTEM_PROMPT = `You are Aria — a senior B2B Sales Consultant for Pacific Products & Solutions, India's leading manufacturer and installer of commercial restroom cubicles, shower cubicles, exterior cladding, locker systems, toilet partitions, and wall panelling.
 
-## PERSONA
-- Tone: Warm, precise, consultative. Never robotic, never over-enthusiastic.
-- Keep every response to 2–4 short sentences. Use lists only when clearly more helpful.
-- Never say "Great question!" — respond with substance only.
-- Bold (**text**) only key product names or specs.
+## YOUR PERSONA
+- Direct, warm, expert. You are talking to architects, PMCs, procurement heads, and facility managers.
+- Always respond in **1–3 short sentences maximum**. Never write paragraphs.
+- Never introduce yourself mid-conversation. Never start a response with your name.
+- Never say "Great question!", "Certainly!", "Of course!", "Sure!", or similar filler.
+- Use **bold** for product names, specs, and key numbers only.
+- End with one short question to move the conversation forward.
 
-## COMPANY & NAVIGATION DIRECTORY
-- Homepage (/): Overview of Pacific Products & Solutions.
-- About & Process (/about, /process): Company history, ISO 9001:2015 certification, and manufacturing process.
-- Products (/products): Full catalogue of all product offerings.
-- Solutions & Industries (/solutions): Industry-specific applications (Airports, Hospitals, Gyms, Schools, etc.).
-- Resource Center & Downloads (/download): Download Brochures, Catalogs, Technical Specifications, Installation Manuals, and Drawings.
-- Gallery (/gallery): High-quality project images.
-- Blog (/blog): Industry insights and articles.
-- Contact (/contact): Contact forms, office locations, and career opportunities.
-- FAQ (/faq): Frequently asked questions.
+## COMPANY FACTS
+- Full name: Pacific Products & Solutions
+- Email: info@pacificproduct.in | WhatsApp/Phone: +91 98185 92113
+- Offices: Delhi NCR (HQ), Mumbai, Bangalore, Ahmedabad, Kolkata, Dubai (UAE)
+- Certification: **ISO 9001:2015** certified manufacturing facility
+- Warranty: **5 years** standard on all products, up to **10 years** on premium ranges
+- Lead time: **2–4 weeks** standard | **4–8 weeks** for custom/complex projects
+- Installation: Pan-India and UAE. Turnkey supply + install available.
+- After-sales: dedicated helpline, maintenance visits, spare parts, on-site rectification
 
-Pacific Products & Solutions — trusted B2B partner for large-scale commercial projects.
-- Email: info@pacificproduct.in | Phone/WhatsApp: +91 98185 92113
-- Offices: Delhi NCR, Mumbai, Bangalore, Ahmedabad, Kolkata, UAE (Dubai)
-- ISO 9001:2015 certified | Warranty: 5 yrs standard, up to 10 yrs premium
-- Lead time: 2–6 weeks standard, 4–8 weeks for complex/custom projects
+## WEBSITE PAGES (share these links when relevant)
+- /products → Full product catalogue
+- /solutions → Industry-specific case studies (airports, hospitals, offices, malls, gyms, schools)
+- /gallery → Project photo gallery
+- /download → Technical specs, CAD drawings, installation manuals, brochures (PDF)
+- /contact → Get a quote, office locations, contact form
+- /faq → Frequently asked questions
+- /blog → Industry articles and guides
+- /about → Company story, certifications, process
 
-## PRODUCTS (website catalogue)
-- **Restroom Cubicle Systems** — Compact laminate, phenolic, powder-coated steel, stainless steel. 12mm–25mm panels, 1800–2100mm height, anti-vandal hardware, concealed fixings.
-- **Shower Cubicles** — Waterproof HPL & toughened glass. Gym, hotel, hospital & aquatic centre variants. Marine-grade and chlorine-resistant options.
-- **Exterior Cladding** — ACM, HPL, fibre cement, terracotta rain-screen. 1220×2440mm panels, 3–6mm thick, 10-yr warranty.
-- **Locker Systems** — Metal, phenolic, laminate. Single/double/multi-tier. Digital, RFID, mechanical locks. For gyms, offices, schools, hospitals.
-- **Toilet Partition Systems** — Floor, ceiling or wall-hung. HPL, phenolic, stainless steel.
-- **Custom Hardware** — 304/316 SS hinges, indicator locks, self-closing mechanisms. Satin, mirror, black finish. Up to 50 kg.
-- **Interior Panelling** — Decorative HPL, acoustic panels. MDF/WPC/PVC/wood veneer. 6–18mm.
-- **Acrylic Solid Surface** — Seamless countertops, vanities, reception desks. 3050×760mm sheets.
+## PRODUCT CATALOGUE (use these exact details)
+
+**1. Restroom Cubicle Systems**
+- Materials: Compact laminate (12–13mm), phenolic resin (12–13mm), powder-coated steel (0.7–1.2mm), 304 stainless steel
+- Panel height: 1800mm, 1950mm, 2100mm, or floor-to-ceiling
+- Hardware: concealed anti-vandal hinges, indicator bolts, coat hooks, door closers — all 304 SS
+- Configurations: Standard, ADA/wheelchair-accessible (900mm door, grab rails), urinal screens, vanity tops
+- Finishes: 50+ HPL decors including stone, wood, solid colours, anti-fingerprint
+
+**2. Shower Cubicles**
+- Materials: Waterproof HPL, toughened glass (8mm, 10mm), stainless steel frame
+- Variants: Gym/sports, hotel/hospitality, hospital (anti-microbial), aquatic/pool (marine-grade, chlorine-resistant)
+- Drain options: linear, centre, corner. Threshold or zero-threshold (wet room)
+- Glass options: clear, frosted, patterned, anti-lime-scale coating
+
+**3. Exterior Cladding Systems**
+- Materials: ACM (Aluminium Composite), HPL (High Pressure Laminate), fibre cement, terracotta rain-screen
+- Panel size: typically 1220×2440mm | Thickness: 3–6mm (ACM), 6–13mm (HPL)
+- Fixing: concealed cassette, visible rivet, or Z-profile systems
+- Warranty: **10-year** fade and delamination warranty on HPL cladding
+- Applications: facades, canopies, columns, soffits, signage panels
+
+**4. Locker Systems**
+- Materials: cold-rolled steel (powder-coated), phenolic resin, laminate
+- Configurations: single-tier, double-tier, triple-tier, L-shaped, Z-locker, laptop lockers, day-use lockers
+- Locking: key, combination, RFID/smart card, electronic keypad, coin-operated
+- Industries: gyms, offices, hospitals, schools/colleges, airports, stadiums
+
+**5. Toilet Partition Systems**
+- Floor-mounted, ceiling-hung, floor-to-ceiling, or wall-hung pilaster
+- Materials: HPL, phenolic, powder-coated steel
+- Used in high-traffic venues: malls, airports, metro stations
+
+**6. Custom Hardware**
+- Grade: 304 SS (standard), 316 SS (marine/coastal)
+- Products: indicator locks, hinges (piano, concealed, pivot), coat hooks, door closers, towel rails, paper holders
+- Load: up to 50 kg | Finish: satin, mirror, matte black, gold PVD
+
+**7. Interior Panelling**
+- Decorative HPL wall panels, acoustic panels (NRC up to 0.85)
+- Substrate: MDF, WPC, PVC foam, solid wood veneer — 6–18mm
+- Applications: reception walls, corridors, boardrooms, feature walls
+
+**8. Acrylic Solid Surface**
+- Seamless countertops, vanities, reception desks, window sills
+- Sheet size: 3050×760mm | Thickness: 6mm, 9mm, 12mm
+- Thermoformable, repairable, non-porous, hygienic
 
 ## INDUSTRIES SERVED
-Airports, hospitals, schools/colleges, corporate offices, hotels, shopping malls, gyms, stadiums, metro/railway stations, industrial facilities, residential townships.
+Airports • Hospitals & Healthcare • Corporate Offices • Shopping Malls • Hotels & Hospitality • Gyms & Sports Complexes • Schools & Colleges • Metro/Railway Stations • Industrial Facilities • Residential Townships • Government Buildings
 
-## KEY FAQ
-- Quote request: email info@pacificproduct.in or WhatsApp +91 98185 92113. Response within 24 hrs.
-- Accessible cubicles: ADA/IS:1255 compliant, extra-wide doors (900mm), grab-rail support.
-- Warranty covers manufacturing defects, hardware failures, includes replacement and re-installation.
-- All products comply with BIS Indian Standards; ISO 9001:2015 certified facility.
-- After-sales: helpline, maintenance visits, spare parts, on-site rectification.
+## HOW TO HANDLE COMMON QUERIES
 
-## SALES BEHAVIOUR
-- Mention project-specific specs when the user names an industry or building type.
-- Direct users to specific website pages when they ask for related information (e.g., share the "/download" link for catalogs/specs, "/contact" for locations, etc.).
-- For pricing: acknowledge it depends on spec/quantity/material/location; ask for project details.
-- If user mentions a city, reference the nearest Pacific office.
-- If the user seems ready, guide them naturally toward sharing contact details.
+**Pricing questions:**
+Never give a price. Say: "Pricing depends on material grade, panel thickness, quantity, and site location. Share your project details — floor area, number of cubicles/lockers, and city — and I'll arrange a formal quotation."
 
-## STRICT RULES
-1. If asked about "services" or "what you offer", include exactly: [SHOW_SERVICES]
-2. If asked about "industries", "sectors", "solutions", or "who do you serve", include exactly: [SHOW_SOLUTIONS]
-3. If asked about "products", "materials", "items", "range", or "catalogue", include exactly: [SHOW_PRODUCTS]
-4. Request name + contact ONLY if they explicitly ask for a quote, pricing, site visit, or to be contacted.
-5. Once the user provides name + email/phone, acknowledge and append exactly: [LEAD_CAPTURED]
-6. Never fabricate prices, project references, or certification numbers.
-7. Unknown answers: "I'll have a specialist follow up — could I take your contact details?"`;
+**Quote requests:**
+Ask for: (1) project type, (2) number of units or floor area, (3) city/location, (4) timeline. Then ask for their name and contact.
+
+**Specifications:**
+Direct to /download for technical PDFs, or offer to have a specialist send spec sheets.
+
+**Comparison with competitors:**
+Focus on Pacific's strengths — ISO certification, 5–10yr warranty, pan-India install, turnkey delivery. Do not name competitors.
+
+**Unknown information:**
+Say: "I'll have one of our specialists follow up with the exact details — may I have your name and contact number?"
+
+## STRICT OUTPUT RULES
+1. If asked about "services", "what do you do", or "what do you offer" → include exactly: [SHOW_SERVICES]
+2. If asked about "industries", "sectors", "solutions", or "who do you serve" → include exactly: [SHOW_SOLUTIONS]
+3. If asked about "products", "materials", "items", "range", "catalogue", or "what do you make" → include exactly: [SHOW_PRODUCTS]
+4. Ask for name + contact ONLY when user explicitly asks for a quote, pricing, site visit, or callback.
+5. When user provides name + email or phone → acknowledge warmly, then append exactly: [LEAD_CAPTURED]
+6. Never fabricate prices, delivery dates, or project references.
+7. Maximum 60 words per response. If listing specs, use a tight bullet list instead of sentences.`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sub-components
 // ─────────────────────────────────────────────────────────────────────────────
 
 function DragScroll({ children, className }: { children: React.ReactNode, className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isDown, setIsDown] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const ref      = useRef<HTMLDivElement>(null);
+  const isDown   = useRef(false);
+  const startX   = useRef(0);
+  const scrollLeft = useRef(0);
 
+  // ── Mouse drag (desktop) ──
   const onMouseDown = (e: React.MouseEvent) => {
     if (!ref.current) return;
-    setIsDown(true);
-    setStartX(e.pageX - ref.current.offsetLeft);
-    setScrollLeft(ref.current.scrollLeft);
+    isDown.current = true;
+    startX.current = e.pageX - ref.current.offsetLeft;
+    scrollLeft.current = ref.current.scrollLeft;
+    ref.current.style.cursor = "grabbing";
   };
-  const onMouseLeave = () => setIsDown(false);
-  const onMouseUp = () => setIsDown(false);
+  const onMouseUp   = () => { isDown.current = false; if (ref.current) ref.current.style.cursor = "grab"; };
+  const onMouseLeave = () => { isDown.current = false; if (ref.current) ref.current.style.cursor = "grab"; };
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDown || !ref.current) return;
+    if (!isDown.current || !ref.current) return;
     e.preventDefault();
-    const x = e.pageX - ref.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    ref.current.scrollLeft = scrollLeft - walk;
+    const x    = e.pageX - ref.current.offsetLeft;
+    ref.current.scrollLeft = scrollLeft.current - (x - startX.current) * 1.5;
+  };
+
+  // ── Touch drag (mobile) ──
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (!ref.current) return;
+    startX.current    = e.touches[0].pageX;
+    scrollLeft.current = ref.current.scrollLeft;
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!ref.current) return;
+    const dx = e.touches[0].pageX - startX.current;
+    ref.current.scrollLeft = scrollLeft.current - dx;
   };
 
   return (
     <div
       ref={ref}
       onMouseDown={onMouseDown}
-      onMouseLeave={onMouseLeave}
       onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
       onMouseMove={onMouseMove}
-      className={`cursor-grab active:cursor-grabbing ${className}`}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      className={`select-none ${className ?? ""}`}
+      style={{ cursor: "grab", WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
     >
       {children}
     </div>
@@ -458,12 +544,11 @@ export function Chatbot() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+        model: "meta/llama-3.1-8b-instruct",
         messages: payload,
-        temperature: 0.5,
+        temperature: 0.2,
         top_p: 0.9,
-        max_tokens: 512,
-        chat_template_kwargs: { enable_thinking: false },
+        max_tokens: 280,
       }),
     });
 
@@ -501,15 +586,23 @@ export function Chatbot() {
         await saveLead(hist);
       }
 
-      // Detect category for filtering products from DB
-      const filterCategory = showProducts ? detectCategory(userText) : undefined;
+      // ── Client-side product intent detection (always reliable) ──
+      const intent = detectProductIntent(userText);
+      const shouldShowProducts = showProducts || intent.show;
+      const isFeaturedOnly     = intent.featuredOnly;
+      // Category from user text (client-side wins over AI-only detection)
+      const filterCategory = shouldShowProducts ? detectCategory(userText) : undefined;
 
       setMessages((prev) => [...prev, {
         id: `b-${Date.now()}`, sender: "bot", text,
-        showServices, showSolutions, showProducts, filterCategory,
+        showServices, showSolutions,
+        showProducts: shouldShowProducts,
+        filterCategory,
+        featuredOnly: isFeaturedOnly,
         quickReplies: getQuickReplies(userText),
       }]);
-    } catch {
+    } catch (err) {
+      console.error("[Aria] callAI failed:", err);
       setMessages((prev) => [...prev, {
         id: `b-err-${Date.now()}`, sender: "bot",
         text: "I may have missed that. Would you like help with **restroom cubicles**, **shower cubicles**, **locker solutions**, or a **custom requirement**?",
@@ -524,12 +617,14 @@ export function Chatbot() {
     if (e.key === "Enter") handleSend();
   };
 
-  // Filter products for display
-  const getFilteredProducts = (filterCategory?: string) => {
-    if (!filterCategory) return products;
-    return products.filter((p) =>
-      p.category?.toLowerCase().includes(filterCategory.toLowerCase())
+  // Filter products for display — max 6 cards in chat
+  const getFilteredProducts = (filterCategory?: string, featuredOnly?: boolean) => {
+    let list = [...products];
+    if (featuredOnly) list = list.filter((p) => p.is_featured);
+    if (filterCategory) list = list.filter((p) =>
+      p.category?.toLowerCase().trim() === filterCategory.toLowerCase().trim()
     );
+    return list.slice(0, 6);
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -645,16 +740,20 @@ export function Chatbot() {
                     </DragScroll>
                   )}
 
-                  {/* Products Carousel — ONLY from Supabase */}
+                  {/* Products Carousel — live from Supabase */}
                   {msg.showProducts && (
                     <div className="pl-8">
-                      {getFilteredProducts(msg.filterCategory).length > 0 ? (
+                      {getFilteredProducts(msg.filterCategory, msg.featuredOnly).length > 0 ? (
                         <>
                           <p className="text-[10.5px] text-gray-400 dark:text-gray-500 mb-2 font-medium">
-                            {msg.filterCategory ? `${msg.filterCategory} — ` : ""}Products from our catalogue:
+                            {msg.featuredOnly
+                              ? "⭐ Featured products:"
+                              : msg.filterCategory
+                              ? `${msg.filterCategory} — from our catalogue:`
+                              : "Products from our catalogue:"}
                           </p>
                           <DragScroll className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
-                            {getFilteredProducts(msg.filterCategory).map((p) => (
+                            {getFilteredProducts(msg.filterCategory, msg.featuredOnly).map((p) => (
                               <LiveProductCard key={p.id} product={p} />
                             ))}
                           </DragScroll>

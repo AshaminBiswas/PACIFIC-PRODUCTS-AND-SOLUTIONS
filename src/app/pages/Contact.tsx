@@ -54,8 +54,8 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       <SEO
-        title="Contact Us"
-        description="Get in touch with Pacific Products & Solutions for premium restroom cubicles, cladding, and interior solutions. Call +91 98185 92113 or visit our Delhi office."
+        title="Contact Pacific Products & Solutions | Get a Quote"
+        description="Request a quote for restroom cubicles, cladding & locker systems. Call +91 98185 92113 or visit our Delhi office. Pan-India installation available."
         canonical="/contact"
         jsonLd={localBusinessSchema()}
       />

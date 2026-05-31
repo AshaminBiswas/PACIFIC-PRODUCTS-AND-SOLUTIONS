@@ -1,12 +1,13 @@
 // ── SEO Constants & Structured Data Factories ─────────────────────────────
 
 export const SITE_NAME = "Pacific Products & Solutions";
-export const SITE_URL = "https://pacific-products-and-solutions-nu.vercel.app";
+export const SITE_URL = "https://pacificproduct.in";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const DEFAULT_DESCRIPTION =
   "India's leading B2B interior contracting company specializing in premium restroom cubicles, exterior cladding, wall paneling, locker solutions, and custom hardware for commercial spaces.";
 export const DEFAULT_KEYWORDS = 
   "restroom cubicles manufacturer India, toilet partitions Delhi, exterior cladding contractors, HPL cubicle hardware, commercial washroom panels, locker system suppliers, Pacific Products and Solutions, toilet cubicles, locker system, shower cubicles";
+
 
 // ── Organization Schema ───────────────────────────────────────────────────
 
@@ -16,7 +17,7 @@ export function organizationSchema() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: `${SITE_URL}/src/image/logo/logo.webp`,
+    logo: `${SITE_URL}/logo.webp`,
     description: DEFAULT_DESCRIPTION,
     email: "info@pacificproduct.in",
     telephone: "+919818592113",
@@ -56,7 +57,7 @@ export function localBusinessSchema(location?: {
     "@type": "LocalBusiness",
     "@id": `${SITE_URL}/#business`,
     name: SITE_NAME,
-    image: `${SITE_URL}/src/image/logo/logo.webp`,
+    image: `${SITE_URL}/logo.webp`,
     url: SITE_URL,
     telephone: location?.phone || "+919818592113",
     email: location?.email || "info@pacificproduct.in",
@@ -149,7 +150,7 @@ export function blogPostSchema(post: {
       name: SITE_NAME,
       logo: {
         "@type": "ImageObject",
-        url: `${SITE_URL}/src/image/logo/logo.webp`,
+        url: `${SITE_URL}/logo.webp`,
       },
     },
   };

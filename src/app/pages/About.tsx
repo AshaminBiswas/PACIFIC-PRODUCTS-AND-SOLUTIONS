@@ -150,8 +150,8 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       <SEO
-        title="About Us"
-        description="Learn about Pacific Products & Solutions — 12+ years of excellence in B2B interior contracting, ISO-certified manufacturing, and pan-India installation."
+        title="About Pacific Products & Solutions"
+        description="Learn about Pacific Products & Solutions — 12+ years of excellence in B2B interior contracting, ISO 9001:2015 certified manufacturing, and pan-India commercial installation."
         keywords={`${DEFAULT_KEYWORDS}, B2B interior contracting company, ISO certified cubicle manufacturer, turnkey interior solutions India, Pacific Products team`}
         canonical="/about"
       />

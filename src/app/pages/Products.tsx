@@ -27,8 +27,8 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       <SEO
-        title="Our Products & Services"
-        description="Explore our range of premium restroom cubicles, shower cubicles, exterior cladding, locker systems, wall paneling, and custom hardware solutions."
+        title="Restroom Cubicles, Cladding & Locker Systems"
+        description="Explore our premium range of restroom cubicles, shower cubicles, exterior cladding, locker systems, wall paneling, and custom hardware solutions for commercial spaces across India."
         keywords={`${DEFAULT_KEYWORDS}, premium restroom cubicles, shower partitions, HPL exterior cladding, commercial wall paneling, phenolic lockers, stainless steel cubicle hardware`}
         canonical="/products"
       />
