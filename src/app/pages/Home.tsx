@@ -702,6 +702,123 @@ import { DynamicIcon } from "../components/DynamicIcon";
 import { ImageWithFallback as SolutionImage } from "../components/figma/ImageWithFallback";
 import { CoreServiceCard } from "../components/CoreServiceCard";
 import { FeaturedServices } from "../components/FeaturedServices";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const stripHtml = (html: string) => html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || '';
+
+function SolutionsCarousel({ solutions, navigate }: { solutions: any[]; navigate: (path: string) => void }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(true);
+
+  const updateButtons = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  };
+
+  const scroll = (dir: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const card = el.querySelector('[data-sol-card]') as HTMLElement;
+    const w = card ? card.offsetWidth + 24 : 380;
+    el.scrollBy({ left: dir === 'left' ? -w : w, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="relative">
+      {/* Left button — desktop only */}
+      <button
+        onClick={() => scroll('left')}
+        disabled={!canLeft}
+        className="hidden lg:flex absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 shadow-lg items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-[#7FB706] hover:text-white hover:border-[#7FB706] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+        aria-label="Scroll left"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+
+      {/* Scroll container */}
+      <div
+        ref={scrollRef}
+        onScroll={updateButtons}
+        className="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory lg:snap-none"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {solutions.map((solution, index) => (
+          <motion.div
+            data-sol-card
+            key={solution.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: Math.min(index * 0.08, 0.4), duration: 0.5 }}
+            whileHover={{ y: -6 }}
+            className="group relative flex flex-col bg-white dark:bg-[#0a0a1a] rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer shrink-0 snap-start"
+            style={{ width: 'clamp(280px, 80vw, 380px)' }}
+            onClick={() => navigate(`/solutions/${solution.slug}`)}
+          >
+            {/* Glow border on hover */}
+            <div className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" style={{ boxShadow: 'inset 0 0 0 1.5px #7FB706' }} />
+
+            {/* Image */}
+            <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-900 z-10">
+              <SolutionImage src={solution.image_url} alt={solution.title} className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-[#7FB706] opacity-0 group-hover:opacity-20 transition-opacity duration-500 mix-blend-overlay" />
+              <div className="absolute bottom-4 left-6">
+                <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center group-hover:bg-[#7FB706]/20 group-hover:border-[#7FB706]/50 transition-colors duration-500">
+                  <DynamicIcon name={solution.icon_name} className="w-6 h-6 text-[#B5F823]" />
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex flex-col flex-1 p-6 z-10 relative bg-white dark:bg-[#0a0a1a]">
+              <div className="flex items-start justify-between gap-4 mb-3">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-[#7FB706]">{solution.title}</h3>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-50 dark:bg-white/5 text-gray-400 group-hover:bg-[#7FB706] group-hover:text-white transition-colors duration-500 shrink-0 mt-0.5">
+                  <ArrowRight className="w-4 h-4 transform transition-transform duration-500 group-hover:translate-x-1" />
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed flex-1 mb-5 line-clamp-2">
+                {solution.subtitle || stripHtml(solution.description)}
+              </p>
+              <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/10 flex items-center text-sm font-semibold text-gray-400 group-hover:text-[#7FB706] transition-colors duration-300 relative overflow-hidden">
+                <div className="absolute top-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#7FB706] to-[#B5F823] group-hover:w-full transition-all duration-700 ease-out" />
+                Explore Solution <ArrowRight className="w-4 h-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" />
+              </div>
+            </div>
+          </motion.div>
+        ))}
+
+        {/* View All card at end */}
+        <div className="shrink-0 snap-start flex items-center justify-center" style={{ width: 'clamp(200px, 50vw, 260px)' }}>
+          <button
+            onClick={() => navigate('/solutions')}
+            className="flex flex-col items-center gap-3 p-8 rounded-2xl border-2 border-dashed border-gray-200 dark:border-white/10 text-gray-400 hover:border-[#7FB706] hover:text-[#7FB706] transition-all duration-300 w-full h-full justify-center"
+          >
+            <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#7FB706]/10">
+              <ArrowRight className="w-6 h-6" />
+            </div>
+            <span className="font-semibold text-sm text-center">View All Solutions</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Right button — desktop only */}
+      <button
+        onClick={() => scroll('right')}
+        disabled={!canRight}
+        className="hidden lg:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 shadow-lg items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-[#7FB706] hover:text-white hover:border-[#7FB706] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+        aria-label="Scroll right"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+    </div>
+  );
+}
+
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -733,106 +850,34 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-10 sm:mb-14 lg:mb-16"
+            className="flex items-end justify-between mb-10 sm:mb-14 lg:mb-16"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-3 sm:mb-4">
-              Our Solutions
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
-              Industry-specific solutions tailored to meet your unique requirements
-            </p>
+            <div>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-3 sm:mb-4">
+                Our Solutions
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl">
+                Industry-specific solutions tailored to meet your unique requirements
+              </p>
+            </div>
+            {/* Desktop scroll buttons */}
+            {solutions && solutions.length > 0 && (() => {
+              const scrollRef = { current: null as HTMLDivElement | null };
+              const scroll = (dir: 'left' | 'right') => {
+                if (scrollRef.current) {
+                  const card = scrollRef.current.querySelector('[data-sol-card]') as HTMLElement;
+                  const w = card ? card.offsetWidth + 24 : 360;
+                  scrollRef.current.scrollBy({ left: dir === 'left' ? -w : w, behavior: 'smooth' });
+                }
+              };
+              return null;
+            })()}
           </motion.div>
 
           {loadingSolutions ? (
             <div className="text-center text-gray-500 py-10">Loading solutions...</div>
           ) : solutions && solutions.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                {solutions.slice(0, 6).map((solution, index) => (
-                  <motion.div
-                    key={solution.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, duration: 0.5 }}
-                    whileHover={{ y: -8 }}
-                    className="group relative flex flex-col bg-white dark:bg-[#0a0a1a] rounded-2xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer"
-                    onClick={() => navigate(`/solutions/${solution.slug}`)}
-                  >
-                    {/* Dynamic Hover Glow Border */}
-                    <div
-                      className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
-                      style={{ boxShadow: `inset 0 0 0 1.5px #7FB706` }}
-                    />
-
-                    {/* Top Section: Image area */}
-                    <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-900 z-10">
-                      <SolutionImage
-                        src={solution.image_url}
-                        alt={solution.title}
-                        className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110"
-                      />
-
-                      {/* Gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
-
-                      {/* Brand Green overlay on hover */}
-                      <div
-                        className="absolute inset-0 bg-[#7FB706] opacity-0 group-hover:opacity-20 transition-opacity duration-500 mix-blend-overlay"
-                      />
-
-                      {/* Floating Icon */}
-                      <div className="absolute bottom-4 left-6 flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center group-hover:bg-[#7FB706]/20 group-hover:border-[#7FB706]/50 transition-colors duration-500">
-                          <DynamicIcon name={solution.icon_name} className="w-6 h-6 text-[#B5F823]" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bottom Section: Content area */}
-                    <div className="flex flex-col flex-1 p-6 sm:p-8 z-10 relative bg-white dark:bg-[#0a0a1a]">
-                      {/* Title & Arrow */}
-                      <div className="flex items-start justify-between gap-4 mb-4">
-                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-[#7FB706]">
-                          {solution.title}
-                        </h3>
-                        <motion.div
-                          className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 dark:bg-white/5 text-gray-400 group-hover:bg-[#7FB706] group-hover:text-white transition-colors duration-500 shrink-0 mt-1"
-                        >
-                          <ArrowRight className="w-5 h-5 transform transition-transform duration-500 group-hover:translate-x-1" />
-                        </motion.div>
-                      </div>
-
-                      {/* Description */}
-                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed flex-1 mb-6 line-clamp-3">
-                        {solution.subtitle || solution.description}
-                      </p>
-
-                      {/* Footer */}
-                      <div className="mt-auto pt-5 border-t border-gray-100 dark:border-white/10 flex items-center text-sm font-semibold text-gray-400 group-hover:text-[#7FB706] transition-colors duration-300 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#7FB706] to-[#B5F823] group-hover:w-full transition-all duration-700 ease-out" />
-                        Explore Solution
-                        <ArrowRight className="w-4 h-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {solutions.length > 6 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="text-center mt-8 sm:mt-12"
-                >
-                  <Button size="lg" variant="outline" onClick={() => navigate("/solutions")}>
-                    View All Solutions
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </motion.div>
-              )}
-            </>
+            <SolutionsCarousel solutions={solutions} navigate={navigate} />
           ) : (
             <div className="text-center text-gray-500 py-10">
               No solutions yet. Add some from the Admin Dashboard!

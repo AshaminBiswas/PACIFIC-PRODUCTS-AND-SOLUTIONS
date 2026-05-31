@@ -1,24 +1,68 @@
 import { motion } from "motion/react";
 import { useParams, useNavigate } from "react-router";
-import { useState } from "react";
-import { ArrowRight, CheckCircle2, Users, Building2, Globe, TrendingUp } from "lucide-react";
+import { useState, useRef, useMemo } from "react";
+import { ArrowRight, CheckCircle2, Users, Building2, Globe, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../components/Button";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import { useSolution } from "../../lib/hooks";
+import { useSolution, useProducts } from "../../lib/hooks";
 import { DynamicIcon } from "../components/DynamicIcon";
 import { SEO } from "../components/SEO";
 import { breadcrumbSchema } from "../../lib/seo-data";
+import { ProductCard } from "../components/ProductCard";
 
 export default function SolutionDetailPage() {
   const { industry } = useParams<{ industry: string }>();
   const navigate = useNavigate();
   const { data: solution, loading } = useSolution(industry);
+  const { data: allProducts } = useProducts();
   const [currentMain, setCurrentMain] = useState<string | null>(null);
   const [currentThumbs, setCurrentThumbs] = useState<string[] | null>(null);
   const [activeColorIdx, setActiveColorIdx] = useState(0);
+  const prodScrollRef = useRef<HTMLDivElement>(null);
+  const [prodCanLeft, setProdCanLeft] = useState(false);
+  const [prodCanRight, setProdCanRight] = useState(true);
 
   const mainImage = currentMain || solution?.image_url || "";
   const thumbnailImages = currentThumbs || solution?.additional_images?.filter(Boolean).slice(0, 4) || [];
+
+  // ── Suggested products: score by keyword overlap ──────────────────────────
+  const suggestedProducts = useMemo(() => {
+    if (!solution || allProducts.length === 0) return [];
+    const keywords = [
+      ...solution.title.toLowerCase().split(/\s+/),
+      ...(solution.features || []).map(f => f.toLowerCase()),
+      ...(solution.clients || []).map(c => c.toLowerCase()),
+    ].filter(k => k.length > 3);
+
+    const scored = allProducts.map(p => {
+      const haystack = [
+        p.title, p.category || '', p.subtitle || '',
+        ...(p.features || []),
+      ].join(' ').toLowerCase();
+      const score = keywords.filter(k => haystack.includes(k)).length;
+      return { product: p, score };
+    });
+
+    const top = scored.filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, 6).map(s => s.product);
+    if (top.length >= 2) return top;
+    // fallback: featured → any 4
+    const featured = allProducts.filter(p => p.is_featured).slice(0, 6);
+    return featured.length >= 2 ? featured : allProducts.slice(0, 6);
+  }, [solution, allProducts]);
+
+  const scrollProds = (dir: 'left' | 'right') => {
+    const el = prodScrollRef.current;
+    if (!el) return;
+    const card = el.querySelector('[data-prod-card]') as HTMLElement;
+    const w = card ? card.offsetWidth + 24 : 300;
+    el.scrollBy({ left: dir === 'left' ? -w : w, behavior: 'smooth' });
+  };
+  const updateProdBtns = () => {
+    const el = prodScrollRef.current;
+    if (!el) return;
+    setProdCanLeft(el.scrollLeft > 4);
+    setProdCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  };
 
   const handleSwap = (idx: number) => {
     const clickedImg = thumbnailImages[idx];
@@ -64,110 +108,78 @@ export default function SolutionDetailPage() {
         jsonLd={breadcrumbSchema([{name: 'Home', url: '/'}, {name: 'Solutions', url: '/solutions'}, {name: solution.title, url: `/solutions/${solution.slug}`}])}
       />
 
-      {/* ═══════════════════ CINEMATIC HERO BANNER ═══════════════════ */}
-      <section className="relative min-h-[70vh] flex items-end overflow-hidden">
-        {/* Full-bleed background image */}
+      {/* ═══════════════════ HERO — 100vh minus navbar ═══════════════════ */}
+      <section
+        className="relative w-full overflow-hidden"
+        style={{ height: 'calc(100vh - 80px)' }}
+      >
+        {/* Image fills full area with object-cover */}
         <div className="absolute inset-0">
           <ImageWithFallback src={mainImage} alt={solution.title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
         </div>
 
-        {/* Content overlay */}
-        <div className="relative z-10 w-full pb-12 sm:pb-16 lg:pb-20 pt-32">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Breadcrumb */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex items-center gap-2 text-sm text-white/60 mb-6"
-            >
-              <button onClick={() => navigate("/")} className="hover:text-white transition-colors">Home</button>
-              <span>/</span>
-              <button onClick={() => navigate("/solutions")} className="hover:text-white transition-colors">Solutions</button>
-              <span>/</span>
-              <span className="text-white font-medium">{solution.title}</span>
-            </motion.div>
-
-            <div className="max-w-3xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="flex items-center gap-4 mb-5"
-              >
-                <div className="w-14 h-14 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl flex items-center justify-center">
-                  <DynamicIcon name={solution.icon_name} className="w-7 h-7 text-[#B5F823]" />
-                </div>
-                <span className="text-sm font-bold tracking-widest text-[#B5F823] uppercase">Industry Solution</span>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-5 leading-[1.1]"
-              >
-                {solution.title}
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed max-w-2xl"
-              >
-                {solution.subtitle}
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="flex flex-wrap gap-3"
-              >
-                <Button size="lg" onClick={() => navigate("/contact")}>
-                  Get a Free Quote
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
+        {/* Thumbnail swap strip — bottom-right */}
+        {thumbnailImages.length > 0 && (
+          <div className="absolute bottom-4 right-4 flex gap-2 z-20">
+            {thumbnailImages.map((img, idx) => {
+              const isActive = img === mainImage;
+              return (
                 <button
-                  onClick={() => window.open("https://wa.me/919818592113", "_blank")}
-                  className="px-6 py-3.5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all font-medium text-base"
+                  key={img + idx}
+                  onClick={() => handleSwap(idx)}
+                  className={`relative rounded-lg overflow-hidden w-14 h-10 sm:w-20 sm:h-14 transition-all duration-300 shrink-0 ${
+                    isActive
+                      ? "ring-2 ring-[#7FB706] ring-offset-1 ring-offset-black scale-105"
+                      : "opacity-50 hover:opacity-90 border border-white/20 hover:scale-105"
+                  }`}
                 >
-                  WhatsApp Us
+                  <ImageWithFallback src={img} alt={`${solution.title} ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Content — pinned to bottom */}
+        <div className="absolute inset-0 flex items-end z-10">
+          <div className="w-full pb-12 sm:pb-16 lg:pb-20">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex items-center gap-2 text-sm text-white/60 mb-6">
+                <button onClick={() => navigate("/")} className="hover:text-white transition-colors">Home</button>
+                <span>/</span>
+                <button onClick={() => navigate("/solutions")} className="hover:text-white transition-colors">Solutions</button>
+                <span>/</span>
+                <span className="text-white font-medium">{solution.title}</span>
               </motion.div>
+              <div className="max-w-3xl">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-4 mb-5">
+                  <div className="w-14 h-14 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl flex items-center justify-center">
+                    <DynamicIcon name={solution.icon_name} className="w-7 h-7 text-[#B5F823]" />
+                  </div>
+                  <span className="text-sm font-bold tracking-widest text-[#B5F823] uppercase">Industry Solution</span>
+                </motion.div>
+                <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-5 leading-[1.1]">
+                  {solution.title}
+                </motion.h1>
+                <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed max-w-2xl">
+                  {solution.subtitle}
+                </motion.p>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="flex flex-wrap gap-3">
+                  <Button size="lg" onClick={() => navigate("/contact")}>
+                    Get a Free Quote <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                  <button onClick={() => window.open("https://wa.me/919818592113", "_blank")} className="px-6 py-3.5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all font-medium text-base">
+                    WhatsApp Us
+                  </button>
+                </motion.div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════ THUMBNAIL GALLERY ═══════════════════ */}
-      {thumbnailImages.length > 0 && (
-        <section className="py-8 bg-gray-50 dark:bg-[#0a0a1a] transition-colors">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
-              {thumbnailImages.map((img, idx) => {
-                const isActive = img === mainImage;
-                return (
-                  <button
-                    key={img + idx}
-                    onClick={() => handleSwap(idx)}
-                    className={`relative rounded-xl overflow-hidden aspect-[4/3] transition-all duration-300 ${
-                      isActive
-                        ? "ring-2 ring-[#7FB706] ring-offset-2 ring-offset-gray-50 dark:ring-offset-[#0a0a1a] shadow-lg scale-[1.02]"
-                        : "opacity-50 hover:opacity-90 border border-gray-200 dark:border-white/10 hover:scale-[1.02]"
-                    }`}
-                  >
-                    <ImageWithFallback src={img} alt={`${solution.title} ${idx + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ═══════════════════ ABOUT THIS SOLUTION ═══════════════════ */}
       <section className="py-16 sm:py-20 lg:py-24 bg-white dark:bg-[#030213] transition-colors">
@@ -345,6 +357,48 @@ export default function SolutionDetailPage() {
                 >
                   <div className="absolute inset-0 rounded-xl bg-[#7FB706]/0 group-hover:bg-[#7FB706]/5 transition-colors duration-300" />
                   <p className="relative text-sm sm:text-base font-bold text-gray-800 dark:text-white tracking-wide">{client}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+
+      {/* ═══════════════════ SUGGESTED PRODUCTS ═══════════════════ */}
+      {suggestedProducts.length > 0 && (
+        <section className="pb-16 sm:pb-20 bg-gray-50 dark:bg-[#0a0a1a] transition-colors">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-10"
+            >
+              <span className="inline-block text-xs font-bold tracking-widest text-[#7FB706] uppercase mb-2">Products</span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Suggested Products</h2>
+              <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Products often used for {solution.title.toLowerCase()} projects</p>
+            </motion.div>
+
+            {/* Responsive grid — 1 col mobile / 2 col tablet / 3 col desktop */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {suggestedProducts.slice(0, 3).map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <ProductCard
+                    title={product.title}
+                    description={product.subtitle || product.description || ''}
+                    image={product.image_url}
+                    path={product.category
+                      ? `/products/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
+                      : `/products/${product.slug}`}
+                  />
                 </motion.div>
               ))}
             </div>
