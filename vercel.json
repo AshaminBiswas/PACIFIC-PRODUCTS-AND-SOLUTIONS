@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/nvidia.ts": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/nvidia/(.*)",
