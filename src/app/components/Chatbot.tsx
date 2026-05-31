@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   MessageSquare, X, Send, Bot, RefreshCw,
   Sparkles, ExternalLink, Star, ClipboardList, PhoneCall,
+  Maximize2, Minimize2
 } from "lucide-react";
+import DOMPurify from "dompurify";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import type { Product, Solution, CoreService } from "../../lib/database.types";
 
@@ -27,7 +29,8 @@ type Message = {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY as string;
+// NVIDIA API key is injected server-side by the Vercel function (production)
+// or the Vite dev proxy (development). The client never holds the key.
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -40,13 +43,12 @@ function getGreeting(): string {
 // Map user text → product category slug for Supabase filtering
 function detectCategory(text: string): string | undefined {
   const t = text.toLowerCase();
-  if (t.includes("restroom") || t.includes("toilet partition") || t.includes("washroom cubicle")) return "Restroom Cubicles";
-  if (t.includes("shower") || t.includes("wet area"))          return "Shower Cubicles";
-  if (t.includes("locker"))                                     return "Lockers";
-  if (t.includes("cladding") || t.includes("facade") || t.includes("exterior")) return "Exterior Cladding";
-  if (t.includes("hardware"))                                   return "Hardware";
-  if (t.includes("panel") || t.includes("interior panel"))     return "Interior Paneling";
-  if (t.includes("solid surface") || t.includes("acrylic"))    return "Surfaces";
+  if (t.includes("restroom") || t.includes("washroom cubicle")) return "Restroom Cubicles";
+  if (t.includes("toilet partition"))                           return "Toilet Partition";
+  if (t.includes("shower") || t.includes("wet area"))           return "Shower Cubicle";
+  if (t.includes("locker"))                                     return "Locker Solution";
+  if (t.includes("changing room"))                              return "Changing Room";
+  if (t.includes("hardware"))                                   return "Custom Hardware";
   return undefined;
 }
 
@@ -65,13 +67,12 @@ function getQuickReplies(text: string): string[] {
 
 const CATEGORY_QUICK_REPLIES = [
   { label: "Restroom Cubicles",     icon: "🚻" },
-  { label: "Shower Cubicles",       icon: "🚿" },
-  { label: "Locker Solutions",      icon: "🔒" },
-  { label: "Exterior Cladding",     icon: "🏢" },
+  { label: "Toilet Partition",      icon: "🪟" },
+  { label: "Shower Cubicle",        icon: "🚿" },
+  { label: "Locker Solution",       icon: "🔒" },
+  { label: "Changing Room",         icon: "🚪" },
   { label: "Custom Hardware",       icon: "🔧" },
-  { label: "Toilet Partitions",     icon: "🪟" },
-  { label: "Commercial Washrooms",  icon: "💼" },
-  { label: "Architectural Products",icon: "📐" },
+  { label: "Other",                 icon: "✨" },
   { label: "Project Consultation",  icon: "💡" },
   { label: "Request a Quote",       icon: "📋" },
 ];
@@ -88,7 +89,17 @@ const SYSTEM_PROMPT = `You are Aria — a senior B2B Sales Consultant for Pacifi
 - Never say "Great question!" — respond with substance only.
 - Bold (**text**) only key product names or specs.
 
-## COMPANY
+## COMPANY & NAVIGATION DIRECTORY
+- Homepage (/): Overview of Pacific Products & Solutions.
+- About & Process (/about, /process): Company history, ISO 9001:2015 certification, and manufacturing process.
+- Products (/products): Full catalogue of all product offerings.
+- Solutions & Industries (/solutions): Industry-specific applications (Airports, Hospitals, Gyms, Schools, etc.).
+- Resource Center & Downloads (/download): Download Brochures, Catalogs, Technical Specifications, Installation Manuals, and Drawings.
+- Gallery (/gallery): High-quality project images.
+- Blog (/blog): Industry insights and articles.
+- Contact (/contact): Contact forms, office locations, and career opportunities.
+- FAQ (/faq): Frequently asked questions.
+
 Pacific Products & Solutions — trusted B2B partner for large-scale commercial projects.
 - Email: info@pacificproduct.in | Phone/WhatsApp: +91 98185 92113
 - Offices: Delhi NCR, Mumbai, Bangalore, Ahmedabad, Kolkata, UAE (Dubai)
@@ -117,6 +128,7 @@ Airports, hospitals, schools/colleges, corporate offices, hotels, shopping malls
 
 ## SALES BEHAVIOUR
 - Mention project-specific specs when the user names an industry or building type.
+- Direct users to specific website pages when they ask for related information (e.g., share the "/download" link for catalogs/specs, "/contact" for locations, etc.).
 - For pricing: acknowledge it depends on spec/quantity/material/location; ask for project details.
 - If user mentions a city, reference the nearest Pacific office.
 - If the user seems ready, guide them naturally toward sharing contact details.
@@ -134,11 +146,53 @@ Airports, hospitals, schools/colleges, corporate offices, hotels, shopping malls
 // Sub-components
 // ─────────────────────────────────────────────────────────────────────────────
 
+function DragScroll({ children, className }: { children: React.ReactNode, className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isDown, setIsDown] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    setIsDown(true);
+    setStartX(e.pageX - ref.current.offsetLeft);
+    setScrollLeft(ref.current.scrollLeft);
+  };
+  const onMouseLeave = () => setIsDown(false);
+  const onMouseUp = () => setIsDown(false);
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDown || !ref.current) return;
+    e.preventDefault();
+    const x = e.pageX - ref.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    ref.current.scrollLeft = scrollLeft - walk;
+  };
+
+  return (
+    <div
+      ref={ref}
+      onMouseDown={onMouseDown}
+      onMouseLeave={onMouseLeave}
+      onMouseUp={onMouseUp}
+      onMouseMove={onMouseMove}
+      className={`cursor-grab active:cursor-grabbing ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 function MessageText({ text }: { text: string }) {
-  const html = text
+  // Build the raw HTML string, then sanitize it with DOMPurify to prevent XSS
+  // before injecting. This is safe against any markdown-formatted AI output.
+  const rawHtml = text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\n/g, "<br/>");
-  return <span dangerouslySetInnerHTML={{ __html: html }} />;
+  const safeHtml = DOMPurify.sanitize(rawHtml, {
+    ALLOWED_TAGS: ["strong", "br"],
+    ALLOWED_ATTR: [],
+  });
+  return <span dangerouslySetInnerHTML={{ __html: safeHtml }} />;
 }
 
 function CategoryButton({ label, icon, onClick }: { label: string; icon: string; onClick: () => void }) {
@@ -305,6 +359,7 @@ function LiveServiceCard({ service }: { service: CoreService }) {
 
 export function Chatbot() {
   const [isOpen, setIsOpen]       = useState(false);
+  const [isChatExpanded, setIsChatExpanded] = useState(false);
   const [hasOpened, setHasOpened] = useState(false);
   const [messages, setMessages]   = useState<Message[]>([]);
   const [input, setInput]         = useState("");
@@ -402,10 +457,7 @@ export function Chatbot() {
 
     const res = await fetch("/api/nvidia/v1/chat/completions", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${NVIDIA_API_KEY}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
         messages: payload,
@@ -431,14 +483,6 @@ export function Chatbot() {
 
     const userMsg: Message = { id: `u-${Date.now()}`, sender: "user", text: userText };
     setMessages((prev) => [...prev, userMsg]);
-
-    if (!NVIDIA_API_KEY) {
-      setMessages((prev) => [...prev, {
-        id: `b-${Date.now()}`, sender: "bot",
-        text: "I'm currently offline. Please WhatsApp us at **+91 98185 92113** or email **info@pacificproduct.in**.",
-      }]);
-      return;
-    }
 
     setIsTyping(true);
     try {
@@ -507,7 +551,11 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[calc(100vh-120px)] mb-4 flex flex-col overflow-hidden"
+            className={`bg-white dark:bg-[#0a0a1a] border border-gray-200 dark:border-white/10 shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ${
+              isChatExpanded
+                ? "fixed inset-0 w-full h-[100dvh] max-h-[100dvh] m-0 rounded-none z-[10000]"
+                : "rounded-2xl w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[calc(100vh-120px)] mb-4"
+            }`}
           >
             {/* Header */}
             <div className="bg-[#030213] text-white px-4 py-3 flex justify-between items-center shrink-0">
@@ -529,7 +577,10 @@ export function Chatbot() {
                 <button onClick={handleRestart} title="Restart" className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                   <RefreshCw className="w-4 h-4" />
                 </button>
-                <button onClick={() => setIsOpen(false)} className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                <button onClick={() => setIsChatExpanded(!isChatExpanded)} title={isChatExpanded ? "Minimize" : "Maximize"} className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                  {isChatExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+                <button onClick={() => setIsOpen(false)} title="Close" className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -578,21 +629,21 @@ export function Chatbot() {
                   {msg.showServices && services.length > 0 && (
                     <div className="pl-8">
                       <p className="text-[10.5px] text-gray-400 dark:text-gray-500 mb-2 font-medium">Our core services:</p>
-                      <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+                      <DragScroll className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
                         {services.map((s) => (
                           <LiveServiceCard key={s.id} service={s} />
                         ))}
-                      </div>
+                      </DragScroll>
                     </div>
                   )}
 
                   {/* Solutions Carousel */}
                   {msg.showSolutions && solutions.length > 0 && (
-                    <div className="pl-8 overflow-x-auto flex gap-3 pb-2 pt-1 snap-x snap-mandatory scrollbar-hide">
+                    <DragScroll className="pl-8 overflow-x-auto flex gap-3 pb-2 pt-1 snap-x snap-mandatory scrollbar-hide">
                       {solutions.map((s) => (
                         <LiveSolutionCard key={s.id} solution={s} />
                       ))}
-                    </div>
+                    </DragScroll>
                   )}
 
                   {/* Products Carousel — ONLY from Supabase */}
@@ -603,11 +654,11 @@ export function Chatbot() {
                           <p className="text-[10.5px] text-gray-400 dark:text-gray-500 mb-2 font-medium">
                             {msg.filterCategory ? `${msg.filterCategory} — ` : ""}Products from our catalogue:
                           </p>
-                          <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+                          <DragScroll className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
                             {getFilteredProducts(msg.filterCategory).map((p) => (
                               <LiveProductCard key={p.id} product={p} />
                             ))}
-                          </div>
+                          </DragScroll>
                           <a href="/products" className="inline-block mt-2 text-[11px] text-[#7FB706] hover:underline font-medium">
                             View full catalogue →
                           </a>

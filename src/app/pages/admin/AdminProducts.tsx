@@ -13,7 +13,11 @@ import {
   Star,
   StarOff,
   GripVertical,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
+import Editor from "react-simple-wysiwyg";
+
 
 // Slug helper
 function toSlug(text: string) {
@@ -30,12 +34,14 @@ const emptyForm = {
   title: "",
   subtitle: "",
   description: "",
+  bottom_description: "",
   category: "",
   image_url: "",
   additional_images: [] as string[],
   features: [] as string[],
   specifications: [] as { label: string; value: string }[],
   applications: [] as string[],
+  colors: [] as { name: string; image_url: string }[],
   is_featured: false,
   sort_order: 0,
   published: false,
@@ -48,6 +54,7 @@ export default function AdminProducts() {
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // ── Feature / spec / application string helpers ──
@@ -57,13 +64,55 @@ export default function AdminProducts() {
   const [newSpecValue, setNewSpecValue] = useState("");
   const [customCategory, setCustomCategory] = useState("");
 
-  const PREDEFINED_CATEGORIES = ["Restroom Cubicles", "Shower Cubicles", "Exterior Cladding", "Locker System", "Custom Hardware", "Others"];
+  // ── Color options helpers ──
+  const [newColorName, setNewColorName] = useState("");
+  const [newColorImage, setNewColorImage] = useState("");
+  const [colorUploading, setColorUploading] = useState(false);
+  const colorFileRef = useRef<HTMLInputElement>(null);
+
+  const handleColorImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setColorUploading(true);
+    const url = await uploadImage(file, "products");
+    if (url) setNewColorImage(url);
+    setColorUploading(false);
+  };
+
+  const addColorOption = () => {
+    if (!newColorName.trim()) return;
+    const imageUrl = newColorImage || "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150&auto=format&fit=crop&q=60";
+    setForm((f) => ({
+      ...f,
+      colors: [...(f.colors || []), { name: newColorName.trim(), image_url: imageUrl }]
+    }));
+    setNewColorName("");
+    setNewColorImage("");
+  };
+
+  const removeColorOption = (index: number) => {
+    setForm((f) => ({
+      ...f,
+      colors: (f.colors || []).filter((_, i) => i !== index)
+    }));
+  };
+
+  const PREDEFINED_CATEGORIES = [
+    "Restroom Cubicles",
+    "Toilet Partition",
+    "Shower Cubicle",
+    "Locker Solution",
+    "Changing Room",
+    "Custom Hardware",
+    "Other"
+  ];
 
   const openCreate = () => {
     setEditing(null);
     setForm({ ...emptyForm, sort_order: products.length + 1 });
     setCustomCategory("");
     setShowModal(true);
+    setIsExpanded(false);
     setError("");
   };
 
@@ -75,18 +124,21 @@ export default function AdminProducts() {
       title: product.title,
       subtitle: product.subtitle,
       description: product.description,
-      category: isCustom ? "Others" : product.category,
+      bottom_description: product.bottom_description || "",
+      category: isCustom ? "Other" : product.category,
       image_url: product.image_url,
       additional_images: product.additional_images || [],
       features: [...product.features],
       specifications: product.specifications.map((s) => ({ ...s })),
       applications: [...product.applications],
+      colors: product.colors ? product.colors.map((c) => ({ ...c })) : [],
       is_featured: product.is_featured,
       sort_order: product.sort_order,
       published: product.published,
     });
     setCustomCategory(isCustom ? product.category : "");
     setShowModal(true);
+    setIsExpanded(false);
     setError("");
   };
 
@@ -140,26 +192,41 @@ export default function AdminProducts() {
     setError("");
 
     const slug = form.slug || toSlug(form.title);
-    const finalCategory = form.category === "Others" && customCategory.trim() !== "" ? customCategory.trim() : form.category;
+    const finalCategory = form.category === "Other" && customCategory.trim() !== "" ? customCategory.trim() : form.category;
     const payload = { ...form, slug, category: finalCategory };
 
     try {
       if (editing) {
-        const { error: err } = await supabase
-          .from("products")
-          .update(payload)
-          .eq("id", editing.id);
-        if (err) throw err;
+        const { error } = await supabase.from("products").update(payload as any).eq("id", editing.id);
+        if (error) throw error;
       } else {
-        const { error: err } = await supabase.from("products").insert(payload);
-        if (err) throw err;
+        const { error } = await supabase.from("products").insert(payload as any);
+        if (error) throw error;
       }
-      setShowModal(false);
       refetch();
+      return { success: true, slug };
     } catch (e: any) {
       setError(e.message);
+      return { success: false, slug: null };
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveAndClose = async () => {
+    const res = await handleSave();
+    if (res?.success) setShowModal(false);
+  };
+
+  const handleSaveAndPreview = async () => {
+    const res = await handleSave();
+    if (res?.success && res.slug) {
+      const finalCategory = form.category === "Other" && customCategory.trim() !== "" ? customCategory.trim() : form.category;
+      const previewUrl = finalCategory 
+        ? `/products/${toSlug(finalCategory)}/${res.slug}`
+        : `/products/${res.slug}`;
+      window.open(previewUrl, "_blank");
+      setShowModal(false);
     }
   };
 
@@ -171,18 +238,12 @@ export default function AdminProducts() {
   };
 
   const togglePublished = async (product: Product) => {
-    await supabase
-      .from("products")
-      .update({ published: !product.published })
-      .eq("id", product.id);
+    await supabase.from("products").update({ published: !product.published } as any).eq("id", product.id);
     refetch();
   };
 
   const toggleFeatured = async (product: Product) => {
-    await supabase
-      .from("products")
-      .update({ is_featured: !product.is_featured })
-      .eq("id", product.id);
+    await supabase.from("products").update({ is_featured: !product.is_featured } as any).eq("id", product.id);
     refetch();
   };
 
@@ -299,23 +360,32 @@ export default function AdminProducts() {
 
       {/* ── Modal ────────────────────────────────────────── */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/70 overflow-y-auto p-4 pt-12">
-          <div className="w-full max-w-2xl bg-[#0a0a1a] border border-white/10 rounded-2xl shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 overflow-hidden p-4 sm:p-6">
+          <div className={`w-full bg-[#0a0a1a] border border-white/10 rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ${isExpanded ? 'max-w-[98vw] h-[95vh]' : 'max-w-3xl max-h-[85vh]'}`}>
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center justify-between p-6 border-b border-white/10 shrink-0">
               <h3 className="text-lg font-bold text-white">
                 {editing ? "Edit Service" : "New Service"}
               </h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 rounded-lg hover:bg-white/10 text-gray-400"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                  title={isExpanded ? "Collapse" : "Expand"}
+                >
+                  {isExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Body */}
-            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+            <div className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
               {error && (
                 <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl p-3 text-sm">
                   {error}
@@ -378,13 +448,14 @@ export default function AdminProducts() {
                   >
                     <option value="">Select Category</option>
                     <option value="Restroom Cubicles">Restroom Cubicles</option>
-                    <option value="Shower Cubicles">Shower Cubicles</option>
-                    <option value="Exterior Cladding">Exterior Cladding</option>
-                    <option value="Locker System">Locker System</option>
+                    <option value="Toilet Partition">Toilet Partition</option>
+                    <option value="Shower Cubicle">Shower Cubicle</option>
+                    <option value="Locker Solution">Locker Solution</option>
+                    <option value="Changing Room">Changing Room</option>
                     <option value="Custom Hardware">Custom Hardware</option>
-                    <option value="Others">Others</option>
+                    <option value="Other">Other</option>
                   </select>
-                  {form.category === "Others" && (
+                  {form.category === "Other" && (
                     <input
                       type="text"
                       value={customCategory}
@@ -401,14 +472,14 @@ export default function AdminProducts() {
                 <label className="block text-sm text-gray-300 mb-1">
                   Description
                 </label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, description: e.target.value }))
-                  }
-                  rows={3}
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706] resize-none"
-                />
+                <div className="bg-[#0a0a1a] border border-white/10 rounded-xl overflow-auto resize-y min-h-[200px] max-h-[800px] flex flex-col [&_.rsw-editor]:flex-1 [&_.rsw-editor]:text-white [&_.rsw-toolbar]:bg-white/5 [&_.rsw-toolbar]:border-b [&_.rsw-toolbar]:border-white/10 [&_.rsw-btn]:text-gray-300 hover:[&_.rsw-btn]:text-white [&_.rsw-btn[data-active='true']]:bg-[#7FB706] [&_.rsw-btn[data-active='true']]:text-white">
+                  <Editor
+                    value={form.description}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, description: e.target.value }))
+                    }
+                  />
+                </div>
               </div>
 
               {/* Image Upload */}
@@ -585,6 +656,21 @@ export default function AdminProducts() {
                 </div>
               </div>
 
+              {/* Bottom Description */}
+              <div className="border-t border-white/5 pt-4">
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Additional Description (Below Specs)
+                </label>
+                <div className="bg-[#0a0a1a] border border-white/10 rounded-xl overflow-auto resize-y min-h-[150px] max-h-[600px] flex flex-col [&_.rsw-editor]:flex-1 [&_.rsw-editor]:text-white [&_.rsw-toolbar]:bg-white/5 [&_.rsw-toolbar]:border-b [&_.rsw-toolbar]:border-white/10 [&_.rsw-btn]:text-gray-300 hover:[&_.rsw-btn]:text-white [&_.rsw-btn[data-active='true']]:bg-[#7FB706] [&_.rsw-btn[data-active='true']]:text-white">
+                  <Editor
+                    value={form.bottom_description || ""}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, bottom_description: e.target.value }))
+                    }
+                  />
+                </div>
+              </div>
+
               {/* Applications */}
               <div>
                 <label className="block text-sm text-gray-300 mb-1">
@@ -632,6 +718,72 @@ export default function AdminProducts() {
                 </div>
               </div>
 
+              {/* Color Options */}
+              <div className="border-t border-white/5 pt-4">
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Color / Finish Options
+                </label>
+                
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                  <div className="flex-1">
+                    <input
+                      value={newColorName}
+                      onChange={(e) => setNewColorName(e.target.value)}
+                      placeholder="Color name (e.g. Teak Wood, Pure White)"
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-[#7FB706]"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={colorFileRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleColorImageUpload}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => colorFileRef.current?.click()}
+                      className="flex items-center gap-1.5 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 text-xs shrink-0"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      {colorUploading ? "Uploading..." : "Upload Finish Image"}
+                    </button>
+                    {newColorImage && (
+                      <img src={newColorImage} alt="" className="w-8 h-8 rounded-lg object-cover border border-white/10 shrink-0" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={addColorOption}
+                      className="px-4 py-2 bg-[#7FB706]/20 text-[#7FB706] rounded-xl text-xs font-semibold hover:bg-[#7FB706]/30"
+                    >
+                      Add Finish
+                    </button>
+                  </div>
+                </div>
+
+                {form.colors && form.colors.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {form.colors.map((color, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-2.5 px-3 py-2 bg-white/[0.02] border border-white/5 rounded-xl text-xs text-gray-300 relative group"
+                      >
+                        <img src={color.image_url} alt="" className="w-9 h-9 rounded-lg object-cover border border-white/10" />
+                        <span className="truncate font-medium flex-1 text-white">{color.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeColorOption(i)}
+                          className="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Toggles */}
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
@@ -674,20 +826,29 @@ export default function AdminProducts() {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-white/10">
+            <div className="flex items-center justify-between p-6 border-t border-white/10 shrink-0">
               <button
                 onClick={() => setShowModal(false)}
                 className="px-4 py-2 text-gray-400 hover:text-white text-sm"
               >
                 Cancel
               </button>
-              <button
-                onClick={handleSave}
-                disabled={saving || !form.title}
-                className="px-6 py-2 bg-[#7FB706] text-white rounded-xl hover:bg-[#6fa005] disabled:opacity-50 text-sm font-medium"
-              >
-                {saving ? "Saving…" : editing ? "Update" : "Create"}
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleSaveAndPreview}
+                  disabled={saving || !form.title}
+                  className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 disabled:opacity-50 text-sm font-medium transition-colors"
+                >
+                  Save & Preview
+                </button>
+                <button
+                  onClick={handleSaveAndClose}
+                  disabled={saving || !form.title}
+                  className="px-6 py-2 bg-[#7FB706] text-white rounded-xl hover:bg-[#6fa005] disabled:opacity-50 text-sm font-medium transition-colors"
+                >
+                  {saving ? "Saving…" : editing ? "Update" : "Create"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
 import { Chatbot } from "./components/Chatbot";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { Outlet } from "react-router";
 import { Suspense, lazy } from "react";
 import {
@@ -34,6 +35,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const Downloads = lazy(() => import("./pages/Downloads"));
 
 // ── Lazy-loaded Admin Pages ───────────────────────────────────────────────
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
@@ -184,6 +186,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "download",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <Downloads />
+          </Suspense>
+        ),
+      },
+      {
         path: "faq",
         element: (
           <Suspense fallback={<PageSkeleton />}>
@@ -247,115 +257,126 @@ export const router = createBrowserRouter([
   },
   {
     path: "/admin/dashboard",
-    element: (
-      <Suspense fallback={<PageSkeleton />}>
-        <AdminDashboard />
-      </Suspense>
-    ),
+    // ProtectedRoute checks the Supabase session before rendering any child.
+    // Unauthenticated users are immediately redirected to /admin (login page)
+    // without any admin UI flashing on screen.
+    element: <ProtectedRoute />,
     children: [
       {
-        index: true,
+        // AdminDashboard is the sidebar/header layout shell; its <Outlet />
+        // renders the active sub-page.  All paths below are relative to
+        // /admin/dashboard (they must NOT start with a slash).
         element: (
           <Suspense fallback={<PageSkeleton />}>
-            <AdminOverview />
+            <AdminDashboard />
           </Suspense>
         ),
-      },
-      {
-        path: "products",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminProducts />
-          </Suspense>
-        ),
-      },
-      {
-        path: "blogs",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminBlogs />
-          </Suspense>
-        ),
-      },
-      {
-        path: "solutions",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminSolutions />
-          </Suspense>
-        ),
-      },
-      {
-        path: "gallery",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminGallery />
-          </Suspense>
-        ),
-      },
-      {
-        path: "hero",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminHero />
-          </Suspense>
-        ),
-      },
-      {
-        path: "core-services",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminCoreServices />
-          </Suspense>
-        ),
-      },
-      {
-        path: "page-banners",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminPageBanners />
-          </Suspense>
-        ),
-      },
-      {
-        path: "catalogs",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminCatalogs />
-          </Suspense>
-        ),
-      },
-      {
-        path: "contact-queries",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminContactQueries />
-          </Suspense>
-        ),
-      },
-      {
-        path: "feedback",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminFeedback />
-          </Suspense>
-        ),
-      },
-      {
-        path: "faq",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminFAQ />
-          </Suspense>
-        ),
-      },
-      {
-        path: "leads",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <AdminLeads />
-          </Suspense>
-        ),
+        children: [
+          {
+            index: true,
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminOverview />
+              </Suspense>
+            ),
+          },
+          {
+            path: "products",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminProducts />
+              </Suspense>
+            ),
+          },
+          {
+            path: "blogs",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminBlogs />
+              </Suspense>
+            ),
+          },
+          {
+            path: "solutions",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminSolutions />
+              </Suspense>
+            ),
+          },
+          {
+            path: "gallery",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminGallery />
+              </Suspense>
+            ),
+          },
+          {
+            path: "hero",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminHero />
+              </Suspense>
+            ),
+          },
+          {
+            path: "core-services",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminCoreServices />
+              </Suspense>
+            ),
+          },
+          {
+            path: "page-banners",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminPageBanners />
+              </Suspense>
+            ),
+          },
+          {
+            path: "catalogs",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminCatalogs />
+              </Suspense>
+            ),
+          },
+          {
+            path: "contact-queries",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminContactQueries />
+              </Suspense>
+            ),
+          },
+          {
+            path: "feedback",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminFeedback />
+              </Suspense>
+            ),
+          },
+          {
+            path: "faq",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminFAQ />
+              </Suspense>
+            ),
+          },
+          {
+            path: "leads",
+            element: (
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminLeads />
+              </Suspense>
+            ),
+          },
+        ],
       },
     ],
   },

@@ -19,6 +19,10 @@ CREATE TABLE IF NOT EXISTS public.catalogs (
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+ALTER TABLE public.catalogs
+  ADD COLUMN IF NOT EXISTS document_type TEXT NOT NULL DEFAULT 'Catalog',
+  ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'Other';
+
 -- ── Updated-at trigger ───────────────────────────────────────
 DROP TRIGGER IF EXISTS catalogs_updated_at ON public.catalogs;
 CREATE TRIGGER catalogs_updated_at

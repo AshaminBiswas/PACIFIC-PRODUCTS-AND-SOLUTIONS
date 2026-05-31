@@ -1,8 +1,13 @@
 {
+  "functions": {
+    "api/nvidia.ts": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/nvidia/(.*)",
-      "destination": "https://integrate.api.nvidia.com/$1"
+      "destination": "/api/nvidia"
     },
     {
       "source": "/(.*)",

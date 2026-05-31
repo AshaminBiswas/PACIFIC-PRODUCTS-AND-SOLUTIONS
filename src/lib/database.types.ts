@@ -125,12 +125,18 @@ export interface Database {
 
 // ── Row types ─────────────────────────────────────────────────
 
+export interface ProductColor {
+  name: string;
+  image_url: string;
+}
+
 export interface Product {
   id: string;
   slug: string;
   title: string;
   subtitle: string;
   description: string;
+  bottom_description?: string;
   category: string;
   image_url: string;
   alt_text?: string | null;
@@ -138,6 +144,7 @@ export interface Product {
   features: string[];
   specifications: { label: string; value: string }[];
   applications: string[];
+  colors?: ProductColor[];
   is_featured: boolean;
   sort_order: number;
   published: boolean;
@@ -168,12 +175,14 @@ export interface Solution {
   title: string;
   subtitle: string;
   description: string;
+  bottom_description?: string;
   icon_name: string;
   image_url: string;
   alt_text?: string | null;
   additional_images: string[];
   features: string[];
   clients: string[];
+  colors?: ProductColor[];
   sort_order: number;
   published: boolean;
   created_at: string;
@@ -231,6 +240,8 @@ export interface Catalog {
   file_size: number;            // bytes
   thumbnail_url: string;
   product_id: string | null;
+  document_type: string;
+  category: string;
   sort_order: number;
   published: boolean;
   created_at: string;

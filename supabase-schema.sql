@@ -11,18 +11,24 @@ CREATE TABLE IF NOT EXISTS public.products (
   title         TEXT NOT NULL,
   subtitle      TEXT NOT NULL DEFAULT '',
   description   TEXT NOT NULL DEFAULT '',
+  bottom_description TEXT NOT NULL DEFAULT '',
   category      TEXT NOT NULL DEFAULT '',
   image_url     TEXT NOT NULL DEFAULT '',
   additional_images JSONB NOT NULL DEFAULT '[]',
   features      JSONB NOT NULL DEFAULT '[]',
   specifications JSONB NOT NULL DEFAULT '[]',
   applications  JSONB NOT NULL DEFAULT '[]',
+  colors        JSONB NOT NULL DEFAULT '[]'::jsonb,
   is_featured   BOOLEAN NOT NULL DEFAULT false,
   sort_order    INTEGER NOT NULL DEFAULT 0,
   published     BOOLEAN NOT NULL DEFAULT false,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE public.products
+  ADD COLUMN IF NOT EXISTS colors JSONB NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS bottom_description TEXT NOT NULL DEFAULT '';
 
 -- ── 2. Blogs ─────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.blogs (
@@ -48,11 +54,13 @@ CREATE TABLE IF NOT EXISTS public.solutions (
   title       TEXT NOT NULL,
   subtitle    TEXT NOT NULL DEFAULT '',
   description TEXT NOT NULL DEFAULT '',
+  bottom_description TEXT NOT NULL DEFAULT '',
   icon_name   TEXT NOT NULL DEFAULT 'Building2',
   image_url   TEXT NOT NULL DEFAULT '',
   additional_images JSONB NOT NULL DEFAULT '[]',
   features    JSONB NOT NULL DEFAULT '[]',
   clients     JSONB NOT NULL DEFAULT '[]',
+  colors      JSONB NOT NULL DEFAULT '[]'::jsonb,
   sort_order  INTEGER NOT NULL DEFAULT 0,
   published   BOOLEAN NOT NULL DEFAULT false,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),

@@ -5,6 +5,7 @@ import type { Catalog } from "../../../lib/database.types";
 import {
   Plus, Trash2, X, Upload, Eye, EyeOff, Pencil,
   FileText, Image as ImageIcon, Download, ExternalLink,
+  Maximize2, Minimize2
 } from "lucide-react";
 
 function formatFileSize(bytes: number): string {
@@ -20,12 +21,15 @@ export default function AdminCatalogs() {
   const { data: products } = useAdminProducts();
 
   const [show, setShow] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
 
   // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [documentType, setDocumentType] = useState("Catalog");
+  const [category, setCategory] = useState("Other");
   const [fileUrl, setFileUrl] = useState("");
   const [fileType, setFileType] = useState<"pdf" | "image">("pdf");
   const [fileSize, setFileSize] = useState(0);
@@ -45,6 +49,8 @@ export default function AdminCatalogs() {
   const resetForm = () => {
     setTitle("");
     setDescription("");
+    setDocumentType("Catalog");
+    setCategory("Other");
     setFileUrl("");
     setFileType("pdf");
     setFileSize(0);
@@ -52,12 +58,15 @@ export default function AdminCatalogs() {
     setProductId("");
     setErr("");
     setEditingId(null);
+    setIsExpanded(false);
   };
 
   const startEdit = (cat: Catalog) => {
     setEditingId(cat.id);
     setTitle(cat.title);
     setDescription(cat.description);
+    setDocumentType(cat.document_type || "Catalog");
+    setCategory(cat.category || "Other");
     setFileUrl(cat.file_url);
     setFileType(cat.file_type);
     setFileSize(cat.file_size);
@@ -118,18 +127,22 @@ export default function AdminCatalogs() {
         const { error } = await supabase.from("catalogs").update({
           title,
           description,
+          document_type: documentType,
+          category,
           file_url: fileUrl,
           file_type: fileType,
           file_size: fileSize,
           thumbnail_url: thumbnailUrl,
           product_id: productId || null,
-        }).eq("id", editingId);
+        } as any).eq("id", editingId);
         if (error) throw error;
       } else {
         // Insert new catalog
         const { error } = await supabase.from("catalogs").insert({
           title,
           description,
+          document_type: documentType,
+          category,
           file_url: fileUrl,
           file_type: fileType,
           file_size: fileSize,
@@ -137,7 +150,7 @@ export default function AdminCatalogs() {
           product_id: productId || null,
           sort_order: catalogs.length + 1,
           published: true,
-        });
+        } as any);
         if (error) throw error;
       }
       setShow(false);
@@ -169,12 +182,12 @@ export default function AdminCatalogs() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Catalogs</h1>
+        <h1 className="text-2xl font-bold text-white">Downloads & Catalogs</h1>
         <button
           onClick={() => { setShow(true); setErr(""); }}
           className="flex items-center gap-2 px-4 py-2 bg-[#7FB706] text-white rounded-xl hover:bg-[#6fa005] text-sm font-medium"
         >
-          <Plus className="w-4 h-4" />Upload Catalog
+          <Plus className="w-4 h-4" />Upload Document
         </button>
       </div>
 
@@ -192,127 +205,126 @@ export default function AdminCatalogs() {
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {catalogs.map((cat) => (
-            <div
-              key={cat.id}
-              className="group relative bg-white/5 border border-white/10 rounded-2xl p-5 flex items-center gap-5 hover:border-white/20 transition-colors"
-            >
-              {/* Thumbnail / Icon */}
-              <div className="w-16 h-16 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                {cat.thumbnail_url ? (
-                  <img
-                    src={cat.thumbnail_url}
-                    alt={cat.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : cat.file_type === "pdf" ? (
-                  <FileText className="w-7 h-7 text-red-400" />
-                ) : (
-                  <ImageIcon className="w-7 h-7 text-blue-400" />
-                )}
-              </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <h3 className="text-white font-medium truncate">{cat.title}</h3>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
-                    cat.file_type === "pdf"
-                      ? "bg-red-500/10 text-red-400"
-                      : "bg-blue-500/10 text-blue-400"
-                  }`}>
-                    {cat.file_type === "pdf" ? (
-                      <FileText className="w-3 h-3" />
-                    ) : (
-                      <ImageIcon className="w-3 h-3" />
-                    )}
-                    {cat.file_type.toUpperCase()}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {formatFileSize(cat.file_size)}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    • {getProductTitle(cat.product_id)}
-                  </span>
-                </div>
-                {cat.description && (
-                  <p className="text-gray-500 text-xs mt-1 truncate">{cat.description}</p>
-                )}
-              </div>
-
-              {/* Status badge */}
-              {!cat.published && (
-                <span className="px-2 py-0.5 bg-gray-800/80 text-gray-400 text-xs rounded-full">
-                  Draft
-                </span>
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => startEdit(cat)}
-                  className="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-[#7FB706] hover:bg-white/10 transition-colors"
-                  title="Edit"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setPreviewCatalog(cat)}
-                  className="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                  title="Preview"
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
-                <a
-                  href={cat.file_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-[#7FB706] hover:bg-white/10 transition-colors"
-                  title="Download"
-                >
-                  <Download className="w-4 h-4" />
-                </a>
-                <button
-                  onClick={() => toggle(cat)}
-                  className="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                  title={cat.published ? "Unpublish" : "Publish"}
-                >
-                  {cat.published ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-                <button
-                  onClick={() => del(cat.id)}
-                  className="p-2 bg-red-500/10 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
-                  title="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10 text-gray-400 text-left">
+                  <th className="px-4 py-3 font-medium">Document</th>
+                  <th className="px-4 py-3 font-medium hidden sm:table-cell">Details</th>
+                  <th className="px-4 py-3 font-medium text-center">Status</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {catalogs.map((cat) => (
+                  <tr key={cat.id} className="hover:bg-white/[0.02]">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {cat.thumbnail_url ? (
+                            <img src={cat.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                          ) : cat.file_type === "pdf" ? (
+                            <FileText className="w-5 h-5 text-red-400" />
+                          ) : (
+                            <ImageIcon className="w-5 h-5 text-blue-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-white font-medium truncate max-w-[150px] sm:max-w-[250px]">{cat.title}</p>
+                          <p className="text-gray-500 text-xs truncate max-w-[150px] sm:max-w-[250px]">{cat.description || "No description"}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <div className="flex flex-col gap-1 text-xs">
+                        <span className="text-gray-300">{cat.document_type || 'Catalog'} • {cat.category || 'Other'}</span>
+                        <span className="text-gray-500">
+                          {cat.file_type.toUpperCase()} • {formatFileSize(cat.file_size)} • {getProductTitle(cat.product_id)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button onClick={() => toggle(cat)}>
+                        {cat.published ? (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-green-500/15 text-green-400 rounded-full">
+                            <Eye className="w-3 h-3" /> Live
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-gray-500/15 text-gray-400 rounded-full">
+                            <EyeOff className="w-3 h-3" /> Draft
+                          </span>
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => startEdit(cat)}
+                          className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                          title="Edit"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setPreviewCatalog(cat)}
+                          className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                          title="Preview"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <a
+                          href={cat.file_url}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                          title="Download"
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                        <button
+                          onClick={() => del(cat.id)}
+                          className="p-2 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* Upload Modal */}
       {show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-lg bg-[#0a0a1a] border border-white/10 rounded-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
-              <h3 className="text-lg font-bold text-white">{editingId ? "Edit Catalog" : "Upload Catalog"}</h3>
-              <button
-                onClick={() => { setShow(false); resetForm(); }}
-                className="p-2 rounded-lg hover:bg-white/10 text-gray-400"
-              >
-                <X className="w-5 h-5" />
-              </button>
+          <div className={`w-full bg-[#0a0a1a] border border-white/10 rounded-2xl flex flex-col transition-all duration-300 ${isExpanded ? 'max-w-[98vw] h-[95vh]' : 'max-w-lg max-h-[90vh]'}`}>
+            <div className="flex items-center justify-between p-6 border-b border-white/10 shrink-0">
+              <h3 className="text-lg font-bold text-white">{editingId ? "Edit Document" : "Upload Document"}</h3>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="p-2 rounded-lg hover:bg-white/10 text-gray-400"
+                  title={isExpanded ? "Collapse" : "Expand"}
+                >
+                  {isExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={() => { setShow(false); resetForm(); }}
+                  className="p-2 rounded-lg hover:bg-white/10 text-gray-400"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
               {err && (
                 <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl p-3 text-sm">
                   {err}
@@ -337,17 +349,54 @@ export default function AdminCatalogs() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
-                  placeholder="Brief description of this catalog"
+                  placeholder="Brief description"
                   className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706] resize-none"
                 />
+              </div>
+
+              {/* Document Type & Category Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">Document Type *</label>
+                  <select
+                    value={documentType}
+                    onChange={(e) => setDocumentType(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]"
+                  >
+                    <option value="Brochure" className="bg-[#0a0a1a]">Brochure</option>
+                    <option value="Catalog" className="bg-[#0a0a1a]">Catalog</option>
+                    <option value="Drawing" className="bg-[#0a0a1a]">Drawing</option>
+                    <option value="Installation Manual" className="bg-[#0a0a1a]">Installation Manual</option>
+                    <option value="Warranty" className="bg-[#0a0a1a]">Warranty</option>
+                    <option value="Technical Specification" className="bg-[#0a0a1a]">Technical Specification</option>
+                    <option value="Test Report" className="bg-[#0a0a1a]">Test Report</option>
+                    <option value="Other" className="bg-[#0a0a1a]">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">Category *</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]"
+                  >
+                    <option value="Restroom Cubicles" className="bg-[#0a0a1a]">Restroom Cubicles</option>
+                    <option value="Toilet Partition" className="bg-[#0a0a1a]">Toilet Partition</option>
+                    <option value="Shower Cubicle" className="bg-[#0a0a1a]">Shower Cubicle</option>
+                    <option value="Locker Solution" className="bg-[#0a0a1a]">Locker Solution</option>
+                    <option value="Changing Room" className="bg-[#0a0a1a]">Changing Room</option>
+                    <option value="Custom Hardware" className="bg-[#0a0a1a]">Custom Hardware</option>
+                    <option value="Other" className="bg-[#0a0a1a]">Other</option>
+                  </select>
+                </div>
               </div>
 
               {/* File Upload */}
               <div>
                 <label className="block text-sm text-gray-300 mb-1">
-                  Catalog File * <span className="text-gray-500">(PDF or Image)</span>
+                  File * <span className="text-gray-500">(PDF or Image)</span>
                 </label>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <input
                     ref={fileRef}
                     type="file"
@@ -355,26 +404,45 @@ export default function AdminCatalogs() {
                     onChange={handleFileUpload}
                     className="hidden"
                   />
-                  <button
-                    type="button"
-                    onClick={() => fileRef.current?.click()}
-                    disabled={uploading}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 text-sm disabled:opacity-50"
-                  >
-                    <Upload className="w-4 h-4" />
-                    {uploading ? "Uploading…" : "Choose File"}
-                  </button>
-                  {fileUrl && (
-                    <div className="flex items-center gap-2 text-sm">
-                      {fileType === "pdf" ? (
-                        <FileText className="w-4 h-4 text-red-400" />
-                      ) : (
-                        <ImageIcon className="w-4 h-4 text-blue-400" />
-                      )}
-                      <span className="text-green-400">✓ Uploaded</span>
-                      <span className="text-gray-500">
-                        ({formatFileSize(fileSize)})
-                      </span>
+                  {!fileUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      disabled={uploading}
+                      className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 text-sm disabled:opacity-50"
+                    >
+                      <Upload className="w-4 h-4" />
+                      {uploading ? "Uploading…" : "Choose File"}
+                    </button>
+                  ) : (
+                    <div className="flex items-center flex-wrap gap-2 w-full sm:w-auto">
+                      <div className="flex items-center gap-2 text-sm bg-white/5 px-3 py-2 rounded-xl border border-white/10">
+                        {fileType === "pdf" ? (
+                          <FileText className="w-4 h-4 text-red-400" />
+                        ) : (
+                          <ImageIcon className="w-4 h-4 text-blue-400" />
+                        )}
+                        <span className="text-green-400">✓ Uploaded</span>
+                        <span className="text-gray-500">
+                          ({formatFileSize(fileSize)})
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => fileRef.current?.click()}
+                        className="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-[#7FB706] hover:bg-white/10 transition-colors"
+                        title="Edit File"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setFileUrl(""); setFileSize(0); }}
+                        className="p-2 bg-red-500/10 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+                        title="Delete File"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   )}
                 </div>
@@ -382,7 +450,7 @@ export default function AdminCatalogs() {
                   <img
                     src={fileUrl}
                     alt="Preview"
-                    className="mt-3 h-32 rounded-lg object-cover border border-white/10"
+                    className="mt-3 h-32 w-auto max-w-full rounded-lg object-contain border border-white/10 bg-black/50"
                   />
                 )}
               </div>
@@ -392,7 +460,7 @@ export default function AdminCatalogs() {
                 <label className="block text-sm text-gray-300 mb-1">
                   Thumbnail <span className="text-gray-500">(optional, for PDF preview)</span>
                 </label>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
                   <input
                     ref={thumbRef}
                     type="file"
@@ -400,33 +468,54 @@ export default function AdminCatalogs() {
                     onChange={handleThumbnailUpload}
                     className="hidden"
                   />
-                  <button
-                    type="button"
-                    onClick={() => thumbRef.current?.click()}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 text-sm"
-                  >
-                    <Upload className="w-4 h-4" />Upload Thumbnail
-                  </button>
+                  {!thumbnailUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => thumbRef.current?.click()}
+                      className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:bg-white/10 text-sm whitespace-nowrap"
+                    >
+                      <Upload className="w-4 h-4" />Upload Thumbnail
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => thumbRef.current?.click()}
+                        className="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-[#7FB706] hover:bg-white/10 transition-colors"
+                        title="Edit Thumbnail"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setThumbnailUrl("")}
+                        className="p-2 bg-red-500/10 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+                        title="Delete Thumbnail"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                   <input
                     value={thumbnailUrl}
                     onChange={(e) => setThumbnailUrl(e.target.value)}
                     placeholder="or paste URL"
-                    className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]"
+                    className="w-full sm:flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]"
                   />
                 </div>
                 {thumbnailUrl && (
                   <img
                     src={thumbnailUrl}
                     alt="Thumbnail"
-                    className="mt-2 h-20 rounded-lg object-cover"
+                    className="mt-3 h-20 w-auto max-w-full rounded-lg object-contain bg-black/50"
                   />
                 )}
               </div>
 
-              {/* Link to Product */}
+              {/* Link to Product (Optional) */}
               <div>
                 <label className="block text-sm text-gray-300 mb-1">
-                  Link to Service *
+                  Link to Product/Service <span className="text-gray-500">(optional)</span>
                 </label>
                 <select
                   value={productId}
@@ -445,7 +534,7 @@ export default function AdminCatalogs() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-white/10">
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-white/10 shrink-0">
               <button
                 onClick={() => { setShow(false); resetForm(); }}
                 className="px-4 py-2 text-gray-400 hover:text-white text-sm"
@@ -454,10 +543,10 @@ export default function AdminCatalogs() {
               </button>
               <button
                 onClick={save}
-                disabled={saving || !title || !fileUrl || !productId}
+                disabled={saving || !title || !fileUrl}
                 className="px-6 py-2 bg-[#7FB706] text-white rounded-xl hover:bg-[#6fa005] disabled:opacity-50 text-sm font-medium"
               >
-                {saving ? "Saving…" : editingId ? "Save Changes" : "Upload Catalog"}
+                {saving ? "Saving…" : editingId ? "Save Changes" : "Upload Document"}
               </button>
             </div>
           </div>
@@ -469,39 +558,39 @@ export default function AdminCatalogs() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
           <div className="w-full max-w-4xl bg-[#0a0a1a] border border-white/10 rounded-2xl max-h-[92vh] flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-white/10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 border-b border-white/10 gap-4">
               <div className="flex items-center gap-3">
                 {previewCatalog.file_type === "pdf" ? (
                   <FileText className="w-5 h-5 text-red-400" />
                 ) : (
                   <ImageIcon className="w-5 h-5 text-blue-400" />
                 )}
-                <div>
-                  <h3 className="text-lg font-bold text-white">{previewCatalog.title}</h3>
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold text-white truncate">{previewCatalog.title}</h3>
                   <p className="text-xs text-gray-500">
                     {previewCatalog.file_type.toUpperCase()} • {formatFileSize(previewCatalog.file_size)}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <a
                   href={previewCatalog.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg text-gray-300 hover:bg-white/10 text-sm"
+                  className="flex flex-1 sm:flex-none justify-center items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg text-gray-300 hover:bg-white/10 text-sm"
                 >
                   <ExternalLink className="w-4 h-4" />Open
                 </a>
                 <a
                   href={previewCatalog.file_url}
                   download
-                  className="flex items-center gap-2 px-3 py-1.5 bg-[#7FB706]/10 rounded-lg text-[#7FB706] hover:bg-[#7FB706]/20 text-sm"
+                  className="flex flex-1 sm:flex-none justify-center items-center gap-2 px-3 py-1.5 bg-[#7FB706]/10 rounded-lg text-[#7FB706] hover:bg-[#7FB706]/20 text-sm"
                 >
                   <Download className="w-4 h-4" />Download
                 </a>
                 <button
                   onClick={() => setPreviewCatalog(null)}
-                  className="p-2 rounded-lg hover:bg-white/10 text-gray-400"
+                  className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 text-gray-400 shrink-0"
                 >
                   <X className="w-5 h-5" />
                 </button>

@@ -120,7 +120,8 @@ type AIRecommendation = {
   url: string;
 };
 
-const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY as string;
+// NVIDIA API key is injected server-side by the Vercel function (production)
+// or the Vite dev proxy (development). The client never holds the key.
 
 // ── Hero Section (extracted as its own component) ─────────────
 
@@ -206,7 +207,6 @@ function HeroSection() {
 
   // ── AI recommendations ──
   const fetchAIRecommendations = useCallback(async (query: string) => {
-    if (!NVIDIA_API_KEY) return;
     setIsAISearching(true);
     try {
       const productList = allProducts.map((p) => {
@@ -221,10 +221,7 @@ function HeroSection() {
 
       const res = await fetch("/api/nvidia/v1/chat/completions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${NVIDIA_API_KEY}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
           messages: [{ role: "user", content: prompt }],

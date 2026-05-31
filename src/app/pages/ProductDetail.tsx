@@ -38,6 +38,7 @@ export default function ProductDetailPage() {
   const [showCatalogViewer, setShowCatalogViewer] = useState(false);
   const [currentMain, setCurrentMain] = useState<string | null>(null);
   const [currentThumbs, setCurrentThumbs] = useState<string[] | null>(null);
+  const [activeColorIdx, setActiveColorIdx] = useState(0);
 
   // Redirect old /products/:slug URLs to /products/:categorySlug/:productSlug
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function ProductDetailPage() {
   const isPremiumShowerCubicles = lookupSlug === "premium-shower-cubicles-supplier-in-india";
   const seoDescription = isPremiumShowerCubicles
     ? "Premium shower cubicles manufacturer in India offering luxury modular shower cubicle solutions for hotels, gyms, offices, hospitals, and commercial spaces. Waterproof, durable, hygienic, and modern shower partition systems by Pacific Product and Solution."
-    : (product.description?.slice(0, 155) || `Premium ${product.title} solutions by Pacific Products & Solutions`);
+    : (product.description?.replace(/<[^>]+>/g, '').slice(0, 155) || `Premium ${product.title} solutions by Pacific Products & Solutions`);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#030213] transition-colors">
@@ -148,9 +149,10 @@ export default function ProductDetailPage() {
                 {product.title}
               </h1>
               <p className="text-xl text-[#B5F823] font-medium mb-4">{product.subtitle}</p>
-              <p className="text-sm sm:text-base text-gray-400 mb-8 leading-relaxed max-w-xl">
-                {product.description}
-              </p>
+              <div 
+                className="prose prose-sm sm:prose-base dark:prose-invert prose-p:text-gray-400 prose-headings:text-[#B5F823] prose-strong:text-white max-w-xl mb-8 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: product.description || '' }}
+              />
 
               {/* Inline stats */}
               <div className="flex flex-wrap gap-6 mb-8 pb-8 border-b border-white/10">
@@ -300,8 +302,80 @@ export default function ProductDetailPage() {
               </div>
             </motion.div>
           </div>
+
+          {/* Additional Description - Full Width */}
+          {product.bottom_description && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }} 
+              whileInView={{ opacity: 1, y: 0 }} 
+              viewport={{ once: true }}
+              className="mt-16 pt-16 border-t border-gray-200 dark:border-white/10"
+            >
+              <div 
+                className="prose prose-sm sm:prose-base dark:prose-invert prose-p:text-gray-600 dark:prose-p:text-gray-400 prose-headings:text-gray-900 dark:prose-headings:text-[#B5F823] prose-strong:text-gray-900 dark:prose-strong:text-white max-w-none leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: product.bottom_description }}
+              />
+            </motion.div>
+          )}
         </div>
       </section>
+
+      {/* ═══════════════════ COLORS & FINISHES ═══════════════════ */}
+      {product.colors && product.colors.length > 0 && (
+        <section className="py-16 sm:py-20 lg:py-24 bg-white dark:bg-[#030213] transition-colors">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+              <span className="text-xs font-bold tracking-widest text-[#7FB706] uppercase">Options</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mt-2 mb-4">Colors & Finishes</h2>
+            </motion.div>
+            
+            {/* Main Image Showcase for the active color */}
+            <div className="max-w-4xl mx-auto mb-10">
+              <motion.div 
+                key={activeColorIdx}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }}
+                className="relative rounded-2xl overflow-hidden aspect-[16/9] ring-1 ring-black/5 dark:ring-white/10 bg-gray-50 dark:bg-white/[0.02]"
+              >
+                <ImageWithFallback 
+                  src={product.colors[activeColorIdx]?.image_url} 
+                  alt={product.colors[activeColorIdx]?.name} 
+                  className="w-full h-full object-cover" 
+                />
+                <div className="absolute bottom-4 left-4 right-4 text-center sm:text-left sm:bottom-6 sm:left-6">
+                  <div className="inline-block px-4 py-2 bg-white/90 dark:bg-black/80 backdrop-blur-md rounded-xl shadow-lg border border-black/5 dark:border-white/10">
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {product.colors[activeColorIdx]?.name}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Color Thumbnails */}
+            <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+              {product.colors.map((color: any, index: number) => {
+                const isActive = index === activeColorIdx;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setActiveColorIdx(index)}
+                    className={`group relative flex flex-col items-center gap-2 transition-all duration-300 ${isActive ? 'scale-110' : 'hover:scale-105 opacity-70 hover:opacity-100'}`}
+                  >
+                    <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden ring-2 transition-all shadow-md ${isActive ? 'ring-[#7FB706] ring-offset-2 ring-offset-white dark:ring-offset-[#030213] shadow-[#7FB706]/20' : 'ring-gray-200 dark:ring-white/10 hover:ring-[#7FB706]/50'}`}>
+                      <ImageWithFallback src={color.image_url} alt={color.name} className="w-full h-full object-cover" />
+                    </div>
+                    <span className={`text-xs sm:text-sm font-semibold transition-colors ${isActive ? 'text-[#7FB706]' : 'text-gray-500 dark:text-gray-400'}`}>
+                      {color.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ═══════════════════ APPLICATIONS ═══════════════════ */}
       {product.applications && product.applications.length > 0 && (

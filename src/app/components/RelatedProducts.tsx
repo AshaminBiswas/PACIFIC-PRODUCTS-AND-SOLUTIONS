@@ -25,13 +25,10 @@ export function RelatedProducts({ currentProductId, currentCategory }: RelatedPr
   // Exclude current product
   const others = allProducts.filter((p: Product) => p.id !== currentProductId);
 
-  // Prioritise: same category first, then fill with others
-  const sameCategory = currentCategory
-    ? others.filter((p: Product) => p.category === currentCategory)
+  // Only suggest products from the same category to avoid distracting the customer
+  const suggestions = currentCategory
+    ? others.filter((p: Product) => p.category === currentCategory).slice(0, 3)
     : [];
-  const different = others.filter((p: Product) => p.category !== currentCategory);
-
-  const suggestions = [...sameCategory, ...different].slice(0, 3);
 
   if (suggestions.length === 0) return null;
 

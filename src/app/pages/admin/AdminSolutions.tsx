@@ -2,18 +2,23 @@ import { useState, useRef } from "react";
 import { supabase, uploadImage } from "../../../lib/supabase";
 import { useAdminSolutions } from "../../../lib/hooks";
 import type { Solution } from "../../../lib/database.types";
-import { Plus, Pencil, Trash2, X, Upload, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Upload, Eye, EyeOff, Maximize2, Minimize2 } from "lucide-react";
+import Editor from "react-simple-wysiwyg";
+import type { ProductColor } from "../../../lib/database.types";
 
 function toSlug(t: string) { return t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
 
 const ICONS = ["Plane", "ShoppingBag", "Building2", "Home", "Factory", "Globe", "Shield", "Award", "Target", "Lightbulb"];
 
-const empty = { slug: "", title: "", subtitle: "", description: "", icon_name: "Building2", image_url: "", additional_images: [] as string[], features: [] as string[], clients: [] as string[], sort_order: 0, published: false };
+const empty = { slug: "", title: "", subtitle: "", description: "", bottom_description: "", icon_name: "Building2", image_url: "", additional_images: [] as string[], features: [] as string[], clients: [] as string[], colors: [] as ProductColor[], sort_order: 0, published: false };
 
 export default function AdminSolutions() {
   const { data: solutions, loading, refetch } = useAdminSolutions();
   const [editing, setEditing] = useState<Solution | null>(null);
   const [form, setForm] = useState({ ...empty });
+  const [isExpanded, setIsExpanded] = useState(false);
+  const colorFileRef = useRef<HTMLInputElement>(null);
+  const [colorName, setColorName] = useState("");
   const [show, setShow] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
@@ -24,11 +29,11 @@ export default function AdminSolutions() {
 
   const PREDEFINED_TITLES = ["Corporates", "Malls", "Airports", "Metro and railways", "Hospitals", "Schools & Colleges", "Others"];
 
-  const openCreate = () => { setEditing(null); setForm({ ...empty, sort_order: solutions.length + 1 }); setCustomTitle(""); setShow(true); setErr(""); };
+  const openCreate = () => { setEditing(null); setForm({ ...empty, sort_order: solutions.length + 1 }); setCustomTitle(""); setShow(true); setIsExpanded(false); setErr(""); };
   const openEdit = (s: Solution) => { 
     setEditing(s); 
     const isCustom = s.title && !PREDEFINED_TITLES.includes(s.title);
-    setForm({ slug: s.slug, title: isCustom ? "Others" : s.title, subtitle: s.subtitle, description: s.description, icon_name: s.icon_name, image_url: s.image_url, additional_images: s.additional_images || [], features: [...s.features], clients: [...s.clients], sort_order: s.sort_order, published: s.published }); 
+    setForm({ slug: s.slug, title: isCustom ? "Others" : s.title, subtitle: s.subtitle, description: s.description, bottom_description: s.bottom_description || "", icon_name: s.icon_name, image_url: s.image_url, additional_images: s.additional_images || [], features: [...s.features], clients: [...s.clients], colors: s.colors || [], sort_order: s.sort_order, published: s.published }); 
     setCustomTitle(isCustom ? s.title : "");
     setShow(true); 
     setErr(""); 
@@ -44,14 +49,51 @@ export default function AdminSolutions() {
     const slug = form.slug || toSlug(finalTitle);
     const payload = { ...form, title: finalTitle, slug };
     try {
-      if (editing) { const { error } = await supabase.from("solutions").update(payload).eq("id", editing.id); if (error) throw error; }
-      else { const { error } = await supabase.from("solutions").insert(payload); if (error) throw error; }
-      setShow(false); refetch();
-    } catch (e: any) { setErr(e.message); } finally { setSaving(false); }
+      if (editing) {
+        const { error: err } = await supabase.from("solutions").update(payload as any).eq("id", editing.id);
+        if (err) throw err;
+      } else {
+        const { error: err } = await supabase.from("solutions").insert(payload as any);
+        if (err) throw err;
+      }
+      refetch(); return { success: true, slug };
+    } catch (e: any) { setErr(e.message); return { success: false, slug: null }; } finally { setSaving(false); }
   };
 
-  const del = async (id: string) => { if (!confirm("Delete?")) return; await supabase.from("solutions").delete().eq("id", id); refetch(); };
-  const toggle = async (s: Solution) => { await supabase.from("solutions").update({ published: !s.published }).eq("id", s.id); refetch(); };
+  
+  const handleSaveAndClose = async () => {
+    const res = await save();
+    if (res?.success) setShow(false);
+  };
+
+  const handleSaveAndPreview = async () => {
+    const res = await save();
+    if (res?.success && res.slug) {
+      window.open(`/solutions/${res.slug}`, "_blank");
+      setShow(false);
+    }
+  };
+
+  const handleColorImg = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const url = await uploadImage(f, "solutions");
+    if (url) {
+      if (!colorName.trim()) {
+        setErr("Please enter a color name before uploading.");
+        return;
+      }
+      setForm((p) => ({
+        ...p,
+        colors: [...(p.colors || []), { name: colorName.trim(), image_url: url }],
+      }));
+      setColorName("");
+      if (colorFileRef.current) colorFileRef.current.value = "";
+    }
+  };
+
+const del = async (id: string) => { if (!confirm("Delete?")) return; await supabase.from("solutions").delete().eq("id", id); refetch(); };
+  const toggle = async (s: Solution) => { await supabase.from("solutions").update({ published: !s.published } as any).eq("id", s.id); refetch(); };
 
   return (
     <div>
@@ -82,10 +124,18 @@ export default function AdminSolutions() {
       )}
 
       {show && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/70 overflow-y-auto p-4 pt-12">
-          <div className="w-full max-w-2xl bg-[#0a0a1a] border border-white/10 rounded-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-white/10"><h3 className="text-lg font-bold text-white">{editing ? "Edit" : "New"} Solution</h3><button onClick={() => setShow(false)} className="p-2 rounded-lg hover:bg-white/10 text-gray-400"><X className="w-5 h-5" /></button></div>
-            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 overflow-hidden p-4 sm:p-6">
+          <div className={`w-full bg-[#0a0a1a] border border-white/10 rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ${isExpanded ? "max-w-[98vw] h-[95vh]" : "max-w-3xl max-h-[85vh]"}`}>
+            <div className="flex items-center justify-between p-6 border-b border-white/10 shrink-0">
+              <h3 className="text-lg font-bold text-white">{editing ? "Edit Solution" : "New Solution"}</h3>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setIsExpanded(!isExpanded)} className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white" title={isExpanded ? "Collapse" : "Expand"}>
+                  {isExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                </button>
+                <button onClick={() => setShow(false)} className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white"><X className="w-5 h-5" /></button>
+              </div>
+            </div>
+            <div className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
               {err && <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl p-3 text-sm">{err}</div>}
               <div><label className="block text-sm text-gray-300 mb-1">Title *</label><select value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="w-full px-4 py-2.5 bg-[#0a0a1a] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]"><option value="" className="bg-[#0a0a1a]">Select an Industry</option><option value="Corporates" className="bg-[#0a0a1a]">Corporates</option><option value="Malls" className="bg-[#0a0a1a]">Malls</option><option value="Airports" className="bg-[#0a0a1a]">Airports</option><option value="Metro and railways" className="bg-[#0a0a1a]">Metro and railways</option><option value="Hospitals" className="bg-[#0a0a1a]">Hospitals</option><option value="Schools & Colleges" className="bg-[#0a0a1a]">Schools & Colleges</option><option value="Others" className="bg-[#0a0a1a]">Others</option></select>
               {form.title === "Others" && <input type="text" value={customTitle} onChange={e => setCustomTitle(e.target.value)} placeholder="Enter custom industry" className="w-full mt-2 px-4 py-2.5 bg-[#0a0a1a] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]" />}</div>
@@ -101,8 +151,48 @@ export default function AdminSolutions() {
                 <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"><input type="checkbox" checked={form.published} onChange={e => setForm(f => ({ ...f, published: e.target.checked }))} className="accent-[#7FB706] w-4 h-4" />Published</label>
                 <div className="flex items-center gap-2"><label className="text-sm text-gray-300">Sort</label><input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))} className="w-16 px-2 py-1 bg-white/5 border border-white/10 rounded-lg text-white text-sm text-center focus:outline-none focus:border-[#7FB706]" /></div>
               </div>
+              {/* Bottom Description */}
+              <div className="border-t border-white/5 pt-4 px-6">
+                <label className="block text-sm font-semibold text-white mb-2">Additional Description (Below Specs)</label>
+                <div className="bg-[#0a0a1a] border border-white/10 rounded-xl overflow-auto resize-y min-h-[150px] max-h-[600px] flex flex-col [&_.rsw-editor]:flex-1 [&_.rsw-editor]:text-white [&_.rsw-toolbar]:bg-white/5 [&_.rsw-toolbar]:border-b [&_.rsw-toolbar]:border-white/10 [&_.rsw-btn]:text-gray-300 hover:[&_.rsw-btn]:text-white [&_.rsw-btn[data-active='true']]:bg-[#7FB706] [&_.rsw-btn[data-active='true']]:text-white">
+                  <Editor value={form.bottom_description || ""} onChange={(e) => setForm((f) => ({ ...f, bottom_description: e.target.value }))} />
+                </div>
+              </div>
+
+              {/* Colors */}
+              <div className="border-t border-white/5 pt-4">
+                <label className="block text-sm font-semibold text-white mb-2">Colors & Finishes</label>
+                <div className="flex gap-2 mb-2">
+                  <input type="text" value={colorName} onChange={(e) => setColorName(e.target.value)} placeholder="Color Name (e.g. Matte Black)" className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#7FB706]" />
+                  <input ref={colorFileRef} type="file" accept="image/*" onChange={handleColorImg} className="hidden" />
+                  <button type="button" onClick={() => colorFileRef.current?.click()} className="flex items-center gap-2 px-4 py-2 bg-[#7FB706]/20 text-[#7FB706] rounded-xl text-sm">
+                    <Upload className="w-4 h-4" /> Upload Swatch
+                  </button>
+                </div>
+                {form.colors && form.colors.length > 0 && (
+                  <div className="flex flex-wrap gap-4 mt-4">
+                    {form.colors.map((c, i) => (
+                      <div key={i} className="relative group flex flex-col items-center gap-1">
+                        <img src={c.image_url} alt={c.name} className="w-12 h-12 rounded-full object-cover border border-white/10" />
+                        <span className="text-xs text-gray-400">{c.name}</span>
+                        <button type="button" onClick={() => setForm((p) => ({ ...p, colors: (p.colors || []).filter((_, j) => j !== i) }))} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-white/10"><button onClick={() => setShow(false)} className="px-4 py-2 text-gray-400 hover:text-white text-sm">Cancel</button><button onClick={save} disabled={saving || !form.title} className="px-6 py-2 bg-[#7FB706] text-white rounded-xl hover:bg-[#6fa005] disabled:opacity-50 text-sm font-medium">{saving ? "Saving…" : editing ? "Update" : "Create"}</button></div>
+
+            <div className="flex items-center justify-between p-6 border-t border-white/10 shrink-0">
+              <button onClick={() => setShow(false)} className="px-4 py-2 text-gray-400 hover:text-white text-sm">Cancel</button>
+              <div className="flex items-center gap-3">
+                <button onClick={handleSaveAndPreview} disabled={saving || !form.title} className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 disabled:opacity-50 text-sm font-medium transition-colors">Save & Preview</button>
+                <button onClick={handleSaveAndClose} disabled={saving || !form.title} className="px-6 py-2 bg-[#7FB706] text-white rounded-xl hover:bg-[#6fa005] disabled:opacity-50 text-sm font-medium transition-colors">{saving ? "Saving…" : editing ? "Update" : "Create"}</button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

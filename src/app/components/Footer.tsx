@@ -32,6 +32,7 @@ export function Footer() {
     { name: "About Us", path: "/about" },
     { name: "Our Process", path: "/process" },
     { name: "Brochure", path: "/brochure" },
+    { name: "Downloads", path: "/download" },
     { name: "FAQ", path: "/faq" },
     { name: "Testimonials", path: "/testimonials" },
     { name: "Careers", path: "/careers" },
