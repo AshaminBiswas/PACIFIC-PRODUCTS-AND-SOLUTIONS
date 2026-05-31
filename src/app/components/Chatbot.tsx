@@ -446,7 +446,6 @@ export function Chatbot() {
 
   // ── NVIDIA API — thinking disabled for speed ──
   const callAI = async (history: Message[], userText: string) => {
-    if (!NVIDIA_API_KEY) throw new Error("No API key");
 
     const payload: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
     history.forEach((m) => {
