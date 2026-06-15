@@ -2,76 +2,18 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { CheckCircle2, AlertCircle, MessageSquarePlus } from "lucide-react";
+import { CheckCircle2, AlertCircle, MessageSquarePlus, Star } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 interface Testimonial {
+  id: string;
   name: string;
-  role: string;
-  company: string;
-  initials: string;
-  color: string;
-  tag: string;
+  company: string | null;
   stars: number;
-  text: string;
+  message: string;
 }
-
-// ── Data ─────────────────────────────────────────────────────────────────────
-
-const testimonials: Testimonial[] = [
-  {
-    name: "Rajiv Mehta",
-    role: "Principal Architect",
-    company: "RMD Architects",
-    initials: "RM",
-    color: "#7FB706",
-    tag: "Architecture",
-    stars: 5,
-    text: "Exceptional craftsmanship on every project. Their marble work for our luxury residential project exceeded every expectation. The team's attention to detail is truly unmatched in the industry.",
-  },
-  {
-    name: "Priya Nair",
-    role: "Interior Designer",
-    company: "Studio Nair",
-    initials: "PN",
-    color: "#2D9CDB",
-    tag: "Interior Design",
-    stars: 5,
-    text: "Working with them was an absolute pleasure. The Italian marble selection they curated for my client's penthouse was breathtaking. Delivery was on time and quality was pristine.",
-  },
-  {
-    name: "Aditya Sharma",
-    role: "VP Construction",
-    company: "Shapoorji Pallonji",
-    initials: "AS",
-    color: "#F2994A",
-    tag: "Corporate",
-    stars: 5,
-    text: "We've partnered on 8 commercial projects across India. Their consistency and professionalism set the gold standard. From sourcing to installation support, they are simply the best.",
-  },
-  {
-    name: "Kavitha Reddy",
-    role: "Project Manager",
-    company: "Prestige Group",
-    initials: "KR",
-    color: "#9B51E0",
-    tag: "Real Estate",
-    stars: 5,
-    text: "The granite flooring they supplied for our 200-unit township project was flawless. Their bulk pricing and quality assurance gave us complete peace of mind throughout the project lifecycle.",
-  },
-  {
-    name: "Suresh Balasubramanian",
-    role: "Managing Director",
-    company: "SBL Developers",
-    initials: "SB",
-    color: "#EB5757",
-    tag: "Development",
-    stars: 5,
-    text: "Incredible range of stone options. Found the exact finish we needed for our heritage-inspired hotel lobby. Their team guided us at every step — from design to final polish. Highly recommended.",
-  },
-];
 
 // ── Mobile hook (safe for SSR) ────────────────────────────────────────────────
 
@@ -179,6 +121,22 @@ function getCardVariants(mobile: boolean) {
   };
 }
 
+// ── Avatar color palette ──────────────────────────────────────────────────────
+
+const AVATAR_COLORS = [
+  "#7FB706", "#2D9CDB", "#F2994A", "#9B51E0",
+  "#EB5757", "#27AE60", "#F2C94C", "#56CCF2",
+];
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+}
+
 // ── Single Card ───────────────────────────────────────────────────────────────
 
 function TestimonialCard({
@@ -186,15 +144,18 @@ function TestimonialCard({
   state,
   onClick,
   isMobile,
+  colorIndex,
 }: {
   testimonial: Testimonial;
   state: CardState;
   onClick: () => void;
   isMobile: boolean;
+  colorIndex: number;
 }) {
   const isActive = state === "active";
-  // FIX: variants are computed from reactive isMobile prop, not a stale window read
   const variants = getCardVariants(isMobile);
+  const color = AVATAR_COLORS[colorIndex % AVATAR_COLORS.length];
+  const initials = getInitials(testimonial.name);
 
   return (
     <motion.div
@@ -247,33 +208,36 @@ function TestimonialCard({
         <StarRating count={testimonial.stars} />
 
         <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400 italic mb-6">
-          {testimonial.text}
+          {testimonial.message}
         </p>
 
         {/* Reviewer footer */}
         <div className="flex items-center gap-3 pt-4 border-t border-[#7FB706]/10">
-          {/* Avatar with hover spin */}
+          {/* Avatar */}
           <motion.div
             className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm text-white flex-shrink-0"
-            style={{ background: testimonial.color }}
+            style={{ background: color }}
             whileHover={isActive ? { scale: 1.12, rotate: -8 } : {}}
             transition={{ type: "spring", stiffness: 300, damping: 18 }}
           >
-            {testimonial.initials}
+            {initials}
           </motion.div>
 
           <div className="min-w-0">
             <p className="font-semibold text-sm text-gray-900 dark:text-white truncate transition-colors">
               {testimonial.name}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 truncate transition-colors">
-              {testimonial.role} · {testimonial.company}
-            </p>
+            {testimonial.company && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate transition-colors">
+                {testimonial.company}
+              </p>
+            )}
           </div>
 
-          {/* Tag pill */}
-          <span className="ml-auto shrink-0 bg-[#7FB706]/10 text-[#5a8500] text-[10px] font-bold tracking-wide uppercase px-2.5 py-1 rounded-full">
-            {testimonial.tag}
+          {/* Star count pill */}
+          <span className="ml-auto shrink-0 flex items-center gap-1 bg-[#7FB706]/10 text-[#5a8500] text-[10px] font-bold tracking-wide uppercase px-2.5 py-1 rounded-full">
+            <Star className="w-3 h-3 fill-current" />
+            {testimonial.stars}/5
           </span>
         </div>
       </div>
@@ -354,7 +318,7 @@ function DotIndicator({
   );
 }
 
-// ── Feedback Form ─────────────────────────────────────────────────────────────
+// ── Interactive Stars (Feedback Form) ─────────────────────────────────────────
 
 function InteractiveStars({
   value,
@@ -395,6 +359,8 @@ function InteractiveStars({
     </div>
   );
 }
+
+// ── Feedback Form ─────────────────────────────────────────────────────────────
 
 function FeedbackForm() {
   const [formData, setFormData] = useState({ name: "", company: "", message: "" });
@@ -587,15 +553,42 @@ function FeedbackForm() {
 
 // ── Main Carousel ─────────────────────────────────────────────────────────────
 
-// FIX: changed from `export default` to named export to match the import in Home.tsx
 export function TestimonialCarousel() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
   const [current, setCurrent] = useState(0);
-  const total = testimonials.length;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isMobile = useIsMobile();
-
-  // Drag / swipe state
   const dragStartX = useRef(0);
+
+  // ── Fetch real testimonials from Supabase ──────────────────────────────────
+  useEffect(() => {
+    async function fetchTestimonials() {
+      if (!isSupabaseConfigured()) {
+        setLoadingReviews(false);
+        return;
+      }
+      try {
+        const { data, error } = await supabase
+          .from("feedback")
+          .select("id, name, company, stars, message")
+          .gte("stars", 4)
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        if (!error && data) {
+          setTestimonials(data as Testimonial[]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch testimonials:", err);
+      } finally {
+        setLoadingReviews(false);
+      }
+    }
+    fetchTestimonials();
+  }, []);
+
+  const total = testimonials.length;
 
   const goTo = useCallback(
     (idx: number) => setCurrent(((idx % total) + total) % total),
@@ -606,10 +599,9 @@ export function TestimonialCarousel() {
     if (timerRef.current) clearInterval(timerRef.current);
   }, []);
 
-  // FIX: use functional updater `(prev) => ...` to avoid the stale closure bug
-  // where the interval always advanced from the same captured `current` value.
   const startTimer = useCallback(() => {
     stopTimer();
+    if (total < 2) return;
     timerRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % total);
     }, 4500);
@@ -620,7 +612,6 @@ export function TestimonialCarousel() {
     return stopTimer;
   }, [current, startTimer, stopTimer]);
 
-  // Touch / mouse drag handlers
   const handleDragStart = (clientX: number) => {
     dragStartX.current = clientX;
   };
@@ -659,43 +650,71 @@ export function TestimonialCarousel() {
           </p>
         </motion.div>
 
-        {/* Carousel */}
-        <div
-          className="relative w-full"
-          onMouseEnter={stopTimer}
-          onMouseLeave={startTimer}
-          onMouseDown={(e) => handleDragStart(e.clientX)}
-          onMouseUp={(e) => handleDragEnd(e.clientX)}
-          onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
-          onTouchEnd={(e) => handleDragEnd(e.changedTouches[0].clientX)}
-        >
-          {/* Cards track */}
-          <div className="relative w-full h-[300px] md:h-[320px]">
-            {testimonials.map((t, i) => {
-              const state = getCardState(i, current, total);
-              return (
-                <TestimonialCard
-                  key={t.name}
-                  testimonial={t}
-                  state={state}
-                  isMobile={isMobile}
-                  onClick={() => {
-                    if (i !== current) goTo(i);
-                  }}
-                />
-              );
-            })}
+        {/* Carousel or Empty State */}
+        {loadingReviews ? (
+          <div className="flex justify-center py-16">
+            <div className="w-10 h-10 border-4 border-[#7FB706]/20 border-t-[#7FB706] rounded-full animate-spin" />
           </div>
+        ) : total > 0 ? (
+          <div
+            className="relative w-full"
+            onMouseEnter={stopTimer}
+            onMouseLeave={startTimer}
+            onMouseDown={(e) => handleDragStart(e.clientX)}
+            onMouseUp={(e) => handleDragEnd(e.clientX)}
+            onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+            onTouchEnd={(e) => handleDragEnd(e.changedTouches[0].clientX)}
+          >
+            {/* Cards track */}
+            <div className="relative w-full h-[300px] md:h-[320px]">
+              {testimonials.map((t, i) => {
+                const state = getCardState(i, current, total);
+                return (
+                  <TestimonialCard
+                    key={t.id}
+                    testimonial={t}
+                    state={state}
+                    isMobile={isMobile}
+                    colorIndex={i}
+                    onClick={() => {
+                      if (i !== current) goTo(i);
+                    }}
+                  />
+                );
+              })}
+            </div>
 
-          {/* Desktop-only nav buttons */}
-          <div className="hidden md:flex justify-center gap-3 mt-6">
-            <NavButton direction="prev" onClick={() => goTo(current - 1)} />
-            <NavButton direction="next" onClick={() => goTo(current + 1)} />
+            {/* Desktop-only nav buttons */}
+            {total > 1 && (
+              <div className="hidden md:flex justify-center gap-3 mt-6">
+                <NavButton direction="prev" onClick={() => goTo(current - 1)} />
+                <NavButton direction="next" onClick={() => goTo(current + 1)} />
+              </div>
+            )}
+
+            {/* Dots */}
+            {total > 1 && (
+              <DotIndicator count={total} current={current} onSelect={goTo} />
+            )}
           </div>
-
-          {/* Dots (all screen sizes) */}
-          <DotIndicator count={total} current={current} onSelect={goTo} />
-        </div>
+        ) : (
+          /* Empty state — shown until real reviews are submitted & visible */
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center py-16 gap-4 text-center"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-[#7FB706]/10 flex items-center justify-center">
+              <Star className="w-8 h-8 text-[#7FB706]" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              Be the First to Leave a Review!
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+              Share your experience working with us. Your feedback helps us improve and helps others make informed decisions.
+            </p>
+          </motion.div>
+        )}
 
         {/* Feedback Form */}
         <FeedbackForm />

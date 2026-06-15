@@ -153,10 +153,6 @@ export default function GalleryPage() {
                         <h3 className="text-white text-xl md:text-2xl font-bold leading-tight mb-2">
                           {item.title}
                         </h3>
-                        {/* Fake Description for detail — can be replaced with DB field later */}
-                        <p className="text-gray-300 text-sm line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-150">
-                          High-quality installation showcasing precision engineering and premium materials designed for long-lasting durability.
-                        </p>
                       </div>
                     </div>
                   </motion.div>

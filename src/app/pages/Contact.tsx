@@ -24,15 +24,15 @@ export default function ContactPage() {
     {
       city: "Mumbai",
       slug: "mumbai",
-      address: "Plot No. 123, MIDC Industrial Area, Andheri East, Mumbai - 400093, Maharashtra, India",
-      phone: "+91 22 1234 5678",
+      address: "Andheri East, Mumbai, Maharashtra, India",
+      phone: "+91 98185 92113",
       email: "info@pacificproduct.in",
     },
     {
       city: "Bangalore",
       slug: "bangalore",
-      address: "Electronic City Phase 1, Bangalore - 560100, Karnataka, India",
-      phone: "+91 80 5555 6666",
+      address: "Bangalore, Karnataka, India",
+      phone: "+91 98185 92113",
       email: "info@pacificproduct.in",
     },
     {
@@ -105,7 +105,6 @@ export default function ContactPage() {
                   <div>
                     <h4 className="font-semibold text-white text-lg mb-2">Phone</h4>
                     <p className="text-gray-400 hover:text-white transition-colors cursor-pointer">+91 98185 92113</p>
-                    <p className="text-gray-400 hover:text-white transition-colors cursor-pointer">+91 98765 43210 (Sales)</p>
                   </div>
                 </div>
 
@@ -152,7 +151,7 @@ export default function ContactPage() {
                 <h3 className="text-2xl font-bold text-white mb-3 relative z-10">Need Quick Assistance?</h3>
                 <p className="text-gray-300 mb-6 relative z-10">Chat with us on WhatsApp for instant support</p>
                 <button
-                  onClick={() => window.open("https://wa.me/919876543210", "_blank")}
+                  onClick={() => window.open("https://wa.me/919818592113", "_blank")}
                   className="relative z-10 inline-flex items-center px-6 py-3 bg-[#7FB706] text-white font-medium rounded-xl hover:bg-[#8cc70a] shadow-lg shadow-[#7FB706]/30 transition-all hover:scale-105 active:scale-95"
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">

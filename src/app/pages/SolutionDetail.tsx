@@ -95,8 +95,8 @@ export default function SolutionDetailPage() {
   const stats = [
     { icon: Building2, value: "600+", label: "Projects Delivered" },
     { icon: Users, value: "100+", label: "Happy Clients" },
-    { icon: Globe, value: "15+", label: "Cities Covered" },
-    { icon: TrendingUp, value: "98%", label: "Client Satisfaction" },
+    { icon: Globe, value: "12+", label: "Years of Expertise" },
+    { icon: TrendingUp, value: "4", label: "Offices Across India" },
   ];
 
   return (
