@@ -23,7 +23,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/Button";
 import { SEO } from "../components/SEO";
-import { organizationSchema, webSiteSchema, DEFAULT_KEYWORDS } from "../../lib/seo-data";
+import { organizationSchema, webSiteSchema, DEFAULT_KEYWORDS, aggregateRatingSchema, speakableSchema, faqSchema } from "../../lib/seo-data";
 import { ServiceCard } from "../components/ServiceCard";
 import { ProductCard } from "../components/ProductCard";
 import { TestimonialCarousel } from "../components/TestimonialCarousel";
@@ -829,11 +829,21 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <SEO
-        title="Premium Restroom Cubicles, Cladding & Interior Solutions"
-        description="India's leading B2B interior contracting company. Premium restroom cubicles, exterior cladding, wall paneling, locker solutions for commercial spaces."
-        keywords={`${DEFAULT_KEYWORDS}, restroom cubicles manufacturer India, toilet partitions Delhi, exterior cladding contractors, HPL cubicle hardware, commercial washroom panels, locker systems suppliers, Pacific Products and Solutions`}
+        title="Restroom Cubicles Manufacturer India | Toilet Partitions, Cladding & Lockers"
+        description="Pacific Products & Solutions — India's #1 manufacturer of restroom cubicles, toilet partitions, exterior cladding, locker systems & custom hardware. ISO 9001:2015 certified. 600+ projects across Delhi, Mumbai, Bangalore & Dubai. Get a free quote today."
+        keywords={`${DEFAULT_KEYWORDS}, restroom cubicles manufacturer Delhi, toilet partitions manufacturer India, exterior cladding supplier India, HPL cubicle system, locker system supplier India, compact laminate partitions`}
         canonical="/"
-        jsonLd={[organizationSchema(), webSiteSchema()]}
+        jsonLd={[
+          organizationSchema(),
+          webSiteSchema(),
+          aggregateRatingSchema(),
+          speakableSchema(["h1", "h2", ".speakable"]),
+          faqSchema([
+            { question: "What products does Pacific Products & Solutions manufacture?", answer: "Pacific Products & Solutions manufactures premium restroom cubicles, toilet partitions, shower cubicles, exterior cladding, locker systems, wall paneling, and custom hardware for commercial spaces across India and the UAE." },
+            { question: "Where is Pacific Products & Solutions located?", answer: "Pacific Products & Solutions has offices in Delhi (head office), Mumbai, Bangalore, Ahmedabad, Kolkata, and Dubai UAE. They serve pan-India and international clients." },
+            { question: "What is the warranty on Pacific Products installations?", answer: "All Pacific Products installations come with a 5-year comprehensive warranty covering manufacturing defects, with extended warranty options available." },
+          ])
+        ]}
       />
       <h1 className="sr-only">Pacific Products & Solutions — Premium Restroom Cubicles, Cladding & Interior Solutions</h1>
 

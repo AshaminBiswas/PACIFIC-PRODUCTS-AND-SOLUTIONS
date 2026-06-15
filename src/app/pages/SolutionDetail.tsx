@@ -7,7 +7,7 @@ import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useSolution, useProducts } from "../../lib/hooks";
 import { DynamicIcon } from "../components/DynamicIcon";
 import { SEO } from "../components/SEO";
-import { breadcrumbSchema } from "../../lib/seo-data";
+import { breadcrumbSchema, faqSchema, serviceSchema, DEFAULT_KEYWORDS } from "../../lib/seo-data";
 import { ProductCard } from "../components/ProductCard";
 
 export default function SolutionDetailPage() {
@@ -102,10 +102,19 @@ export default function SolutionDetailPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#030213] transition-colors">
       <SEO
-        title={solution.title}
-        description={solution.subtitle?.slice(0, 155) || solution.description?.slice(0, 155) || `${solution.title} solutions by Pacific Products`}
+        title={`${solution.title} | Commercial Interior Solutions India`}
+        description={`Pacific Products & Solutions delivers premium ${solution.title} for corporate offices, malls, airports, hospitals & more across India & UAE. ISO certified. 600+ projects. Get a free quote.`}
+        keywords={`${DEFAULT_KEYWORDS}, ${solution.title.toLowerCase()}, ${solution.title.toLowerCase()} india, commercial ${solution.title.toLowerCase()}, ${solution.title.toLowerCase()} manufacturer, ${solution.title.toLowerCase()} contractor india`}
         canonical={`/solutions/${solution.slug}`}
-        jsonLd={breadcrumbSchema([{name: 'Home', url: '/'}, {name: 'Solutions', url: '/solutions'}, {name: solution.title, url: `/solutions/${solution.slug}`}])}
+        jsonLd={[
+          breadcrumbSchema([{name: 'Home', url: '/'}, {name: 'Solutions', url: '/solutions'}, {name: solution.title, url: `/solutions/${solution.slug}`}]),
+          serviceSchema({ name: solution.title, description: solution.subtitle || solution.description || '', slug: solution.slug }),
+          faqSchema([
+            { question: `What is included in Pacific Products' ${solution.title}?`, answer: solution.description || `Pacific Products provides complete ${solution.title} including design, manufacturing, supply, and installation for commercial spaces across India.` },
+            { question: `Which cities do you provide ${solution.title} in?`, answer: 'We provide solutions across Delhi NCR, Mumbai, Bangalore, Ahmedabad, Kolkata, and Dubai UAE. Contact us for a site visit.' },
+            { question: `What is the cost of ${solution.title}?`, answer: `The cost depends on size, materials, and complexity. Contact us at +91 98185 92113 or info@pacificproduct.in for a free, no-obligation quote.` },
+          ])
+        ]}
       />
 
       {/* ═══════════════════ HERO — 100vh minus navbar ═══════════════════ */}

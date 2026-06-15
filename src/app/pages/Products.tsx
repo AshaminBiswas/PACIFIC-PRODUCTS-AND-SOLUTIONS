@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router";
 import { useProducts, usePageBanner } from "../../lib/hooks";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { SEO } from "../components/SEO";
-import { DEFAULT_KEYWORDS } from "../../lib/seo-data";
+import { DEFAULT_KEYWORDS, itemListSchema, faqSchema } from "../../lib/seo-data";
 import { PageHero } from "../components/PageHero";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
@@ -27,10 +27,26 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       <SEO
-        title="Restroom Cubicles, Cladding & Locker Systems"
-        description="Explore our premium range of restroom cubicles, shower cubicles, exterior cladding, locker systems, wall paneling, and custom hardware solutions for commercial spaces across India."
-        keywords={`${DEFAULT_KEYWORDS}, premium restroom cubicles, shower partitions, HPL exterior cladding, commercial wall paneling, phenolic lockers, stainless steel cubicle hardware`}
+        title="Restroom Cubicles, Toilet Partitions & Commercial Interior Products | India"
+        description="Explore Pacific Products' full range — restroom cubicles, toilet partitions, shower cubicles, exterior cladding, HPL locker systems, wall paneling & custom hardware. ISO certified. Pan-India supply & installation. Free quote."
+        keywords={`${DEFAULT_KEYWORDS}, restroom cubicles buy India, toilet partition price India, HPL cubicle system, exterior cladding supply install India, locker system manufacturer, wall paneling commercial, shower cubicle supplier`}
         canonical="/products"
+        jsonLd={[
+          itemListSchema([
+            { name: 'Restroom Cubicles', url: '/products/restroom-cubicles/restroom-cubicles', description: 'Premium HPL and compact laminate restroom cubicles for commercial washrooms' },
+            { name: 'Toilet Partitions', url: '/products/restroom-cubicles/toilet-partitions', description: 'Floor-mounted, ceiling-hung and overhead-braced toilet partition systems' },
+            { name: 'Shower Cubicles', url: '/products/restroom-cubicles/shower-cubicles', description: 'Waterproof shower enclosure systems for hotels, gyms, and institutions' },
+            { name: 'Exterior Cladding', url: '/products/exterior-cladding/exterior-cladding', description: 'HPL, aluminium composite and metal cladding for building facades' },
+            { name: 'Locker Systems', url: '/products/locker-systems/locker-systems', description: 'Phenolic, HPL, metal and digital locker systems for offices, gyms, schools' },
+            { name: 'Interior Wall Paneling', url: '/products/interior-paneling/interior-paneling', description: 'Decorative and functional wall panel systems for commercial interiors' },
+            { name: 'Custom Hardware', url: '/products/hardware/cubicle-hardware', description: 'Stainless steel 304/316 hinges, latches, coat hooks and partition hardware' },
+          ]),
+          faqSchema([
+            { question: 'What type of restroom cubicles does Pacific Products manufacture?', answer: 'Pacific Products manufactures HPL (High-Pressure Laminate), compact laminate, phenolic, and stainless steel restroom cubicles in floor-mounted, ceiling-hung, and overhead-braced configurations.' },
+            { question: 'Do you supply and install products across India?', answer: 'Yes, we supply and install all products pan-India including Delhi NCR, Mumbai, Bangalore, Ahmedabad, Kolkata, and international markets including UAE.' },
+            { question: 'What is the minimum order quantity for restroom cubicles?', answer: 'We accept orders of all sizes — from single-unit installations to large commercial projects. Contact us at +91 98185 92113 for a customised quote.' },
+          ])
+        ]}
       />
       {/* Hero Banner */}
       <PageHero

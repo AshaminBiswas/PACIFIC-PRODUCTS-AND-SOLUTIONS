@@ -14,7 +14,7 @@ import { usePageBanner } from "../../lib/hooks";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router";
 import { SEO } from "../components/SEO";
-import { DEFAULT_KEYWORDS } from "../../lib/seo-data";
+import { DEFAULT_KEYWORDS, organizationSchema, faqSchema } from "../../lib/seo-data";
 import aboutImg from "../../image/about.webp";
 
 const DEFAULT_BG = "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80";
@@ -150,10 +150,18 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen pt-20 bg-transparent dark:bg-[#030213] transition-colors">
       <SEO
-        title="About Pacific Products & Solutions"
-        description="Learn about Pacific Products & Solutions — 12+ years of excellence in B2B interior contracting, ISO 9001:2015 certified manufacturing, and pan-India commercial installation."
-        keywords={`${DEFAULT_KEYWORDS}, B2B interior contracting company, ISO certified cubicle manufacturer, turnkey interior solutions India, Pacific Products team`}
+        title="About Pacific Products & Solutions | ISO Certified Restroom Cubicle Manufacturer"
+        description="Pacific Products & Solutions — ISO 9001:2015 certified manufacturer of restroom cubicles, toilet partitions, exterior cladding & locker systems. 12+ years, 600+ projects, 4 offices across India & UAE. Learn about our story, team, and quality commitment."
+        keywords={`${DEFAULT_KEYWORDS}, about Pacific Products and Solutions, ISO certified cubicle manufacturer India, B2B interior contracting company Delhi, restroom cubicle company 12 years, commercial interior solutions India, turnkey interior contractor`}
         canonical="/about"
+        jsonLd={[
+          organizationSchema(),
+          faqSchema([
+            { question: "When was Pacific Products & Solutions founded?", answer: "Pacific Products & Solutions was founded in 2012 and has been delivering premium restroom cubicles and commercial interior solutions for over 12 years." },
+            { question: "Is Pacific Products & Solutions ISO certified?", answer: "Yes, Pacific Products & Solutions is ISO 9001:2015 certified, ensuring consistent manufacturing quality and process excellence." },
+            { question: "How many projects has Pacific Products & Solutions completed?", answer: "Pacific Products & Solutions has completed 600+ projects for 100+ prestigious clients across India and the UAE." },
+          ])
+        ]}
       />
 
       {/* ═══ HERO ═══ */}

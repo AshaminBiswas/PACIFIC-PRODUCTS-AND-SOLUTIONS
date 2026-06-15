@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, animate, useInView } from "motion/react";
 import { Link, useNavigate, useParams } from "react-router";
 import { SEO } from "../components/SEO";
-import { localBusinessSchema } from "../../lib/seo-data";
+import { localBusinessSchema, faqSchema, breadcrumbSchema } from "../../lib/seo-data";
 import {
   ArrowRight,
   Award,
@@ -805,7 +805,13 @@ export default function LocationPage() {
         description={cleanText(pageData.meta.description)}
         keywords={pageData.meta.keywords ? cleanText(pageData.meta.keywords) : undefined}
         canonical={`/locations/${slug}`}
-        jsonLd={localBusinessSchema({city: cleanText(pageData.city), address: cleanText(pageData.address), phone: pageData.phone, email: pageData.email, region: cleanText(pageData.region)})}
+        geoRegion={slug === 'delhi' ? 'IN-DL' : slug === 'mumbai' ? 'IN-MH' : slug === 'bangalore' ? 'IN-KA' : slug === 'ahmedabad' ? 'IN-GJ' : slug === 'kolkata' ? 'IN-WB' : slug === 'uae' ? 'AE-DU' : 'IN-DL'}
+        geoPlacename={`${cleanText(pageData.city)}, ${slug === 'uae' ? 'United Arab Emirates' : 'India'}`}
+        jsonLd={[
+          localBusinessSchema({city: cleanText(pageData.city), address: cleanText(pageData.address), phone: pageData.phone, email: pageData.email, region: cleanText(pageData.region)}),
+          breadcrumbSchema([{name: 'Home', url: '/'}, {name: 'Locations', url: '/contact'}, {name: cleanText(pageData.city), url: `/locations/${slug}`}]),
+          faqSchema(pageData.faqs.map(f => ({ question: cleanText(f.question), answer: cleanText(f.answer) }))),
+        ]}
       />
       <HeroSection data={pageData} slug={slug} />
       
