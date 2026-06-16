@@ -36,6 +36,8 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const Downloads = lazy(() => import("./pages/Downloads"));
+const ConfigureCubicle = lazy(() => import("./pages/ConfigureCubicle"));
+const ProductDesigner = lazy(() => import("./pages/ProductDesigner"));
 
 // ── Lazy-loaded Admin Pages ───────────────────────────────────────────────
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
@@ -237,6 +239,22 @@ export const router = createBrowserRouter([
       },
       { path: "privacy", element: (<Suspense fallback={<PageSkeleton />}><PrivacyPolicy /></Suspense>) },
       { path: "terms", element: (<Suspense fallback={<PageSkeleton />}><TermsOfService /></Suspense>) },
+      {
+        path: "configure-cubicle",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <ConfigureCubicle />
+          </Suspense>
+        ),
+      },
+      {
+        path: "design-studio",
+        element: (
+          <Suspense fallback={<PageSkeleton />}>
+            <ProductDesigner />
+          </Suspense>
+        ),
+      },
       {
         path: "*",
         element: (

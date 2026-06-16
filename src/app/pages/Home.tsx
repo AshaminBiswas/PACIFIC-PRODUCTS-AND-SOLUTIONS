@@ -27,6 +27,7 @@ import { organizationSchema, webSiteSchema, DEFAULT_KEYWORDS, aggregateRatingSch
 import { ServiceCard } from "../components/ServiceCard";
 import { ProductCard } from "../components/ProductCard";
 import { TestimonialCarousel } from "../components/TestimonialCarousel";
+import { AnimatedCounter } from "../components/AnimatedCounter";
 
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { useRef, useState, useEffect, useCallback } from "react";
@@ -819,6 +820,51 @@ function SolutionsCarousel({ solutions, navigate }: { solutions: any[]; navigate
   );
 }
 
+function StatsSection() {
+  const stats = [
+    { label: "Experience", value: 12, suffix: "+ Years", icon: Award },
+    { label: "Projects completed", value: 600, suffix: "+", icon: CheckCircle2 },
+    { label: "Happy Clients", value: 100, suffix: "+", icon: Users },
+    { label: "Offices", value: 4, suffix: " Across India", icon: Building2 },
+    { label: "Warranty", value: 5, suffix: "-Year Warranty", icon: Shield },
+  ];
+
+  return (
+    <section className="bg-[#030213] text-white py-12 border-y border-[#7FB706]/20 relative overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-[#7FB706]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-[#B5F823]/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center text-center">
+          {stats.map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1, duration: 0.5 }}
+                className="flex flex-col items-center group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-3 group-hover:border-[#7FB706] group-hover:bg-[#7FB706]/10 transition-all duration-300">
+                  <Icon className="w-6 h-6 text-[#B5F823] group-hover:scale-110 transition-transform duration-300" />
+                </div>
+                <div className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#7FB706] to-[#B5F823]">
+                  <AnimatedCounter end={stat.value} suffix={stat.suffix} />
+                </div>
+                <p className="text-xs sm:text-sm text-gray-400 font-medium uppercase tracking-wider mt-2 group-hover:text-white transition-colors duration-300">
+                  {stat.label}
+                </p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -847,25 +893,33 @@ export default function HomePage() {
       />
       <h1 className="sr-only">Pacific Products & Solutions — Premium Restroom Cubicles, Cladding & Interior Solutions</h1>
 
-      {/* Hero */}
+      {/* ══════════════════════════════════════════════════════
+          HERO — untouched
+      ══════════════════════════════════════════════════════ */}
       <HeroSection />
 
-      {/* Featured Products */}
+      {/* ══════════════════════════════════════════════════════
+          NEW: STATS BANNER
+      ══════════════════════════════════════════════════════ */}
+      <StatsSection />
+
+      {/* ══════════════════════════════════════════════════════
+          FEATURED PRODUCTS
+      ══════════════════════════════════════════════════════ */}
       <FeaturedServices />
 
-      {/* Our Solutions */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white/40 dark:bg-[#0a0a1a] transition-colors">
+      {/* ══════════════════════════════════════════════════════
+          OUR SOLUTIONS
+      ══════════════════════════════════════════════════════ */}
+      <section className="py-16 sm:py-24 bg-[#f7fef0] dark:bg-[#0a0a1a] transition-colors overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-end justify-between mb-10 sm:mb-14 lg:mb-16"
+            className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 sm:mb-16 gap-4"
           >
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#030213] dark:text-white mb-3 sm:mb-4">
-                Our Solutions
-              </h2>
               <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-2xl">
                 Industry-specific solutions tailored to meet your unique requirements
               </p>

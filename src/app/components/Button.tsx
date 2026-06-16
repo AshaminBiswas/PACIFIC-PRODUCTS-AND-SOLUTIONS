@@ -1,7 +1,7 @@
-import { motion } from "motion/react";
-import { forwardRef, ButtonHTMLAttributes } from "react";
+import { motion, HTMLMotionProps } from "motion/react";
+import { forwardRef } from "react";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends HTMLMotionProps<"button"> {
   variant?: "primary" | "secondary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
 }

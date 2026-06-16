@@ -49,7 +49,7 @@ export default function BlogDetailPage() {
         description={blog.excerpt?.slice(0, 155) || blog.title}
         canonical={`/blog/${blog.slug}`}
         ogType="article"
-        ogImage={blog.cover_image}
+        ogImage={blog.cover_image_url}
         jsonLd={blogPostSchema(blog)}
       />
       {/* Hero */}

@@ -65,10 +65,10 @@ const adjacentLocations: Record<LocationSlug, string[]> = {
 
 function cleanText(value: string) {
   return value
-    .replaceAll("â€”", "-")
-    .replaceAll("â€“", "-")
-    .replaceAll("Â·", "|")
-    .replaceAll("Â", "");
+    .replace(/â€”/g, "-")
+    .replace(/â€“/g, "-")
+    .replace(/Â·/g, "|")
+    .replace(/Â/g, "");
 }
 
 

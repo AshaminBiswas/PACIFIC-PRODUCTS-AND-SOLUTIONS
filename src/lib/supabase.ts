@@ -12,7 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient<Database>(
+export const supabase = createClient<any>(
   supabaseUrl || "https://placeholder.supabase.co",
   supabaseAnonKey || "placeholder-key"
 );
