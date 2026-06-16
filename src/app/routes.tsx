@@ -240,22 +240,6 @@ export const router = createBrowserRouter([
       { path: "privacy", element: (<Suspense fallback={<PageSkeleton />}><PrivacyPolicy /></Suspense>) },
       { path: "terms", element: (<Suspense fallback={<PageSkeleton />}><TermsOfService /></Suspense>) },
       {
-        path: "configure-cubicle",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <ConfigureCubicle />
-          </Suspense>
-        ),
-      },
-      {
-        path: "design-studio",
-        element: (
-          <Suspense fallback={<PageSkeleton />}>
-            <ProductDesigner />
-          </Suspense>
-        ),
-      },
-      {
         path: "*",
         element: (
           <Suspense fallback={<PageSkeleton />}>
@@ -264,6 +248,22 @@ export const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: "/configure-cubicle",
+    element: (
+      <Suspense fallback={<PageSkeleton />}>
+        <ConfigureCubicle />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/design-studio",
+    element: (
+      <Suspense fallback={<PageSkeleton />}>
+        <ProductDesigner />
+      </Suspense>
+    ),
   },
   {
     path: "/admin",
