@@ -163,10 +163,10 @@ function DrawingPlane() {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      visible={false}
+      visible={true}
     >
       <planeGeometry args={[50, 50]} />
-      <meshBasicMaterial visible={false} />
+      <meshBasicMaterial transparent opacity={0} depthWrite={false} />
     </mesh>
   );
 }

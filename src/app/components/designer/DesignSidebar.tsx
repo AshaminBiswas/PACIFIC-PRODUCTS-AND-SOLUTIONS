@@ -861,7 +861,8 @@ function QuoteModal({
 /* ─── Main Sidebar ───────────────────────────────────────────────────────── */
 
 export function DesignSidebar() {
-  const [activeTab, setActiveTab] = useState<TabId>("properties");
+  const hasObjects = useDesignStore((s) => s.objects.length > 0);
+  const [activeTab, setActiveTab] = useState<TabId>(hasObjects ? "properties" : "templates");
   const [collapsed, setCollapsed] = useState(false);
 
   return (
