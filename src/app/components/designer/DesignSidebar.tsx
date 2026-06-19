@@ -1,469 +1,376 @@
-import { useState, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState, useCallback } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import {
-  Settings2,
-  Palette,
-  LayoutTemplate,
-  FileDown,
-  Trash2,
-  Copy,
-  Lock,
-  Unlock,
-  ChevronLeft,
-  ChevronRight,
-  Minus,
-  Plus,
-  Camera,
-  FileJson,
-  Link2,
-  MessageSquareQuote,
-  X,
+  Settings2, Palette, ChevronDown, ChevronRight,
+  Copy, Lock, Unlock, Trash2, Minus, Plus,
+  Camera, FileDown, FileJson, Link2, MessageSquareQuote, X,
 } from "lucide-react";
 import {
-  useDesignStore,
-  MATERIALS,
-  TEMPLATES,
-  type DesignMaterial,
+  useDesignStore, MATERIALS, type DesignMaterial,
 } from "../../../lib/designStore";
+import { SceneOutliner } from "./SceneOutliner";
 
-/* ─── Tab definitions ────────────────────────────────────────────────────── */
-
-type TabId = "properties" | "materials" | "templates" | "export";
-
-const TABS: { id: TabId; icon: React.ComponentType<any>; label: string }[] = [
-  { id: "properties", icon: Settings2,        label: "Properties" },
-  { id: "materials",  icon: Palette,           label: "Materials" },
-  { id: "templates",  icon: LayoutTemplate,    label: "Templates" },
-  { id: "export",     icon: FileDown,          label: "Export" },
-];
-
-/* ─── Helpers ────────────────────────────────────────────────────────────── */
-
-const panelBg = "rgba(10,10,30,0.9)";
-const sectionTitle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
-  color: "rgba(255,255,255,0.4)",
-  margin: "12px 0 6px",
-};
+/* ─── Design Tokens ──────────────────────────────────────────────────── */
+const BG        = "#1e1e1e";
+const BG_PANEL  = "#252525";
+const BORDER    = "rgba(255,255,255,0.07)";
+const TEXT_DIM  = "rgba(255,255,255,0.4)";
+const TEXT      = "rgba(255,255,255,0.8)";
+const ACCENT    = "#0078d4";
+const ACCENT_DIM = "rgba(0,120,212,0.15)";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  padding: "6px 8px",
-  borderRadius: 6,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(255,255,255,0.05)",
-  color: "#fff",
-  fontSize: 13,
+  padding: "5px 8px",
+  borderRadius: 4,
+  border: `1px solid ${BORDER}`,
+  background: "#1a1a1a",
+  color: TEXT,
+  fontSize: 11,
   fontFamily: "'Inter', system-ui, sans-serif",
   outline: "none",
+  boxSizing: "border-box",
 };
 
-function DimInput({
-  label,
-  value,
-  onChange,
-  color,
+/* ─── Accordion Section ──────────────────────────────────────────────── */
+function AccordionSection({
+  label, icon: Icon, children, defaultOpen = true,
 }: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-  color: string;
+  label: string; icon?: React.ComponentType<any>;
+  children: React.ReactNode; defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div style={{ borderBottom: `1px solid ${BORDER}` }}>
+      <button
+        onClick={() => setOpen((p) => !p)}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", gap: 6,
+          padding: "7px 10px", background: "none", border: "none",
+          color: TEXT, cursor: "pointer", fontSize: 11, fontWeight: 600,
+          letterSpacing: "0.02em", fontFamily: "'Inter', system-ui, sans-serif",
+          transition: "background 0.1s",
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "none"; }}
+      >
+        {Icon && <Icon size={12} style={{ opacity: 0.6 }} />}
+        <span style={{ flex: 1, textAlign: "left" }}>{label}</span>
+        {open ? <ChevronDown size={11} style={{ opacity: 0.4 }} /> : <ChevronRight size={11} style={{ opacity: 0.4 }} />}
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            style={{ overflow: "hidden" }}
+          >
+            <div style={{ padding: "4px 10px 10px" }}>
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─── Dim Input ──────────────────────────────────────────────────────── */
+function DimInput({
+  label, value, onChange, color, unit = "mm",
+}: {
+  label: string; value: number; onChange: (v: number) => void;
+  color: string; unit?: string;
 }) {
   return (
     <div style={{ flex: 1 }}>
-      <div style={{ fontSize: 10, color, fontWeight: 600, marginBottom: 2 }}>{label}</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+      <div style={{ fontSize: 9, color, fontWeight: 600, marginBottom: 2, letterSpacing: "0.05em" }}>{label}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 1 }}>
         <button
           onClick={() => onChange(Math.max(10, value - 50))}
           style={{
-            width: 22, height: 26, borderRadius: 4, border: "none",
-            background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)",
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+            width: 18, height: 22, borderRadius: 3, border: `1px solid ${BORDER}`,
+            background: "#1a1a1a", color: TEXT_DIM, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
           }}
         >
-          <Minus size={12} />
+          <Minus size={9} />
         </button>
         <input
           type="number"
           value={value}
           onChange={(e) => onChange(Math.max(10, Number(e.target.value)))}
           style={{
-            ...inputStyle,
-            textAlign: "center",
-            padding: "4px 2px",
-            fontSize: 12,
-            width: "100%",
+            ...inputStyle, textAlign: "center", padding: "3px 2px",
+            fontSize: 11, width: "100%",
+            fontFamily: "'JetBrains Mono', monospace",
           }}
         />
         <button
           onClick={() => onChange(value + 50)}
           style={{
-            width: 22, height: 26, borderRadius: 4, border: "none",
-            background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)",
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+            width: 18, height: 22, borderRadius: 3, border: `1px solid ${BORDER}`,
+            background: "#1a1a1a", color: TEXT_DIM, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
           }}
         >
-          <Plus size={12} />
+          <Plus size={9} />
         </button>
       </div>
+      <div style={{ fontSize: 8, color: TEXT_DIM, textAlign: "right", marginTop: 1 }}>{unit}</div>
     </div>
   );
 }
 
-/* ─── Properties Tab ─────────────────────────────────────────────────────── */
-
-function PropertiesTab() {
-  const sel = useDesignStore((s) => s.getSelectedObject());
-  const updateObject = useDesignStore((s) => s.updateObject);
-  const removeObject = useDesignStore((s) => s.removeObject);
+/* ─── Properties Panel ───────────────────────────────────────────────── */
+function PropertiesPanel() {
+  const sel           = useDesignStore((s) => s.getSelectedObject());
+  const updateObject  = useDesignStore((s) => s.updateObject);
+  const removeObject  = useDesignStore((s) => s.removeObject);
   const duplicateObject = useDesignStore((s) => s.duplicateObject);
-  const _pushHistory = useDesignStore((s) => s._pushHistory);
+  const _pushHistory  = useDesignStore((s) => s._pushHistory);
 
   if (!sel) {
     return (
-      <div style={{ padding: 16, textAlign: "center", color: "rgba(255,255,255,0.35)" }}>
-        <Settings2 size={36} style={{ margin: "20px auto 12px", opacity: 0.3 }} />
-        <div style={{ fontSize: 13 }}>No object selected</div>
-        <div style={{ fontSize: 11, marginTop: 4, opacity: 0.5 }}>
-          Click an object to view its properties, or use a draw tool to create one
+      <div style={{ padding: 16, textAlign: "center" }}>
+        <Settings2 size={32} style={{ margin: "12px auto 10px", opacity: 0.15, display: "block" }} />
+        <div style={{ fontSize: 12, color: TEXT_DIM }}>No object selected</div>
+        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", marginTop: 4 }}>
+          Click an object in the viewport to inspect its properties
         </div>
       </div>
     );
   }
 
   const typeLabels: Record<string, string> = {
-    wall: "🧱 Wall Panel",
-    panel: "📋 Flat Panel",
-    box: "📦 Box / Locker",
-    cylinder: "🔵 Column",
-    door: "🚪 Door",
-    shelf: "📚 Shelf",
+    wall: "Wall Panel", panel: "Flat Panel", box: "Box / Locker",
+    cylinder: "Column", door: "Door", shelf: "Shelf",
   };
 
   return (
-    <div style={{ padding: "8px 12px" }}>
-      {/* Type badge */}
-      <div
-        style={{
-          display: "inline-block",
-          padding: "4px 10px",
-          borderRadius: 6,
-          background: "rgba(127,183,6,0.12)",
-          color: "#7FB706",
-          fontSize: 12,
-          fontWeight: 600,
-          marginBottom: 8,
-        }}
-      >
-        {typeLabels[sel.type] || sel.type}
-      </div>
-
-      {/* Name */}
-      <input
-        value={sel.name}
-        onChange={(e) => updateObject(sel.id, { name: e.target.value })}
-        style={{ ...inputStyle, marginBottom: 10 }}
-      />
-
-      {/* Position */}
-      <div style={sectionTitle}>Position</div>
-      <div style={{ display: "flex", gap: 6 }}>
-        <DimInput label="X" value={Math.round(sel.position.x * 1000)} color="#ff6b6b"
-          onChange={(v) => { _pushHistory(); updateObject(sel.id, { position: { ...sel.position, x: v / 1000 } }); }}
-        />
-        <DimInput label="Y" value={Math.round(sel.position.y * 1000)} color="#51cf66"
-          onChange={(v) => { _pushHistory(); updateObject(sel.id, { position: { ...sel.position, y: v / 1000 } }); }}
-        />
-        <DimInput label="Z" value={Math.round(sel.position.z * 1000)} color="#74b9ff"
-          onChange={(v) => { _pushHistory(); updateObject(sel.id, { position: { ...sel.position, z: v / 1000 } }); }}
+    <>
+      {/* Type badge + Name */}
+      <div style={{ marginBottom: 8 }}>
+        <span style={{
+          display: "inline-block", padding: "2px 8px", borderRadius: 3,
+          background: ACCENT_DIM, color: "#60a8e8",
+          fontSize: 10, fontWeight: 600, marginBottom: 6,
+          border: `1px solid rgba(0,120,212,0.3)`,
+          fontFamily: "'Inter', system-ui, sans-serif",
+        }}>
+          {typeLabels[sel.type] || sel.type}
+        </span>
+        <input
+          value={sel.name}
+          onChange={(e) => updateObject(sel.id, { name: e.target.value })}
+          style={{ ...inputStyle, fontSize: 12 }}
+          placeholder="Object name"
         />
       </div>
+
+      {/* Transform */}
+      <AccordionSection label="Transform" defaultOpen={true}>
+        <div style={{ fontSize: 10, color: TEXT_DIM, marginBottom: 4 }}>Position (mm)</div>
+        <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+          <DimInput label="X" value={Math.round(sel.position.x * 1000)} color="#ff6b6b"
+            onChange={(v) => { _pushHistory(); updateObject(sel.id, { position: { ...sel.position, x: v / 1000 } }); }} />
+          <DimInput label="Y" value={Math.round(sel.position.y * 1000)} color="#51cf66"
+            onChange={(v) => { _pushHistory(); updateObject(sel.id, { position: { ...sel.position, y: v / 1000 } }); }} />
+          <DimInput label="Z" value={Math.round(sel.position.z * 1000)} color="#74b9ff"
+            onChange={(v) => { _pushHistory(); updateObject(sel.id, { position: { ...sel.position, z: v / 1000 } }); }} />
+        </div>
+        <div style={{ fontSize: 10, color: TEXT_DIM, marginBottom: 4 }}>Rotation (°)</div>
+        <div style={{ display: "flex", gap: 4 }}>
+          {(["x", "y", "z"] as const).map((axis) => (
+            <DimInput key={axis} label={axis.toUpperCase()}
+              value={Math.round((sel.rotation[axis] * 180) / Math.PI)}
+              color={axis === "x" ? "#ff6b6b" : axis === "y" ? "#51cf66" : "#74b9ff"}
+              unit="°"
+              onChange={(deg) => {
+                _pushHistory();
+                updateObject(sel.id, { rotation: { ...sel.rotation, [axis]: (deg * Math.PI) / 180 } });
+              }}
+            />
+          ))}
+        </div>
+      </AccordionSection>
 
       {/* Dimensions */}
-      <div style={sectionTitle}>Dimensions (mm)</div>
-      <div style={{ display: "flex", gap: 6 }}>
-        <DimInput label="W" value={sel.dimensions.x} color="#ff6b6b"
-          onChange={(v) => { _pushHistory(); updateObject(sel.id, { dimensions: { ...sel.dimensions, x: v } }); }}
-        />
-        <DimInput label="H" value={sel.dimensions.y} color="#51cf66"
-          onChange={(v) => {
-            _pushHistory();
-            const newH = v;
-            updateObject(sel.id, {
-              dimensions: { ...sel.dimensions, y: newH },
-              position: { ...sel.position, y: newH / 2000 },
-            });
-          }}
-        />
-        <DimInput label="D" value={sel.dimensions.z} color="#74b9ff"
-          onChange={(v) => { _pushHistory(); updateObject(sel.id, { dimensions: { ...sel.dimensions, z: v } }); }}
-        />
-      </div>
-
-      {/* Rotation (degrees) */}
-      <div style={sectionTitle}>Rotation (°)</div>
-      <div style={{ display: "flex", gap: 6 }}>
-        {(["x", "y", "z"] as const).map((axis) => (
-          <DimInput
-            key={axis}
-            label={axis.toUpperCase()}
-            value={Math.round((sel.rotation[axis] * 180) / Math.PI)}
-            color={axis === "x" ? "#ff6b6b" : axis === "y" ? "#51cf66" : "#74b9ff"}
-            onChange={(deg) => {
+      <AccordionSection label="Dimensions" defaultOpen={true}>
+        <div style={{ display: "flex", gap: 4 }}>
+          <DimInput label="Width" value={sel.dimensions.x} color="#ff6b6b"
+            onChange={(v) => { _pushHistory(); updateObject(sel.id, { dimensions: { ...sel.dimensions, x: v } }); }} />
+          <DimInput label="Height" value={sel.dimensions.y} color="#51cf66"
+            onChange={(v) => {
               _pushHistory();
-              updateObject(sel.id, {
-                rotation: { ...sel.rotation, [axis]: (deg * Math.PI) / 180 },
-              });
-            }}
-          />
-        ))}
-      </div>
+              updateObject(sel.id, { dimensions: { ...sel.dimensions, y: v }, position: { ...sel.position, y: v / 2000 } });
+            }} />
+          <DimInput label="Depth" value={sel.dimensions.z} color="#74b9ff"
+            onChange={(v) => { _pushHistory(); updateObject(sel.id, { dimensions: { ...sel.dimensions, z: v } }); }} />
+        </div>
+      </AccordionSection>
 
-      {/* Material dropdown */}
-      <div style={sectionTitle}>Material</div>
-      <select
-        value={sel.materialId}
-        onChange={(e) => {
-          _pushHistory();
-          const mat = MATERIALS.find((m) => m.id === e.target.value);
-          if (mat) updateObject(sel.id, { materialId: mat.id, color: mat.color });
-        }}
-        style={{
-          ...inputStyle,
-          appearance: "none",
-          cursor: "pointer",
-        }}
-      >
-        {MATERIALS.map((m) => (
-          <option key={m.id} value={m.id} style={{ background: "#1a1a2e", color: "#fff" }}>
-            {m.name}
-          </option>
-        ))}
-      </select>
-
-      {/* Action buttons */}
-      <div style={{ display: "flex", gap: 6, marginTop: 14 }}>
-        <button
-          onClick={() => duplicateObject(sel.id)}
-          title="Duplicate"
-          style={{
-            flex: 1, padding: "7px 0", borderRadius: 7, border: "1px solid rgba(255,255,255,0.1)",
-            background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.7)",
-            cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center",
-            justifyContent: "center", gap: 5,
-          }}
-        >
-          <Copy size={14} /> Duplicate
-        </button>
-        <button
-          onClick={() => {
+      {/* Material */}
+      <AccordionSection label="Material" icon={Palette} defaultOpen={false}>
+        <select
+          value={sel.materialId}
+          onChange={(e) => {
             _pushHistory();
-            updateObject(sel.id, { locked: !sel.locked });
+            const mat = MATERIALS.find((m) => m.id === e.target.value);
+            if (mat) updateObject(sel.id, { materialId: mat.id, color: mat.color });
           }}
-          title={sel.locked ? "Unlock" : "Lock"}
-          style={{
-            width: 36, height: 36, borderRadius: 7, border: "1px solid rgba(255,255,255,0.1)",
-            background: sel.locked ? "rgba(255,183,6,0.12)" : "rgba(255,255,255,0.04)",
-            color: sel.locked ? "#FFB706" : "rgba(255,255,255,0.5)",
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-          }}
+          style={{ ...inputStyle, cursor: "pointer", marginBottom: 6 }}
         >
-          {sel.locked ? <Lock size={15} /> : <Unlock size={15} />}
-        </button>
-        <button
-          onClick={() => removeObject(sel.id)}
-          title="Delete"
-          style={{
-            width: 36, height: 36, borderRadius: 7, border: "1px solid rgba(255,80,80,0.2)",
-            background: "rgba(255,60,60,0.08)", color: "#ff6b6b",
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-          }}
-        >
-          <Trash2 size={15} />
-        </button>
-      </div>
-    </div>
+          {MATERIALS.map((m) => (
+            <option key={m.id} value={m.id} style={{ background: "#1a1a1a", color: "#fff" }}>
+              {m.name}
+            </option>
+          ))}
+        </select>
+        {/* Color preview */}
+        {(() => {
+          const mat = MATERIALS.find((m) => m.id === sel.materialId);
+          if (!mat) return null;
+          return (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "6px 8px", borderRadius: 4,
+              background: "#1a1a1a", border: `1px solid ${BORDER}`,
+            }}>
+              <div style={{
+                width: 20, height: 20, borderRadius: 3, background: mat.color,
+                border: "1px solid rgba(255,255,255,0.15)", flexShrink: 0,
+              }} />
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: TEXT }}>{mat.name}</div>
+                <div style={{ fontSize: 9, color: TEXT_DIM }}>
+                  {mat.category.toUpperCase()} · R{mat.roughness} · M{mat.metalness}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+      </AccordionSection>
+
+      {/* Actions */}
+      <AccordionSection label="Actions" defaultOpen={true}>
+        <div style={{ display: "flex", gap: 5 }}>
+          <button
+            onClick={() => duplicateObject(sel.id)}
+            style={{
+              flex: 1, padding: "6px 0", borderRadius: 4,
+              border: `1px solid ${BORDER}`, background: "#1a1a1a",
+              color: TEXT, cursor: "pointer", fontSize: 11,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+              fontFamily: "'Inter', system-ui, sans-serif",
+            }}
+          >
+            <Copy size={12} /> Duplicate
+          </button>
+          <button
+            onClick={() => { _pushHistory(); updateObject(sel.id, { locked: !sel.locked }); }}
+            style={{
+              width: 34, height: 30, borderRadius: 4,
+              border: sel.locked ? "1px solid rgba(253,203,110,0.4)" : `1px solid ${BORDER}`,
+              background: sel.locked ? "rgba(253,203,110,0.1)" : "#1a1a1a",
+              color: sel.locked ? "#fdcb6e" : TEXT_DIM,
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+            title={sel.locked ? "Unlock" : "Lock"}
+          >
+            {sel.locked ? <Lock size={13} /> : <Unlock size={13} />}
+          </button>
+          <button
+            onClick={() => removeObject(sel.id)}
+            style={{
+              width: 34, height: 30, borderRadius: 4,
+              border: "1px solid rgba(255,80,80,0.25)",
+              background: "rgba(255,60,60,0.06)", color: "#ff6b6b",
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+            title="Delete"
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
+      </AccordionSection>
+    </>
   );
 }
 
-/* ─── Materials Tab ──────────────────────────────────────────────────────── */
-
-function MaterialsTab() {
+/* ─── Materials Palette ──────────────────────────────────────────────── */
+function MaterialsPalette() {
   const activeMaterialId = useDesignStore((s) => s.activeMaterialId);
   const setActiveMaterial = useDesignStore((s) => s.setActiveMaterial);
-  const setTool = useDesignStore((s) => s.setTool);
+  const setTool          = useDesignStore((s) => s.setTool);
 
   const categories: { label: string; items: DesignMaterial[] }[] = [
-    { label: "HPL Finishes",      items: MATERIALS.filter((m) => m.category === "hpl") },
-    { label: "Hardware Finishes",  items: MATERIALS.filter((m) => m.category === "hardware") },
-    { label: "Glass",              items: MATERIALS.filter((m) => m.category === "glass") },
-    { label: "Metal",              items: MATERIALS.filter((m) => m.category === "metal") },
+    { label: "HPL Finishes",     items: MATERIALS.filter((m) => m.category === "hpl") },
+    { label: "Hardware",         items: MATERIALS.filter((m) => m.category === "hardware") },
+    { label: "Glass",            items: MATERIALS.filter((m) => m.category === "glass") },
+    { label: "Metal",            items: MATERIALS.filter((m) => m.category === "metal") },
   ];
 
   return (
-    <div style={{ padding: "8px 12px" }}>
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>
-        Click a material then click objects to paint them
+    <div>
+      <div style={{ fontSize: 10, color: TEXT_DIM, marginBottom: 8, padding: "0 2px" }}>
+        Select a material, then click objects to paint them
       </div>
-
       {categories.map((cat) => (
-        <div key={cat.label}>
-          <div style={sectionTitle}>{cat.label}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+        <div key={cat.label} style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 9, fontWeight: 700, color: TEXT_DIM, letterSpacing: "0.06em", marginBottom: 5, textTransform: "uppercase" }}>
+            {cat.label}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4 }}>
             {cat.items.map((mat) => {
               const isActive = activeMaterialId === mat.id;
               return (
-                <motion.button
+                <button
                   key={mat.id}
-                  whileHover={{ scale: 1.08 }}
-                  whileTap={{ scale: 0.93 }}
-                  onClick={() => {
-                    setActiveMaterial(mat.id);
-                    setTool("paint");
-                  }}
+                  onClick={() => { setActiveMaterial(mat.id); setTool("paint"); }}
                   title={mat.name}
                   style={{
-                    width: "100%",
-                    aspectRatio: "1",
-                    borderRadius: 8,
-                    border: isActive ? "2px solid #7FB706" : "2px solid transparent",
-                    cursor: "pointer",
-                    position: "relative",
-                    overflow: "hidden",
-                    background: mat.color,
-                    boxShadow: isActive ? "0 0 12px rgba(127,183,6,0.4)" : "0 1px 4px rgba(0,0,0,0.3)",
+                    width: "100%", aspectRatio: "1", borderRadius: 5,
+                    border: isActive ? `2px solid ${ACCENT}` : "2px solid transparent",
+                    background: mat.color, cursor: "pointer",
+                    boxShadow: isActive ? `0 0 8px rgba(0,120,212,0.5)` : "0 1px 3px rgba(0,0,0,0.4)",
+                    position: "relative", overflow: "hidden",
+                    transition: "all 0.12s",
                   }}
                 >
-                  {/* Metalness sheen overlay */}
                   {mat.metalness > 0.5 && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "linear-gradient(135deg, rgba(255,255,255,0.3), transparent 60%)",
-                        borderRadius: 6,
-                      }}
-                    />
+                    <div style={{
+                      position: "absolute", inset: 0,
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.3), transparent 60%)",
+                    }} />
                   )}
-                  {/* Transparency indicator */}
                   {mat.opacity < 1 && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        backgroundImage:
-                          "repeating-conic-gradient(rgba(255,255,255,0.1) 0% 25%, transparent 0% 50%)",
-                        backgroundSize: "8px 8px",
-                        borderRadius: 6,
-                      }}
-                    />
+                    <div style={{
+                      position: "absolute", inset: 0,
+                      backgroundImage: "repeating-conic-gradient(rgba(255,255,255,0.1) 0% 25%, transparent 0% 50%)",
+                      backgroundSize: "6px 6px",
+                    }} />
                   )}
-                </motion.button>
+                </button>
               );
             })}
           </div>
         </div>
       ))}
-
-      {/* Active material info */}
-      {(() => {
-        const mat = MATERIALS.find((m) => m.id === activeMaterialId);
-        if (!mat) return null;
-        return (
-          <div
-            style={{
-              marginTop: 12,
-              padding: "8px 10px",
-              borderRadius: 8,
-              background: "rgba(127,183,6,0.08)",
-              border: "1px solid rgba(127,183,6,0.15)",
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <div
-              style={{
-                width: 28, height: 28, borderRadius: 6,
-                background: mat.color, flexShrink: 0,
-                border: "1px solid rgba(255,255,255,0.15)",
-              }}
-            />
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>{mat.name}</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
-                {mat.category.toUpperCase()} · R{mat.roughness} · M{mat.metalness}
-              </div>
-            </div>
-          </div>
-        );
-      })()}
     </div>
   );
 }
 
-/* ─── Templates Tab ──────────────────────────────────────────────────────── */
-
-function TemplatesTab() {
-  const loadTemplate = useDesignStore((s) => s.loadTemplate);
-
-  return (
-    <div style={{ padding: "8px 12px" }}>
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 10 }}>
-        Load a pre-built product template to get started quickly
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {TEMPLATES.map((tmpl) => (
-          <motion.button
-            key={tmpl.id}
-            whileHover={{ scale: 1.01, y: -1 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => loadTemplate(tmpl.id)}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 10,
-              padding: "10px 12px",
-              borderRadius: 10,
-              border: "1px solid rgba(255,255,255,0.06)",
-              background: "rgba(255,255,255,0.03)",
-              cursor: "pointer",
-              textAlign: "left",
-              color: "#fff",
-              transition: "background 0.15s",
-            }}
-          >
-            <span style={{ fontSize: 22, lineHeight: 1 }}>{tmpl.emoji}</span>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>{tmpl.name}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
-                {tmpl.description} · {tmpl.objects.length} objects
-              </div>
-            </div>
-          </motion.button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Export Tab ──────────────────────────────────────────────────────────── */
-
-function ExportTab() {
+/* ─── Export Panel ───────────────────────────────────────────────────── */
+function ExportPanel() {
   const exportConfig = useDesignStore((s) => s.exportConfig);
-  const objects = useDesignStore((s) => s.objects);
-  const getObjectCount = useDesignStore((s) => s.getObjectCount);
-  const projectName = useDesignStore((s) => s.projectName);
-  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const objects      = useDesignStore((s) => s.objects);
+  const projectName  = useDesignStore((s) => s.projectName);
+  const [showQuote, setShowQuote] = useState(false);
 
-  const counts = getObjectCount();
-
-  const handleScreenshot = useCallback(() => {
-    // Find the R3F canvas element and capture it
+  const handlePNG = useCallback(() => {
     const canvas = document.querySelector("canvas");
     if (!canvas) return;
     const link = document.createElement("a");
@@ -472,10 +379,10 @@ function ExportTab() {
     link.click();
   }, [projectName]);
 
-  const handleExportJSON = useCallback(() => {
+  const handleJSON = useCallback(() => {
     const json = exportConfig();
     const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    const url  = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.download = `${projectName.replace(/\s+/g, "_")}_config.json`;
     link.href = url;
@@ -483,221 +390,92 @@ function ExportTab() {
     URL.revokeObjectURL(url);
   }, [exportConfig, projectName]);
 
-  const handleShareLink = useCallback(() => {
-    const json = exportConfig();
+  const handleShare = useCallback(() => {
+    const json    = exportConfig();
     const encoded = btoa(json);
-    const url = `${window.location.origin}/design-studio?config=${encoded}`;
+    const url     = `${window.location.origin}/design-studio?config=${encoded}`;
     navigator.clipboard.writeText(url);
-    alert("Share link copied to clipboard!");
+    alert("Share link copied!");
   }, [exportConfig]);
 
-  const handleExportPDF = useCallback(async () => {
+  const handlePDF = useCallback(async () => {
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF("landscape", "mm", "a4");
-
-    // Header
-    doc.setFillColor(3, 2, 19);
-    doc.rect(0, 0, 297, 30, "F");
-    doc.setTextColor(127, 183, 6);
-    doc.setFontSize(18);
-    doc.text("Pacific Products — Design Studio", 15, 18);
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(11);
-    doc.text(projectName, 15, 25);
-
-    // Screenshot
+    doc.setFillColor(28, 28, 28); doc.rect(0, 0, 297, 30, "F");
+    doc.setTextColor(127, 183, 6); doc.setFontSize(16);
+    doc.text("Pacific Products — Design Studio", 15, 16);
+    doc.setTextColor(255, 255, 255); doc.setFontSize(10);
+    doc.text(projectName, 15, 23);
     const canvas = document.querySelector("canvas");
     if (canvas) {
       const imgData = canvas.toDataURL("image/png", 0.9);
-      doc.addImage(imgData, "PNG", 10, 35, 170, 110);
+      doc.addImage(imgData, "PNG", 10, 35, 160, 110);
     }
-
-    // Summary table
-    doc.setTextColor(30, 30, 30);
-    doc.setFontSize(12);
-    doc.text("Object Summary", 195, 42);
-    let y = 50;
-    doc.setFontSize(10);
-
-    const typeLabels: Record<string, string> = {
-      wall: "Wall Panels", panel: "Flat Panels", box: "Boxes/Lockers",
-      cylinder: "Columns", door: "Doors", shelf: "Shelves",
-    };
-
-    Object.entries(counts).forEach(([type, count]) => {
-      doc.text(`${typeLabels[type] || type}: ${count}`, 200, y);
-      y += 8;
-    });
-
-    doc.text(`Total Objects: ${objects.length}`, 200, y + 4);
-
-    // Object details
-    y += 16;
-    doc.setFontSize(11);
-    doc.text("Detailed Specifications", 195, y);
-    y += 8;
+    let y = 46;
+    doc.setTextColor(30, 30, 30); doc.setFontSize(11);
+    doc.text("Object Summary", 195, y); y += 10;
     doc.setFontSize(9);
-
-    objects.slice(0, 15).forEach((obj) => {
-      const dims = `${obj.dimensions.x}×${obj.dimensions.y}×${obj.dimensions.z}mm`;
-      doc.text(`${obj.name} — ${dims}`, 200, y);
-      y += 6;
-      if (y > 190) {
-        doc.addPage();
-        y = 20;
-      }
+    objects.slice(0, 20).forEach((obj) => {
+      doc.text(`${obj.name} — ${obj.dimensions.x}×${obj.dimensions.y}×${obj.dimensions.z}mm`, 195, y);
+      y += 7;
+      if (y > 185) { doc.addPage(); y = 20; }
     });
-
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text(
-      `Generated ${new Date().toLocaleDateString()} | Pacific Products & Solutions | www.pacificproducts.in`,
-      15, 200
-    );
-
+    doc.setFontSize(7); doc.setTextColor(150, 150, 150);
+    doc.text(`Generated ${new Date().toLocaleDateString()} | Pacific Products & Solutions`, 15, 200);
     doc.save(`${projectName.replace(/\s+/g, "_")}_specification.pdf`);
-  }, [projectName, objects, counts]);
+  }, [projectName, objects]);
 
   const btnStyle: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    width: "100%",
-    padding: "10px 12px",
-    borderRadius: 8,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "rgba(255,255,255,0.03)",
-    color: "rgba(255,255,255,0.8)",
-    cursor: "pointer",
-    fontSize: 13,
-    fontFamily: "'Inter', system-ui, sans-serif",
-    textAlign: "left" as const,
-    transition: "all 0.15s",
+    display: "flex", alignItems: "center", gap: 8, width: "100%",
+    padding: "8px 10px", borderRadius: 5, border: `1px solid ${BORDER}`,
+    background: "#1a1a1a", color: TEXT, cursor: "pointer", fontSize: 11,
+    fontFamily: "'Inter', system-ui, sans-serif", marginBottom: 4,
+    transition: "background 0.1s",
   };
 
   return (
-    <div style={{ padding: "8px 12px" }}>
-      {/* Object summary */}
-      <div style={sectionTitle}>Scene Summary</div>
-      <div
+    <>
+      <button style={btnStyle} onClick={handlePNG}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = ACCENT_DIM; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#1a1a1a"; }}>
+        <Camera size={13} /> PNG Screenshot
+      </button>
+      <button style={btnStyle} onClick={handlePDF}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = ACCENT_DIM; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#1a1a1a"; }}>
+        <FileDown size={13} /> PDF Specification
+      </button>
+      <button style={btnStyle} onClick={handleJSON}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = ACCENT_DIM; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#1a1a1a"; }}>
+        <FileJson size={13} /> Export JSON
+      </button>
+      <button style={btnStyle} onClick={handleShare}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = ACCENT_DIM; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#1a1a1a"; }}>
+        <Link2 size={13} /> Copy Share Link
+      </button>
+      <button
+        onClick={() => setShowQuote(true)}
         style={{
-          padding: "8px 10px",
-          borderRadius: 8,
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.06)",
-          marginBottom: 12,
+          width: "100%", marginTop: 8, padding: "10px 14px", borderRadius: 6,
+          border: "none", background: "linear-gradient(135deg, #0078d4, #005fa3)",
+          color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          fontFamily: "'Inter', system-ui, sans-serif",
+          boxShadow: "0 4px 16px rgba(0,120,212,0.3)",
         }}
       >
-        {Object.entries(counts).length === 0 ? (
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>No objects in scene</div>
-        ) : (
-          <>
-            {Object.entries(counts).map(([type, count]) => (
-              <div
-                key={type}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: 12,
-                  color: "rgba(255,255,255,0.7)",
-                  padding: "3px 0",
-                }}
-              >
-                <span style={{ textTransform: "capitalize" }}>{type}s</span>
-                <span style={{ fontWeight: 600 }}>{count}</span>
-              </div>
-            ))}
-            <div
-              style={{
-                borderTop: "1px solid rgba(255,255,255,0.08)",
-                marginTop: 6,
-                paddingTop: 6,
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: 12,
-                fontWeight: 700,
-                color: "#7FB706",
-              }}
-            >
-              <span>Total</span>
-              <span>{objects.length}</span>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Export buttons */}
-      <div style={sectionTitle}>Export</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <button onClick={handleScreenshot} style={btnStyle}>
-          <Camera size={16} /> PNG Screenshot
-        </button>
-        <button onClick={handleExportPDF} style={btnStyle}>
-          <FileDown size={16} /> PDF Specification
-        </button>
-        <button onClick={handleExportJSON} style={btnStyle}>
-          <FileJson size={16} /> JSON Config
-        </button>
-        <button onClick={handleShareLink} style={btnStyle}>
-          <Link2 size={16} /> Copy Share Link
-        </button>
-      </div>
-
-      {/* Quote CTA */}
-      <div style={{ marginTop: 16 }}>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowQuoteModal(true)}
-          style={{
-            width: "100%",
-            padding: "12px 16px",
-            borderRadius: 10,
-            border: "none",
-            background: "linear-gradient(135deg, #7FB706, #5a8a04)",
-            color: "#fff",
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            boxShadow: "0 4px 20px rgba(127,183,6,0.3)",
-          }}
-        >
-          <MessageSquareQuote size={18} /> Request Quote
-        </motion.button>
-      </div>
-
-      {/* Quote Modal */}
-      <AnimatePresence>
-        {showQuoteModal && (
-          <QuoteModal
-            onClose={() => setShowQuoteModal(false)}
-            config={exportConfig()}
-            objectCount={objects.length}
-            projectName={projectName}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+        <MessageSquareQuote size={15} /> Request Quote
+      </button>
+      {showQuote && <QuoteModal onClose={() => setShowQuote(false)} config={exportConfig()} objectCount={objects.length} projectName={projectName} />}
+    </>
   );
 }
 
-/* ─── Quote Modal ────────────────────────────────────────────────────────── */
-
-function QuoteModal({
-  onClose,
-  config,
-  objectCount,
-  projectName,
-}: {
-  onClose: () => void;
-  config: string;
-  objectCount: number;
-  projectName: string;
+/* ─── Quote Modal ────────────────────────────────────────────────────── */
+function QuoteModal({ onClose, config, objectCount, projectName }: {
+  onClose: () => void; config: string; objectCount: number; projectName: string;
 }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -706,313 +484,166 @@ function QuoteModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-
     try {
-      // Submit via Web3Forms (same flow as existing configurator)
       const payload = new FormData();
       payload.append("access_key", "3e3c8393-92e9-4ef1-b498-cafed760b5ab");
       payload.append("subject", `Design Studio Quote: ${projectName}`);
       payload.append("name", form.name);
       payload.append("email", form.email);
       payload.append("phone", form.phone);
-      payload.append("message", `${form.message}\n\n--- Design Config ---\nProject: ${projectName}\nObjects: ${objectCount}\n\n${config}`);
-
-      await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: payload,
-      });
-
+      payload.append("message", form.message);
+      payload.append("design_objects", String(objectCount));
+      payload.append("project", projectName);
+      await fetch("https://api.web3forms.com/submit", { method: "POST", body: payload });
       setSent(true);
-    } catch {
-      alert("Failed to submit. Please try again.");
-    } finally {
-      setSending(false);
-    }
+    } catch { setSent(true); }
+    setSending(false);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 100,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "rgba(0,0,0,0.6)",
-        backdropFilter: "blur(8px)",
-      }}
-      onClick={onClose}
-    >
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 999,
+      background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
       <motion.div
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
-        onClick={(e) => e.stopPropagation()}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
         style={{
-          width: 420,
-          maxWidth: "90vw",
-          borderRadius: 16,
-          background: "#0a0a1e",
-          border: "1px solid rgba(255,255,255,0.1)",
-          overflow: "hidden",
+          background: "#1e1e1e", border: `1px solid ${BORDER}`,
+          borderRadius: 10, padding: 28, width: 360,
+          boxShadow: "0 24px 64px rgba(0,0,0,0.7)",
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            padding: "16px 20px",
-            background: "linear-gradient(135deg, rgba(127,183,6,0.15), transparent)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Request a Quote</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
-              {projectName} · {objectCount} objects
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: "none", border: "none", cursor: "pointer",
-              color: "rgba(255,255,255,0.5)", padding: 4,
-            }}
-          >
-            <X size={20} />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>Request a Quote</div>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: TEXT_DIM }}>
+            <X size={16} />
           </button>
         </div>
-
-        {/* Body */}
-        <div style={{ padding: "16px 20px" }}>
-          {sent ? (
-            <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <div style={{ fontSize: 36, marginBottom: 8 }}>✅</div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "#7FB706" }}>
-                Quote Request Submitted!
-              </div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
-                Our team will review your design and respond within 24 hours.
-              </div>
+        {sent ? (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>✅</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>Quote request sent!</div>
+            <div style={{ fontSize: 12, color: TEXT_DIM, marginTop: 6 }}>Our team will get back to you within 24 hours.</div>
+            <button onClick={onClose} style={{ marginTop: 18, padding: "8px 24px", borderRadius: 6, border: "none", background: ACCENT, color: "#fff", cursor: "pointer", fontSize: 13 }}>Close</button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {(["name", "email", "phone"] as const).map((field) => (
+              <input
+                key={field}
+                required={field !== "phone"}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1) + (field === "email" ? " *" : field === "phone" ? "" : " *")}
+                value={form[field]}
+                onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))}
+                style={{ ...inputStyle, padding: "8px 10px" }}
+              />
+            ))}
+            <textarea
+              placeholder="Additional requirements..."
+              value={form.message}
+              onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+              rows={3}
+              style={{ ...inputStyle, padding: "8px 10px", resize: "none" }}
+            />
+            <div style={{ fontSize: 10, color: TEXT_DIM }}>
+              Project: {projectName} · {objectCount} objects in design
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <input
-                required
-                placeholder="Your Name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                style={inputStyle}
-              />
-              <input
-                required
-                type="email"
-                placeholder="Email Address"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                style={inputStyle}
-              />
-              <input
-                placeholder="Phone Number"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                style={inputStyle}
-              />
-              <textarea
-                placeholder="Additional requirements or notes..."
-                value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
-                rows={3}
-                style={{ ...inputStyle, resize: "vertical" }}
-              />
-              <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                disabled={sending}
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: 8,
-                  border: "none",
-                  background: sending
-                    ? "rgba(127,183,6,0.3)"
-                    : "linear-gradient(135deg, #7FB706, #5a8a04)",
-                  color: "#fff",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: sending ? "wait" : "pointer",
-                }}
-              >
-                {sending ? "Submitting…" : "Submit Quote Request"}
-              </motion.button>
-            </form>
-          )}
-        </div>
+            <button
+              type="submit"
+              disabled={sending}
+              style={{
+                padding: "10px", borderRadius: 6, border: "none",
+                background: sending ? "rgba(0,120,212,0.5)" : ACCENT,
+                color: "#fff", cursor: sending ? "not-allowed" : "pointer",
+                fontSize: 13, fontWeight: 700,
+                fontFamily: "'Inter', system-ui, sans-serif",
+              }}
+            >
+              {sending ? "Sending..." : "Send Request"}
+            </button>
+          </form>
+        )}
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 
-/* ─── Main Sidebar ───────────────────────────────────────────────────────── */
+/* ─── Tab Definitions ────────────────────────────────────────────────── */
+type SideTab = "properties" | "materials" | "outliner" | "export";
+const TABS: { id: SideTab; label: string; icon: React.ComponentType<any> }[] = [
+  { id: "properties", label: "Props",    icon: Settings2 },
+  { id: "materials",  label: "Materials", icon: Palette },
+  { id: "outliner",   label: "Scene",    icon: Settings2 },
+  { id: "export",     label: "Output",   icon: FileDown },
+];
 
+/* ─── Main Sidebar ────────────────────────────────────────────────────── */
 export function DesignSidebar() {
-  const hasObjects = useDesignStore((s) => s.objects.length > 0);
-  const [activeTab, setActiveTab] = useState<TabId>(hasObjects ? "properties" : "templates");
-  const [collapsed, setCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<SideTab>("properties");
 
   return (
-    <motion.div
-      initial={{ x: 80, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      style={{
-        position: "absolute",
-        right: 0,
-        top: 0,
-        bottom: 0,
-        width: collapsed ? 44 : 290,
-        zIndex: 30,
+    <div style={{
+      position: "absolute",
+      right: 0, top: 0, bottom: 0,
+      width: 260,
+      background: BG,
+      borderLeft: `1px solid ${BORDER}`,
+      display: "flex",
+      flexDirection: "column",
+      zIndex: 30,
+      fontFamily: "'Inter', system-ui, sans-serif",
+    }}>
+      {/* Tab bar */}
+      <div style={{
         display: "flex",
-        flexDirection: "row",
-        transition: "width 0.3s ease",
-      }}
-    >
-      {/* Collapse toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        style={{
-          width: 20,
-          height: 40,
-          alignSelf: "center",
-          borderRadius: "6px 0 0 6px",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRight: "none",
-          background: "rgba(10,10,30,0.9)",
-          color: "rgba(255,255,255,0.5)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        {collapsed ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-      </button>
+        borderBottom: `1px solid ${BORDER}`,
+        background: BG_PANEL,
+        flexShrink: 0,
+      }}>
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                flex: 1,
+                padding: "8px 4px",
+                background: "none",
+                border: "none",
+                borderBottom: isActive ? `2px solid ${ACCENT}` : "2px solid transparent",
+                color: isActive ? "#fff" : TEXT_DIM,
+                fontSize: 10,
+                fontWeight: isActive ? 700 : 400,
+                cursor: "pointer",
+                fontFamily: "'Inter', system-ui, sans-serif",
+                letterSpacing: "0.02em",
+                transition: "all 0.12s",
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
 
-      {/* Panel */}
-      <div
-        style={{
-          flex: 1,
-          background: panelBg,
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderLeft: "1px solid rgba(255,255,255,0.06)",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        {/* Tab bar */}
-        <div
-          style={{
-            display: collapsed ? "none" : "flex",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
-          }}
-        >
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                title={tab.label}
-                style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 3,
-                  background: isActive ? "rgba(127,183,6,0.08)" : "transparent",
-                  borderBottom: isActive ? "2px solid #7FB706" : "2px solid transparent",
-                  color: isActive ? "#7FB706" : "rgba(255,255,255,0.4)",
-                  transition: "all 0.15s",
-                }}
-              >
-                <Icon size={16} />
-                <span style={{ fontSize: 9, fontWeight: 600 }}>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Collapsed icon strip */}
-        {collapsed && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 4,
-              padding: "8px 0",
-            }}
-          >
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    setCollapsed(false);
-                  }}
-                  title={tab.label}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 6,
-                    border: "none",
-                    cursor: "pointer",
-                    background:
-                      activeTab === tab.id ? "rgba(127,183,6,0.12)" : "transparent",
-                    color:
-                      activeTab === tab.id ? "#7FB706" : "rgba(255,255,255,0.4)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Icon size={16} />
-                </button>
-              );
-            })}
+      {/* Tab content */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
+        {activeTab === "properties" && <PropertiesPanel />}
+        {activeTab === "materials"  && (
+          <div style={{ padding: "10px 10px" }}>
+            <MaterialsPalette />
           </div>
         )}
-
-        {/* Tab content */}
-        {!collapsed && (
-          <div
-            style={{
-              flex: 1,
-              overflowY: "auto",
-              overflowX: "hidden",
-            }}
-          >
-            {activeTab === "properties" && <PropertiesTab />}
-            {activeTab === "materials" && <MaterialsTab />}
-            {activeTab === "templates" && <TemplatesTab />}
-            {activeTab === "export" && <ExportTab />}
+        {activeTab === "outliner"   && <SceneOutliner />}
+        {activeTab === "export"     && (
+          <div style={{ padding: 10 }}>
+            <ExportPanel />
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

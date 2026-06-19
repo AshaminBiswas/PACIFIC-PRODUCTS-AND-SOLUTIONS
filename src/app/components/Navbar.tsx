@@ -83,7 +83,6 @@ export function Navbar() {
           { name: "Others", path: "/solutions?industry=Others" }
         ],
     },
-    { name: "3D Design Studio", path: "/design-studio" },
     { name: "Gallery", path: "/gallery" },
     { name: "Contact", path: "/contact" },
   ];

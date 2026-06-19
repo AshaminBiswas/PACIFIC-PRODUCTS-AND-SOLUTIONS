@@ -22,7 +22,10 @@ export type ToolType =
   | "draw_door"
   | "draw_shelf"
   | "paint"
-  | "eraser";
+  | "eraser"
+  | "measure"
+  | "text_annotation"
+  | "draw_line";
 
 export type CameraPreset = "front" | "top" | "side" | "perspective";
 
@@ -60,6 +63,20 @@ export interface DrawState {
   isDrawing: boolean;
   drawStart: Vec3 | null;
   drawPreview: Vec3 | null;
+}
+
+export interface DesignLayer {
+  id: string;
+  name: string;
+  visible: boolean;
+  locked: boolean;
+  color: string;
+}
+
+export interface MeasureResult {
+  start: Vec3;
+  end: Vec3;
+  distance: number; // in mm
 }
 
 /* ─── Pre‑built Materials Library ────────────────────────────────────────── */
@@ -267,6 +284,201 @@ export const TEMPLATES: DesignTemplate[] = [
   },
 ];
 
+export interface LibraryComponent {
+  id: string;
+  name: string;
+  category: "Restroom Cubicles" | "Locker Systems" | "Partitions & Screens" | "Cladding & Wall Panels" | "Hardware & Accessories";
+  type: ObjectType;
+  emoji: string;
+  description: string;
+  dimensions: Vec3;
+  materialId: string;
+  rotation?: Vec3;
+}
+
+export const COMPONENT_LIBRARY: LibraryComponent[] = [
+  // Restroom Cubicles
+  {
+    id: "cubicle_pilaster",
+    name: "Front Pilaster Panel",
+    category: "Restroom Cubicles",
+    type: "wall",
+    emoji: "🧱",
+    description: "Vertical HPL pilaster support panel",
+    dimensions: { x: 300, y: 2000, z: 18 },
+    materialId: "hpl_cream",
+  },
+  {
+    id: "cubicle_divider",
+    name: "Stall Divider Panel",
+    category: "Restroom Cubicles",
+    type: "panel",
+    emoji: "📋",
+    description: "Deep divider partition panel for stalls",
+    dimensions: { x: 1500, y: 1800, z: 12 },
+    materialId: "hpl_cream",
+  },
+  {
+    id: "cubicle_door",
+    name: "Stall Door",
+    category: "Restroom Cubicles",
+    type: "door",
+    emoji: "🚪",
+    description: "Standard restroom stall door with hinges",
+    dimensions: { x: 750, y: 1750, z: 18 },
+    materialId: "hpl_sage",
+  },
+  {
+    id: "cubicle_corner_post",
+    name: "Corner Post / Column",
+    category: "Restroom Cubicles",
+    type: "cylinder",
+    emoji: "💈",
+    description: "Stainless steel circular support post",
+    dimensions: { x: 50, y: 2000, z: 50 },
+    materialId: "stainless",
+  },
+
+  // Locker Systems
+  {
+    id: "locker_box_std",
+    name: "Standard Locker Box",
+    category: "Locker Systems",
+    type: "box",
+    emoji: "🔒",
+    description: "Standard 400x500x450mm HPL locker box",
+    dimensions: { x: 400, y: 500, z: 450 },
+    materialId: "hpl_charcoal",
+  },
+  {
+    id: "locker_box_tall",
+    name: "Tall Slim Locker",
+    category: "Locker Systems",
+    type: "box",
+    emoji: "🗄️",
+    description: "Single column tall slim locker compartment",
+    dimensions: { x: 300, y: 900, z: 450 },
+    materialId: "hpl_navy",
+  },
+  {
+    id: "locker_bench",
+    name: "Locker Room Bench",
+    category: "Locker Systems",
+    type: "box",
+    emoji: "🪵",
+    description: "Oak wood locker room bench with steel frame",
+    dimensions: { x: 1200, y: 450, z: 400 },
+    materialId: "hpl_oak",
+  },
+  {
+    id: "locker_stand",
+    name: "Locker Stand Base",
+    category: "Locker Systems",
+    type: "box",
+    emoji: "🪜",
+    description: "Elevated stand base for locker banks",
+    dimensions: { x: 1200, y: 150, z: 450 },
+    materialId: "stainless",
+  },
+
+  // Partitions & Screens
+  {
+    id: "partition_urinal_hpl",
+    name: "Urinal Screen (HPL)",
+    category: "Partitions & Screens",
+    type: "wall",
+    emoji: "🚻",
+    description: "Wall-hung solid HPL urinal screen",
+    dimensions: { x: 450, y: 900, z: 18 },
+    materialId: "hpl_sage",
+  },
+  {
+    id: "partition_urinal_glass",
+    name: "Urinal Screen (Glass)",
+    category: "Partitions & Screens",
+    type: "wall",
+    emoji: "🪟",
+    description: "Wall-hung frosted glass urinal screen",
+    dimensions: { x: 450, y: 900, z: 12 },
+    materialId: "glass_frosted",
+  },
+  {
+    id: "partition_office_divider",
+    name: "Office Partition Screen",
+    category: "Partitions & Screens",
+    type: "wall",
+    emoji: "🏢",
+    description: "Freestanding office acoustic screen divider",
+    dimensions: { x: 1200, y: 1400, z: 24 },
+    materialId: "hpl_sage",
+  },
+
+  // Cladding & Wall Panels
+  {
+    id: "cladding_hpl_wood",
+    name: "Exterior Wood Cladding",
+    category: "Cladding & Wall Panels",
+    type: "wall",
+    emoji: "🧱",
+    description: "Exterior HPL cladding panel wood grain",
+    dimensions: { x: 1220, y: 2440, z: 12 },
+    materialId: "hpl_oak",
+  },
+  {
+    id: "cladding_accent_navy",
+    name: "Interior Accent Panel",
+    category: "Cladding & Wall Panels",
+    type: "wall",
+    emoji: "🟦",
+    description: "Decorative deep navy wall panel",
+    dimensions: { x: 600, y: 1200, z: 10 },
+    materialId: "hpl_navy",
+  },
+  {
+    id: "cladding_fluted",
+    name: "Fluted Charcoal Panel",
+    category: "Cladding & Wall Panels",
+    type: "wall",
+    emoji: "🪵",
+    description: "Vertical fluted charcoal wall panel",
+    dimensions: { x: 300, y: 2400, z: 18 },
+    materialId: "hpl_charcoal",
+  },
+
+  // Hardware & Accessories
+  {
+    id: "hw_grab_bar",
+    name: "Grab Bar (600mm)",
+    category: "Hardware & Accessories",
+    type: "cylinder",
+    emoji: "🦯",
+    description: "Stainless steel safety grab bar",
+    dimensions: { x: 32, y: 600, z: 32 },
+    materialId: "stainless",
+    rotation: { x: Math.PI / 2, y: 0, z: 0 },
+  },
+  {
+    id: "hw_support_leg",
+    name: "Support Leg (150mm)",
+    category: "Hardware & Accessories",
+    type: "cylinder",
+    emoji: "🦶",
+    description: "Adjustable stainless support pedestal",
+    dimensions: { x: 40, y: 150, z: 40 },
+    materialId: "stainless",
+  },
+  {
+    id: "hw_headrail",
+    name: "Top Headrail Bar",
+    category: "Hardware & Accessories",
+    type: "box",
+    emoji: "➖",
+    description: "Top headrail structural bar (2m)",
+    dimensions: { x: 2000, y: 40, z: 30 },
+    materialId: "stainless",
+  },
+];
+
 /* ─── Store Interface ────────────────────────────────────────────────────── */
 
 interface HistorySnapshot {
@@ -297,8 +509,19 @@ interface DesignState {
   // Project
   projectName: string;
 
+  // Cursor & Command
+  cursorPos: Vec3;
+  commandHistory: string[];
+  activeCommand: string;
+  measureResult: MeasureResult | null;
+
+  // Layers
+  layers: DesignLayer[];
+  activeLayerId: string;
+
   // Actions
   addObject: (obj: Omit<DesignObject, "id">) => void;
+  addComponent: (presetId: string) => void;
   removeObject: (id: string) => void;
   updateObject: (id: string, patch: Partial<DesignObject>) => void;
   duplicateObject: (id: string) => void;
@@ -325,6 +548,20 @@ interface DesignState {
   toggleSnapToGrid: () => void;
   toggleShowGrid: () => void;
   toggleShowDimensions: () => void;
+
+  // Cursor & Command
+  setCursorPos: (pos: Vec3) => void;
+  pushCommand: (cmd: string) => void;
+  setActiveCommand: (cmd: string) => void;
+  executeCommand: (cmd: string) => void;
+  setMeasureResult: (r: MeasureResult | null) => void;
+
+  // Layers
+  addLayer: (name: string) => void;
+  removeLayer: (id: string) => void;
+  toggleLayerVisibility: (id: string) => void;
+  toggleLayerLock: (id: string) => void;
+  setActiveLayer: (id: string) => void;
 
   // Project
   setProjectName: (name: string) => void;
@@ -385,6 +622,19 @@ export const useDesignStore = create<DesignState>((set, get) => ({
 
   projectName: "Untitled Design",
 
+  cursorPos: { x: 0, y: 0, z: 0 },
+  commandHistory: ["Welcome to Pacific Design Studio — AutoCAD Edition", "Type commands below or use the ribbon toolbar"],
+  activeCommand: "",
+  measureResult: null,
+
+  layers: [
+    { id: "layer_0", name: "Layer 0", visible: true, locked: false, color: "#ffffff" },
+    { id: "layer_walls", name: "Walls", visible: true, locked: false, color: "#74b9ff" },
+    { id: "layer_doors", name: "Doors", visible: true, locked: false, color: "#55efc4" },
+    { id: "layer_fixtures", name: "Fixtures", visible: true, locked: false, color: "#fdcb6e" },
+  ],
+  activeLayerId: "layer_0",
+
   /* ── Helpers ──────────────────────────────────────────────────────────── */
 
   snap: (v: number) => {
@@ -417,6 +667,26 @@ export const useDesignStore = create<DesignState>((set, get) => ({
       selectedId: id,
       future: [],
     }));
+  },
+
+  addComponent: (presetId) => {
+    const preset = COMPONENT_LIBRARY.find((c) => c.id === presetId);
+    if (!preset) return;
+    const defaults = TYPE_DEFAULTS[preset.type];
+    const mat = MATERIALS.find((m) => m.id === preset.materialId) || MATERIALS[0];
+    
+    get().addObject({
+      type: preset.type,
+      name: preset.name,
+      position: { x: 0, y: preset.dimensions.y / 2000, z: 0 },
+      rotation: preset.rotation || { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+      dimensions: { ...preset.dimensions },
+      materialId: mat.id,
+      color: mat.color,
+      locked: false,
+      visible: true,
+    });
   },
 
   removeObject: (id) => {
@@ -581,6 +851,75 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   toggleSnapToGrid: () => set((s) => ({ snapToGrid: !s.snapToGrid })),
   toggleShowGrid: () => set((s) => ({ showGrid: !s.showGrid })),
   toggleShowDimensions: () => set((s) => ({ showDimensions: !s.showDimensions })),
+
+  /* ── Cursor & Command ────────────────────────────────────────────── */
+
+  setCursorPos: (pos) => set({ cursorPos: pos }),
+
+  pushCommand: (cmd) => set((s) => ({
+    commandHistory: [...s.commandHistory.slice(-49), cmd],
+  })),
+
+  setActiveCommand: (cmd) => set({ activeCommand: cmd }),
+
+  executeCommand: (cmd) => {
+    const upper = cmd.trim().toUpperCase();
+    const { setTool, setCameraPreset, clearAll, undo, redo, toggleShowGrid, toggleSnapToGrid, toggleShowDimensions, pushCommand } = get();
+    pushCommand(`> ${cmd}`);
+    const toolMap: Record<string, any> = {
+      SELECT: "select", MOVE: "move", ROTATE: "rotate", SCALE: "scale",
+      WALL: "draw_wall", PANEL: "draw_panel", BOX: "draw_box",
+      COLUMN: "draw_cylinder", CYLINDER: "draw_cylinder",
+      DOOR: "draw_door", SHELF: "draw_shelf",
+      PAINT: "paint", ERASE: "eraser", MEASURE: "measure",
+    };
+    if (toolMap[upper]) { setTool(toolMap[upper]); pushCommand(`Active tool: ${toolMap[upper]}`); return; }
+    if (upper === "TOP" || upper === "PLAN") { setCameraPreset("top"); return; }
+    if (upper === "FRONT" || upper === "ELEVATION") { setCameraPreset("front"); return; }
+    if (upper === "SIDE") { setCameraPreset("side"); return; }
+    if (upper === "3D" || upper === "PERSPECTIVE") { setCameraPreset("perspective"); return; }
+    if (upper === "CLEAR" || upper === "NEW") { clearAll(); pushCommand("Scene cleared"); return; }
+    if (upper === "U" || upper === "UNDO") { undo(); pushCommand("Undo"); return; }
+    if (upper === "REDO") { redo(); pushCommand("Redo"); return; }
+    if (upper === "GRID") { toggleShowGrid(); return; }
+    if (upper === "SNAP") { toggleSnapToGrid(); return; }
+    if (upper === "DIM" || upper === "DIMVIS") { toggleShowDimensions(); return; }
+    if (upper === "HELP") {
+      pushCommand("Commands: SELECT, MOVE, ROTATE, SCALE, WALL, BOX, DOOR, PANEL, COLUMN, SHELF, PAINT, ERASE, MEASURE, TOP, FRONT, SIDE, 3D, GRID, SNAP, DIM, UNDO, REDO, CLEAR");
+      return;
+    }
+    pushCommand(`Unknown command: "${cmd}". Type HELP for a list.`);
+  },
+
+  setMeasureResult: (r) => set({ measureResult: r }),
+
+  /* ── Layers ──────────────────────────────────────────────────────── */
+
+  addLayer: (name) => {
+    const id = `layer_${Date.now()}`;
+    set((s) => ({ layers: [...s.layers, { id, name, visible: true, locked: false, color: "#a8e6cf" }] }));
+  },
+
+  removeLayer: (id) => {
+    set((s) => ({
+      layers: s.layers.filter((l) => l.id !== id),
+      activeLayerId: s.activeLayerId === id ? "layer_0" : s.activeLayerId,
+    }));
+  },
+
+  toggleLayerVisibility: (id) => {
+    set((s) => ({
+      layers: s.layers.map((l) => l.id === id ? { ...l, visible: !l.visible } : l),
+    }));
+  },
+
+  toggleLayerLock: (id) => {
+    set((s) => ({
+      layers: s.layers.map((l) => l.id === id ? { ...l, locked: !l.locked } : l),
+    }));
+  },
+
+  setActiveLayer: (id) => set({ activeLayerId: id }),
 
   /* ── Project ─────────────────────────────────────────────────────────── */
 

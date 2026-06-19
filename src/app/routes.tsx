@@ -257,14 +257,14 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
-  {
+  ...(import.meta.env.DEV ? [{
     path: "/design-studio",
     element: (
       <Suspense fallback={<PageSkeleton />}>
         <ProductDesigner />
       </Suspense>
     ),
-  },
+  }] : []),
   {
     path: "/admin",
     element: (

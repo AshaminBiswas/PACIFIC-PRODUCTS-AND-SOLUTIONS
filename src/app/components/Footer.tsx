@@ -37,6 +37,7 @@ export function Footer() {
     { name: "Testimonials", path: "/testimonials" },
     { name: "Careers", path: "/careers" },
     { name: "Blog", path: "/blog" },
+    ...(import.meta.env.DEV ? [{ name: "3D Design Studio", path: "/design-studio" }] : []),
   ];
 
   const locationLinks = [
